@@ -397,6 +397,18 @@ function resoudreSpecial(sp, a) {
     log("Le Majles a voté et le Conseil des gardiens laisse passer.", "pos");
     return true;
   }
+  if (type === "coalition") {
+    const seuil = sp.seuil || regles().seuilVote || 200;
+    if (a.voix < seuil) {
+      S.soutien = Math.round(clamp(S.soutien - 20, 60, 500));
+      appliquerEffet({ popularite: -3, tensionSociale: 6 }, {});
+      log(`La coalition ne suit pas (${a.voix} voix, seuil ${seuil}). Le gouvernement se fragilise.`, "neg", [{ qui: "Partenaires de coalition", texte: "« Sans nos voix, il n'y a pas de majorité. »" }]);
+      if (isBrowser) render();
+      return false;
+    }
+    log(`La coalition tient (${a.voix} voix). Le texte passe.`, "pos");
+    return true;
+  }
   if (type === "parti") {
     log(sp.texte || "La direction du Parti tranche. L'assemblée plénière enregistre.", "");
     appliquerClause({ cause: "Décision du centre du Parti", immediat: { popularite: -0.5 }, reactions: [{ qui: "Assemblée nationale populaire", texte: "« Le vote est un enregistrement, pas un veto. »" }] });
