@@ -148,6 +148,7 @@ function analyse(d) {
   r.voix = Math.round(clamp(S.soutien + (g > 0 ? g * 1.2 : g * 0.3) + (dr > 0 ? dr : dr * 0.5), 120, 420));
   r.solde = r.dRec - r.dDep;
   r.populariteTVA = -(t.TVA - S.taux.TVA) * 3;
+  if (regles().soldePlancher != null && r.solde < regles().soldePlancher) r.cc.push(regles().texteSolde || "La règle budgétaire bloque un creusement de cette ampleur.");
   return r;
 }
 function appliquerEffet(e, deltas) {
