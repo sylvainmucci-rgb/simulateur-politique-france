@@ -26,11 +26,30 @@ let D = tablePays()[idDemande() || "fr"] || tablePays().fr;
 function cleSauvegarde() { return !D || D.id === "fr" || !D.id ? KEY_FR : "statecraft_" + D.id + "_v1"; }
 function regles() { return (D && D.regles) || { seuilVote: 200, seuilCensure: 170, special: { type: "493", label: "Engager le 49.3" }, garde: "Conseil constitutionnel", rejet: "Le 49.3 reste possible." }; }
 function monnaie() { return (D && D.monnaie) || { unite: "Md€", taux: "OAT 10 ans", tauxCourt: "OAT", banque: "BCE" }; }
-function candidatsActifs() { return (D && (D.candidats || D.candidats2027)) || []; }
-function dateElection() { return (D && D.election && D.election.date) || "2027-04-12"; }
+function candidatsActifs() {
+  if (S && S.urne && S.urne.length) return S.urne;
+  return (D && (D.candidats || D.candidats2027)) || [];
+}
+function scrutinCourant() {
+  if (S && S.scrutin && S.scrutin.date) return S.scrutin;
+  return (D && D.election) || { date: "2027-04-12", label: "Élection", type: "presidentielle" };
+}
+function dateElection() { return scrutinCourant().date || "2027-04-12"; }
+const TYPE_REGIME = { fr: "semi", us: "presidentiel", ru: "presidentiel", br: "presidentiel", il: "parlementaire", ir: "guide", cn: "parti", de: "parlementaire", gb: "parlementaire", in: "parlementaire", it: "parlementaire", jp: "parlementaire", ca: "parlementaire", mx: "presidentiel", es: "parlementaire", tr: "presidentiel" };
+function typeRegime() {
+  if (D && D.institutions && D.institutions.type) return D.institutions.type;
+  return TYPE_REGIME[D && D.id] || "parlementaire";
+}
+function idsPays() {
+  const t = tablePays() || {};
+  const ordre = (typeof CARRIERE !== "undefined" && CARRIERE.ordre) || ["us", "gb", "ru", "br", "il", "ir", "de", "cn", "in", "fr"];
+  const ids = ordre.filter(id => t[id]);
+  Object.keys(t).forEach(id => { if (ids.indexOf(id) < 0) ids.push(id); });
+  return ids;
+}
 function nomIndic(k) { if (k === "oat10") return monnaie().tauxCourt || monnaie().taux; return NOMS[k] || k; }
 
-let S = null, view = "dash", timer = null;
+let S = null, view = "dash", timer = null, enCreation = false;
 
 function parseDate(iso) { const [y, m, d] = iso.split("-").map(Number); return new Date(Date.UTC(y, m - 1, d)); }
 function isoDate(d) { return d.toISOString().slice(0, 10); }
@@ -87,7 +106,7 @@ function syncCalendrier() {
   S.tri = Math.floor((+S.date.slice(5, 7) - 1) / 3) + 1;
 }
 
-function nouvelle() {
+function nouvelle(perso) {
   S = {
     date: DEBUT, annee: D.debut.annee, tri: D.debut.trimestre, tour: 0,
     e: { ...D.eco }, taux: { ...D.taux }, dep: { ...D.depenses }, rec: { ...D.recettes },
@@ -102,6 +121,7 @@ function nouvelle() {
     regime: regimeInitial()
   };
   log(D.intro || "Vous prenez vos fonctions. Chaque décision laissera une ligne au journal, et chaque pas de temps un récapitulatif.", "neg");
+  poserPerso(perso || persoIncumbent());
   appliquerActuJusqua();
   snap();
   if (isBrowser) { sauver(true); render(); }
@@ -110,10 +130,17 @@ function nouvelle() {
 
 /* ---------- Décisions : effets immédiats et différés, rattachés à une cause ---------- */
 function regimeInitial() {
-  return { parlement: "normal", decrets: false, article16: false, ordonnances: false, constitution: "V", ric: false, votations: false, proportionnelle: false, senat: true, euro: true, ue: true, revision: null, democratieLocale: false, coup: 4, crise: 6, sanctions: 0, semaines16: 0, derniereDissolution: null };
+  const t = typeRegime();
+  const constitution = t === "semi" ? "V" : (t === "presidentiel" ? "présidentiel" : t === "parlementaire" ? "parlementaire" : t === "guide" ? "Guide" : t === "parti" ? "parti" : t);
+  return { parlement: "normal", decrets: false, article16: false, ordonnances: false, constitution, ric: false, votations: false, proportionnelle: false, senat: t !== "parti", euro: t === "semi" || (D && D.monnaie && D.monnaie.banque === "BCE"), ue: t === "semi" || (D && D.monnaie && D.monnaie.banque === "BCE"), revision: null, democratieLocale: false, coup: 4, crise: 6, sanctions: 0, semaines16: 0, derniereDissolution: null };
 }
 function assurerRegime() { if (S && !S.regime) S.regime = regimeInitial(); }
 function appliquerRupture(id) {
+  if (S.executif === false) {
+    log("Sans l'exécutif, une rupture de régime n'est pas à votre main. La carrière passe par la campagne et les élections.", "neg");
+    if (isBrowser) render();
+    return { ok: false, raison: "sans exécutif" };
+  }
   assurerRegime();
   const r = (D.ruptures || []).find(x => x.id === id);
   if (!r) return { ok: false, raison: "Option inconnue." };
@@ -410,6 +437,11 @@ function poserRecapDecision(titre, resultats) {
   S.recap = { du: S.date, au: S.date, pas: "décision", pause: null, titre, lignes, residual: {}, avant: photo(), apres: photo(), decision: true };
 }
 function voter() {
+  if (S.executif === false) {
+    log("Vous n'avez pas l'exécutif. Meetings, alliances et investiture sont dans Carrière. Une élection peut vous y mener.", "neg");
+    if (isBrowser) render();
+    return { ok: false, raison: "sans exécutif" };
+  }
   if (!S.draft) draftInit();
   const d = S.draft, a = analyse(d);
   if (a.cc.length) {
@@ -434,6 +466,8 @@ function voter() {
   } else if (!resoudreSpecial(R.special || { type: "493" }, a)) return { ok: false };
   const cs = clausesDuTexte(d);
   const resultats = cs.map(appliquerClause);
+  const frott = frottement(d);
+  if (frott) resultats.push(frott);
   S.taux = { ...d.taux };
   S.ret.ageLegal = d.age;
   if (d.smic) S.smic *= 1 + d.smic / 100;
@@ -530,6 +564,7 @@ function resoudreSpecial(sp, a) {
   return false;
 }
 function deciderBouclier() {
+  if (S.executif === false) return { ok: false, raison: "sans exécutif" };
   const on = !S.bouclier;
   S.bouclier = on;
   const r = appliquerClause({
@@ -542,6 +577,7 @@ function deciderBouclier() {
   if (isBrowser) render();
 }
 function deciderFlex() {
+  if (S.executif === false) return { ok: false, raison: "sans exécutif" };
   if (S.flexUE) return { ok: false };
   S.flexUE = 1;
   const ok = Math.random() < 0.6;
@@ -586,22 +622,23 @@ function pasMacro(q) {
   g += rnd(-0.15, 0.15) * q;
   e.croissanceT = g / Math.max(q, 0.01);
   e.croissance = clamp(e.croissance * (1 - 0.25 * q) + (g / Math.max(q, 0.01) * 4) * (0.25 * q), -6, 8);
-  e.inflation = clamp(e.inflation + ((2 - e.inflation) * 0.06 + (g / Math.max(q, 0.01) - 0.25) * 0.12) * q + rnd(-0.08, 0.08) * q - (S.bouclier ? 0.08 * q : 0), -1, 15);
+  e.inflation = clamp(e.inflation + ((2 - e.inflation) * 0.06 + (g / Math.max(q, 0.01) - 0.25) * 0.12) * q + rnd(-0.08, 0.08) * q - (S.bouclier ? 0.08 * q : 0), -2, Math.max(15, (D.eco.inflation || 3) * 1.8));
   const smicRef = (D.smic && D.smic.brutMensuel) || S.smic || 1;
   e.chomage = clamp(e.chomage + (-0.35 * ((g / Math.max(q, 0.01) * 4) - 1) / 4 + (S.smic / smicRef - 1) * 0.5 / 4) * q + rnd(-0.05, 0.05) * q, 3, 25);
   const gTrim = g / Math.max(q, 0.01);
   const nom = (gTrim * q + Math.max(-0.4, e.inflation) / 4 * q) / 100;
-  e.pibMd = clamp(e.pibMd * (1 + nom), 1500, 8000);
+  e.pibMd = clamp(e.pibMd * (1 + nom), Math.min(1500, D.eco.pibMd * 0.4), Math.max(8000, D.eco.pibMd * 2.5));
   for (const k in S.rec) S.rec[k] = Math.max(0, S.rec[k] * (1 + nom * 1.05));
   for (const k in S.dep) if (k !== "interets") S.dep[k] = Math.max(0, S.dep[k] * (1 + Math.max(0, e.inflation) / 400 * 0.9 * q));
   if (S.ret.ageLegal < 62.75) S.dep.retraites += 0.5 * q;
   S.dep.emploi = Math.max(20, S.dep.emploi + (e.chomage - 8.5) * 0.3 * q);
   const spread = clamp(0.15 + 0.035 * (e.dettePct - 100) + 0.18 * (e.deficitPct - 3) + (60 - e.confianceMarches) * 0.015 + S.greve * 0.004, 0.2, 6);
-  const oatCible = clamp(D.eco.bund10 + (S.bce - 2) * 0.6 + spread, 0.5, 12);
-  e.oat10 = clamp(e.oat10 + (oatCible - e.oat10) * 0.35 * q, 0.3, 14);
+  const oatPlafond = Math.max(14, (D.eco.oat10 || 4) * 2.5);
+  const oatCible = clamp(D.eco.bund10 + (S.bce - 2) * 0.6 + spread, 0.5, oatPlafond);
+  e.oat10 = clamp(e.oat10 + (oatCible - e.oat10) * 0.35 * q, 0.05, oatPlafond);
   S.dep.interets = Math.max(0, S.dep.interets + (e.oat10 / 100 * e.detteMd - S.dep.interets) * 0.03 * q);
   majSolde();
-  e.detteMd = clamp(e.detteMd + (-(totRec() - totDep())) / 4 * q, 0, 20000);
+  e.detteMd = clamp(e.detteMd + (-(totRec() - totDep())) / 4 * q, 0, Math.max(20000, D.eco.detteMd * 3));
   e.dettePct = e.detteMd / e.pibMd * 100;
   e.confianceMarches = clamp(e.confianceMarches + ((e.deficitPct < 5 ? 1.5 : -1) + (e.dettePct > 125 ? -2 : 0)) * q, 0, 100);
   S.greve = clamp(S.greve * (1 - 0.4 * q), 0, 100);
@@ -678,7 +715,7 @@ function pasJours(n, sac) {
     sac.push({ cause: "Semestre européen", statut: "échéance", deltas: {}, important: true, texte: titre });
     log(titre, "neg");
   }
-  if (!S.elu && S.date >= dateElection()) {
+  if (S.date >= dateElection() && S.dernierScrutin !== dateElection()) {
     election();
     sac.push({ cause: "Présidentielle 2027", statut: "échéance", deltas: {}, important: true, texte: `Présidentielle : ${S.elu.gagnant} est élu(e).` });
   }
@@ -773,28 +810,236 @@ function pasContraintes(q) {
   }
   if (c.commerce && c.commerce.tarifs) S.e.croissance = clamp(S.e.croissance - c.commerce.tarifs * 0.01 * q, -6, 8);
 }
+const ROLES = [
+  { id: "president", label: "Président", detail: "Chef de l'État. L'exécutif, seulement si le régime le lui donne." },
+  { id: "premier", label: "Premier ministre", detail: "Chef du gouvernement. L'exécutif dans un régime parlementaire ou semi-présidentiel." },
+  { id: "depute", label: "Député", detail: "Vous siégez. Pas de budget tant que vous n'avez pas une majorité ou gagné une élection." },
+  { id: "chef", label: "Chef de parti", detail: "Vous menez une formation. Campagne, alliances, puis scrutin ou investiture." },
+  { id: "citoyen", label: "Citoyen", detail: "Vous fondez un mouvement. Meetings et alliances avant toute élection." }
+];
+const IDEOLOGIES = [
+  { id: "gauche", label: "Gauche" },
+  { id: "ecolo", label: "Écologiste" },
+  { id: "centre", label: "Centre" },
+  { id: "liberal", label: "Libéral" },
+  { id: "droite", label: "Droite" },
+  { id: "souverainiste", label: "Souverainiste" }
+];
+const TRAITS = [
+  { id: "orateur", label: "Orateur", detail: "Les meetings rapportent davantage." },
+  { id: "gestionnaire", label: "Gestionnaire", detail: "Les marchés encaissent mieux un ajustement." },
+  { id: "tribune", label: "Tribune", detail: "La rue vous suit. Les marchés s'en méfient." },
+  { id: "negociateur", label: "Négociateur", detail: "Une alliance apporte plus de sièges." },
+  { id: "rigoriste", label: "Rigoriste", detail: "Couper une dépense vous coûte moins." },
+  { id: "social", label: "Social", detail: "Dépenser pour le social vous rapporte plus." }
+];
+function labelRole(id) { const r = ROLES.find(x => x.id === id); return r ? r.label : (id || ""); }
+function labelIdeo(id) { const r = IDEOLOGIES.find(x => x.id === id); return r ? r.label : (id || ""); }
+function executifDuRole(role) {
+  const t = typeRegime();
+  if (role === "citoyen" || role === "depute" || role === "chef") return false;
+  if (role === "premier") return t === "parlementaire" || t === "semi";
+  if (role === "president") return t !== "parlementaire";
+  return false;
+}
+function figuresPays() {
+  if (D && D.personnalites && D.personnalites.length) return D.personnalites;
+  const pack = (typeof CARRIERE !== "undefined" && CARRIERE.figures && CARRIERE.figures[D.id]) || [];
+  return pack;
+}
+function persoIncumbent() {
+  const figs = figuresPays();
+  const inc = figs.find(p => p.defaut) || figs.find(p => p.role === "president" || p.role === "premier") || null;
+  if (inc) return { origine: "reel", programme: { fiscal: "stable", social: "stable", institutions: "statut" }, traits: [], ...inc };
+  const c = ((D && (D.candidats || D.candidats2027)) || []).find(x => x.joueur) || { n: "Vous", p: "Majorité", base: 20 };
+  const t = typeRegime();
+  return { origine: "reel", nom: c.n, parti: c.p, ideologie: "centre", role: t === "parlementaire" ? "premier" : "president", traits: [], popularite: D.eco.popularite, programme: { fiscal: "stable", social: "stable", institutions: "statut" }, defaut: true };
+}
+function poserPerso(perso) {
+  const def = persoIncumbent();
+  const p = perso || def;
+  const meme = p.nom === def.nom && p.role === def.role && p.parti === def.parti && p.origine !== "cree";
+  S.perso = {
+    nom: p.nom, parti: p.parti, ideologie: p.ideologie || "centre", role: p.role, traits: (p.traits || []).slice(0, 2),
+    origine: p.origine || "reel", programme: p.programme || { fiscal: "stable", social: "stable", institutions: "statut" },
+    assise: p.role === "citoyen" ? 4 : (meme ? 12 : 10), alliances: [], prochainMeeting: S.date
+  };
+  S.executif = executifDuRole(S.perso.role);
+  S.urne = urneDe(S.perso);
+  if (!meme) {
+    if (p.popularite) S.e.popularite = clamp(p.popularite, 5, 75);
+    if (!S.executif) S.soutien = soutienDeDepart(S.perso);
+  }
+  const poste = labelRole(S.perso.role);
+  const main = S.executif ? "Vous avez l'exécutif : les décisions sont les vôtres, même loin de votre étiquette." : "Vous n'avez pas l'exécutif. La carrière (meetings, alliances, investiture, élections) est le chemin.";
+  log(`${S.perso.nom}, ${poste}, ${S.perso.parti}. ${main}`, "");
+  S.journal.unshift({ date: S.date, texte: `${S.perso.nom} (${S.perso.parti}, ${labelIdeo(S.perso.ideologie)}) commence comme ${poste}. ${main}`, statut: "carrière", prevus: [], decisionDate: S.date });
+}
+function urneDe(perso) {
+  const src = ((D && (D.candidats || D.candidats2027)) || []).map(c => ({ ...c, joueur: false }));
+  let trouve = src.find(c => c.n === perso.nom);
+  if (!trouve) {
+    const base = perso.role === "citoyen" ? 2 : (perso.role === "depute" ? 6 : 10);
+    trouve = { n: perso.nom, p: perso.parti, base, c: "#f5b700", joueur: true };
+    src.push(trouve);
+  }
+  src.forEach(c => { c.joueur = c.n === perso.nom; });
+  return src;
+}
+function soutienDeDepart(perso) {
+  if (perso.role === "citoyen") return 22;
+  const groupes = (D.politique && D.politique.assemblee) || [];
+  const g = groupes.find(x => x.p === perso.parti || (perso.parti && (x.p.indexOf(perso.parti) >= 0 || perso.parti.indexOf(x.p) >= 0)));
+  if (perso.role === "depute") return g ? Math.max(30, Math.round(g.s * 0.25)) : 35;
+  return g ? Math.max(40, Math.round(g.s * 0.55)) : 48;
+}
+function ideoGroupe(nom) {
+  const n = (nom || "").toLowerCase();
+  if (/écolog|vert|green|sansei/.test(n)) return "ecolo";
+  if (/\brn\b|rassemblement|reform|afd|souverain|lega|likoud|bjp|akp|mhp|fratelli/.test(n)) return "souverainiste";
+  if (/lfi|insoumis|\bps\b|social|travaill|démocrat|democrat|morena|chp|sumar|npd|réformateur|centrist|psoe|parti démocrate|yesh/.test(n)) return "gauche";
+  if (/horizon|libéral|liberal|renew|forza/.test(n)) return "liberal";
+  if (/conserv|républicain|\blr\b|\bpp\b|cdu|vox|ishin|pld|pouvoir/.test(n)) return "droite";
+  if (/renaissance|ensemble|centre|macron|libéraux/.test(n)) return "centre";
+  return "centre";
+}
+function distanceIdeo(a, b) {
+  const ordre = ["gauche", "ecolo", "centre", "liberal", "droite", "souverainiste"];
+  const ia = ordre.indexOf(a), ib = ordre.indexOf(b);
+  if (ia < 0 || ib < 0) return 2;
+  return Math.abs(ia - ib);
+}
+function seuilInvestiture() {
+  const base = (D.politique && D.politique.soutienBase) || 200;
+  return Math.round(base * 0.72);
+}
+function actionMeeting() {
+  if (!S || !S.perso) return { ok: false, raison: "Pas de personnage." };
+  if (S.perso.prochainMeeting && S.date < S.perso.prochainMeeting) return { ok: false, raison: "Le prochain meeting est possible à partir du " + fmtCourt(S.perso.prochainMeeting) + "." };
+  const traits = S.perso.traits || [];
+  const pop = traits.indexOf("orateur") >= 0 ? 3 : 2;
+  const marche = traits.indexOf("tribune") >= 0 ? -1 : 0;
+  appliquerEffet({ popularite: pop, tensionSociale: 1, confianceMarches: marche }, {});
+  S.perso.assise = (S.perso.assise || 0) + (traits.indexOf("orateur") >= 0 ? 5 : 3);
+  if (!S.executif) S.soutien = Math.round(clamp(S.soutien + 5, 10, 450));
+  const j = (S.urne || []).find(c => c.joueur);
+  if (j) j.base = (j.base || 0) + (traits.indexOf("orateur") >= 0 ? 0.8 : 0.45);
+  S.perso.prochainMeeting = addDays(S.date, 14);
+  const texte = `Meeting de ${S.perso.nom} → popularité +${pop} pt${S.executif ? "" : ", assise parlementaire +" + 5}. Prochain meeting le ${fmtCourt(S.perso.prochainMeeting)}.`;
+  S.journal.unshift({ date: S.date, texte, statut: "carrière", prevus: [], decisionDate: S.date });
+  log(texte, "pos", [{ qui: S.perso.parti, texte: "« La salle était pleine. Ce n'est pas encore une majorité. »" }]);
+  if (isBrowser) render();
+  return { ok: true };
+}
+function actionAlliance(parti) {
+  if (!S || !S.perso) return { ok: false, raison: "Pas de personnage." };
+  const groupes = (D.politique && D.politique.assemblee) || [];
+  const g = groupes.find(x => x.p === parti);
+  if (!g) return { ok: false, raison: "Groupe introuvable." };
+  if ((S.perso.alliances || []).indexOf(parti) >= 0) return { ok: false, raison: "Alliance déjà conclue." };
+  if (parti === S.perso.parti) return { ok: false, raison: "C'est déjà votre formation." };
+  const dist = distanceIdeo(S.perso.ideologie, ideoGroupe(parti));
+  const nego = (S.perso.traits || []).indexOf("negociateur") >= 0;
+  const part = dist <= 1 ? 0.5 : dist === 2 ? 0.32 : dist === 3 ? 0.16 : 0.08;
+  const gain = Math.max(4, Math.round(g.s * part * (nego ? 1.25 : 1)));
+  S.perso.alliances.push(parti);
+  S.soutien = Math.round(clamp(S.soutien + gain, 10, 480));
+  const pop = dist >= 3 ? -2 : dist === 2 ? -1 : 0;
+  if (pop) appliquerEffet({ popularite: pop, tensionSociale: dist }, {});
+  const texte = `Alliance avec ${parti} → +${gain} d'assise dans le modèle${pop ? ", popularité " + pop + " pt" : ""}. Écart idéologique : ${dist}.`;
+  S.journal.unshift({ date: S.date, texte, statut: "carrière", prevus: [], decisionDate: S.date });
+  log(texte, dist >= 3 ? "neg" : "pos", [{ qui: parti, texte: dist >= 3 ? "« On vote avec vous sur un texte, pas sur un programme. »" : "« L'accord tient si le texte reste dans le cadre. »" }]);
+  if (isBrowser) render();
+  return { ok: true, gain };
+}
+function actionInvestiture() {
+  if (!S || !S.perso) return { ok: false, raison: "Pas de personnage." };
+  if (S.executif) return { ok: false, raison: "Vous avez déjà l'exécutif." };
+  const t = typeRegime();
+  if (t === "presidentiel" || t === "guide") return { ok: false, raison: "Dans ce régime, l'Assemblée ne fait pas le chef de l'exécutif. Il faut gagner l'élection." };
+  const seuil = seuilInvestiture();
+  if (S.soutien < seuil) return { ok: false, raison: "Assise " + S.soutien + ". Le modèle en demande " + seuil + " pour former un gouvernement." };
+  S.executif = true;
+  S.perso.role = "premier";
+  S.soutien = Math.max(S.soutien, (D.politique && D.politique.soutienBase) || S.soutien);
+  const texte = `${S.perso.nom} est investi${t === "semi" ? " à la tête du gouvernement" : ""}. L'exécutif est à vous. Le programme affiché ne vous lie pas : vous en payez l'écart.`;
+  S.journal.unshift({ date: S.date, texte, statut: "carrière", prevus: [], decisionDate: S.date });
+  log(texte, "pos", [{ qui: "Parlement", texte: "« La confiance est votée. Elle se retire de la même façon. »" }]);
+  if (isBrowser) render();
+  return { ok: true };
+}
+function appliquerResultatElectoral(joueurGagne, type) {
+  const t = typeRegime();
+  const base = (D.politique && D.politique.soutienBase) || 200;
+  const parlementaire = t === "parlementaire" || t === "semi";
+  if (type === "legislatives" && !parlementaire) {
+    S.soutien = Math.round(clamp(S.soutien + (joueurGagne ? 25 : -30), 40, 450));
+    return;
+  }
+  if (joueurGagne) {
+    S.executif = true;
+    S.perso.role = (type === "presidentielle" && t !== "parlementaire") ? "president" : "premier";
+    S.soutien = Math.round(base);
+    S.e.popularite = clamp(S.e.popularite + 4, 5, 75);
+    return;
+  }
+  if (type === "presidentielle" && t === "parlementaire") return;
+  S.executif = false;
+  if (S.perso) S.perso.role = "chef";
+  S.soutien = Math.round(clamp(S.soutien * 0.45, 20, 180));
+  S.e.popularite = clamp(S.e.popularite - 6, 5, 75);
+  S.fini = false;
+}
+function frottement(d) {
+  if (!S.perso || !d) return null;
+  const id = S.perso.ideologie;
+  const prog = S.perso.programme || {};
+  const traits = S.perso.traits || [];
+  let pop = 0, conf = 0, tension = 0;
+  const vals = Object.keys(d.dep || {}).map(k => d.dep[k]);
+  const baisse = vals.some(v => v <= -4);
+  const hausse = vals.some(v => v >= 4);
+  const ageHausse = S.ret && d.age > S.ret.ageLegal + 0.2;
+  const taxeHausse = (d.taux && S.taux) && (d.taux.TVA > S.taux.TVA + 0.2 || d.taux.IR > S.taux.IR + 4);
+  const taxeBaisse = (d.taux && S.taux) && (d.taux.TVA < S.taux.TVA - 0.2 || d.taux.IR < S.taux.IR - 4);
+  if ((id === "gauche" || id === "ecolo" || prog.social === "depenses") && (baisse || ageHausse)) { pop -= 3; tension += 4; }
+  if ((id === "liberal" || id === "droite" || prog.fiscal === "baisse") && (hausse || taxeHausse)) { conf -= 2; pop -= 1; }
+  if ((id === "gauche" || prog.social === "depenses") && hausse) pop += 1;
+  if (id === "souverainiste" && taxeBaisse) pop += 1;
+  if (traits.indexOf("rigoriste") >= 0 && baisse) pop += 1;
+  if (traits.indexOf("social") >= 0 && hausse) pop += 1;
+  if (traits.indexOf("gestionnaire") >= 0 && conf < 0) conf += 1;
+  if (traits.indexOf("tribune") >= 0 && pop > 0) { pop += 1; conf -= 1; }
+  if (!pop && !conf && !tension) return null;
+  return appliquerClause({
+    cause: `Ligne affichée (${labelIdeo(id)}) : votre décision s'en écarte ou s'y tient`,
+    immediat: { popularite: pop, confianceMarches: conf, tensionSociale: tension },
+    reactions: [{ qui: S.perso.parti, texte: "« On vous jugera sur l'écart entre le programme annoncé et le texte voté. Rien ne vous interdisait de voter autrement. »" }]
+  });
+}
 function election() {
+  const tenu = scrutinCourant();
   const c = candidatsActifs().map(x => ({ ...x }));
   const pj = c.find(x => x.joueur);
   c.forEach(x => { const b = partiBiais(x.p); if (b) x.base = (x.base || 0) + b; });
-  if (pj) pj.base = clamp((pj.base || 20) * 0.5 + (S.e.popularite - 20) * 0.45 + (S.e.croissance > 1 ? 3 : 0) - Math.max(0, S.e.chomage - 6) * 0.8, 2, 70);
+  if (pj) pj.base = clamp((pj.base || 20) * 0.5 + (S.e.popularite - 20) * 0.45 + ((S.perso && !S.executif) ? (S.perso.assise || 0) * 0.15 : 0) + (S.e.croissance > 1 ? 3 : 0) - Math.max(0, S.e.chomage - 6) * 0.8, 2, 70);
   c.forEach(x => { x.s = Math.max(0.5, x.base + rnd(-2.5, 2.5)); });
-  const t = c.reduce((a, b) => a + b.s, 0);
+  const t = c.reduce((a, b) => a + b.s, 0) || 1;
   c.forEach(x => { x.s = x.s / t * 100; });
   c.sort((a, b) => b.s - a.s);
   const [a, b] = c;
-  const famille = (D.election && D.election.familleFavorisee) || "RN";
+  const famille = tenu.familleFavorisee || "RN";
   const r2a = a.p === famille ? clamp(48 + (S.e.tensionSociale - 50) * 0.1 - (b.joueur ? (S.e.popularite - 30) * 0.15 : 0) + rnd(-3, 3), 35, 68) : (a.joueur ? clamp(47 + (S.e.popularite - 40) * 0.25, 42, 64) : 54);
   const gagnant = r2a > 50 ? a : b;
-  const type = (D.election && D.election.type) || "presidentielle";
-  S.elu = { t1: c, finale: [a, b], r2: [r2a, 100 - r2a], gagnant: gagnant.n, type };
-  if (type === "legislatives") {
-    S.fini = false;
-    S.soutien = Math.round(clamp(S.soutien + (gagnant.joueur ? 15 : -35), 80, 450));
-  } else S.fini = D.election && D.election.finSiDefaite === false ? false : !gagnant.joueur;
-  const texte = `${(D.election && D.election.label) || "Présidentielle"} : ${gagnant.n} arrive en tête avec ${f1(Math.max(r2a, 100 - r2a))} % au second tour du modèle.`;
+  const type = tenu.type || "presidentielle";
+  S.elu = { t1: c, finale: [a, b], r2: [r2a, 100 - r2a], gagnant: gagnant.n, type, joueur: !!(gagnant && gagnant.joueur) };
+  appliquerResultatElectoral(!!(gagnant && gagnant.joueur), type);
+  const suite = tenu.suite || { date: addMonths(tenu.date, (type === "legislatives" ? 4 : 5) * 12), label: tenu.label || "Élection suivante", type, familleFavorisee: famille };
+  S.dernierScrutin = tenu.date;
+  S.scrutin = suite;
+  const texte = `${tenu.label || "Élection"} : ${gagnant.n} arrive en tête avec ${f1(Math.max(r2a, 100 - r2a))} % au second tour du modèle. ${S.executif ? "Vous avez l'exécutif." : "Vous restez dans l'opposition : la campagne continue."}`;
   S.journal.unshift({ date: S.date, texte, statut: "échéance", decisionDate: null });
-  log(texte, gagnant.joueur ? "pos" : "neg");
+  log(texte, gagnant && gagnant.joueur ? "pos" : "neg");
   view = "elec";
   arreterLecture();
 }
@@ -856,7 +1101,7 @@ const nw = n => `<div class="news ${esc(n.c)}"><span class=k>${esc(n.d)}</span> 
 function page(html) { $("#main").innerHTML = htmlRecap() + htmlAVenir() + html; }
 function render() {
   if (!isBrowser) return;
-  if (!S) { renderChoix(); return; }
+  if (!S) { if (enCreation) renderCreation(); else renderChoix(); return; }
   document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.v === view));
   const quand = fmtDate(S.date);
   const dateEl = $("#date"), horloge = $("#horloge");
@@ -870,6 +1115,7 @@ function render() {
   if (vit && document.activeElement !== vit) vit.value = String(S.vitesse || 2);
   const e = S.e;
   if (view === "dash") page(`<p class=note>Sovereign — ${esc(D.nom)}. Situation simulée au ${esc(quand)}. ${esc(D.bandeau || "Les chiffres de départ sont documentés dans Sources.")}</p>
+    ${S.perso ? `<div class=card><b>${esc(S.perso.nom)}</b> — ${esc(labelRole(S.perso.role))}, ${esc(S.perso.parti)}, ${esc(labelIdeo(S.perso.ideologie))}. ${S.executif ? "<span class=good>Exécutif : vous faites votre politique.</span>" : "<span class=warn>Pas d'exécutif : la campagne est dans Carrière.</span>"} <span class=note>Traits : ${esc((S.perso.traits || []).join(", ") || "aucun")}. Programme annoncé : fiscal ${esc((S.perso.programme || {}).fiscal || "stable")}, social ${esc((S.perso.programme || {}).social || "stable")}, institutions ${esc((S.perso.programme || {}).institutions || "statut")}.</span></div>` : ""}
     <div class=grid>${kpi("Croissance", f1(e.croissance) + " %", e.croissance < 0.5 ? "bad" : "good")}${kpi("Inflation", f1(e.inflation) + " %", e.inflation > 3 ? "bad" : "")}
     ${kpi("Chômage", f1(e.chomage) + " %", e.chomage > 8 ? "bad" : "")}${kpi("Dette", f1(e.dettePct) + " %", e.dettePct > 100 ? "bad" : "")}${kpi("Déficit", f1(e.deficitPct) + " %", e.deficitPct > 3 ? "bad" : "good")}
     ${kpi(monnaie().taux, f1(e.oat10) + " %", e.oat10 > 4 ? "bad" : "")}${kpi("Popularité", f0(e.popularite) + " %", e.popularite < 30 ? "bad" : "")}
@@ -883,6 +1129,7 @@ function render() {
     ${S.regime ? kpi("Rupture d'appareil", f0(S.regime.coup) + "/100", S.regime.coup > 40 ? "bad" : "") : ""}</div>
     <h2>Évolution</h2><div class=grid style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">${[["pib", "Croissance (%)"], ["chomage", "Chômage (%)"], ["inflation", "Inflation (%)"], ["dette", "Dette (% PIB)"], ["deficit", "Déficit (%)"], ["pop", "Popularité (%)"]].map(([k, l]) => `<div class=card><div class=k>${l}</div><canvas data-h="${k}"></canvas></div>`).join("")}</div>
     <h2>Dernières nouvelles</h2>${S.news.slice(0, 4).map(nw).join("")}`);
+  if (view === "vie") renderCarriere();
   if (view === "dec") renderDec();
   if (view === "regime") renderRegime();
   if (view === "prog") renderProgrammes();
@@ -905,6 +1152,11 @@ function render() {
   drawCharts();
 }
 function renderDec() {
+  if (S.executif === false) {
+    page(`<h2>Décisions</h2><p class=note>${esc(S.perso ? S.perso.nom : "Vous")} n'a pas l'exécutif. Le budget, les textes et les ruptures se débloquent après une investiture ou une élection gagnée. Votre ligne politique ne vous est pas imposée : une fois au pouvoir, vous votez ce que vous voulez, et l'écart avec le programme annoncé a un coût.</p><p><button type=button id=versVie>Aller à la carrière</button></p>`);
+    const b = $("#versVie"); if (b) b.onclick = () => { view = "vie"; render(); };
+    return;
+  }
   if (!S.draft) draftInit();
   const d = S.draft, a = analyse(d);
   const sl = (lab, path, min, max, step, val, txt) => `<div class=row><label>${lab}</label><input type=range min=${min} max=${max} step=${step} value=${val} data-p="${path}"><b>${txt}</b></div>`;
@@ -1036,31 +1288,101 @@ function renderActu() {
     return `<div class=news><span class=k>${esc(it.date)}</span> — <b>${esc(it.evenement)}</b> <span class="badge ${passe ? "est" : "modele"}">${passe ? "Déjà dans la partie" : "Pas encore atteint"}</span><p>${esc(it.resume)}</p>${(it.propositions || []).length ? `<ul class=propre>${it.propositions.map(p => `<li>${esc(p)}</li>`).join("")}</ul>` : ""}<p class=note>${esc(it.source)}</p></div>`;
   }).join(""));
 }
+function renderCarriere() {
+  const p = S.perso || {};
+  const seuil = seuilInvestiture();
+  const groupes = ((D.politique && D.politique.assemblee) || []).filter(g => g.p !== p.parti);
+  const t = typeRegime();
+  const investiturePossible = t !== "presidentiel" && t !== "guide";
+  page(`<h2>Carrière</h2>
+    <div class=card><b>${esc(p.nom || "")}</b> — ${esc(labelRole(p.role))} · ${esc(p.parti || "")} · ${esc(labelIdeo(p.ideologie))}
+    <p>${S.executif ? "Vous dirigez. Les décisions de l'onglet Décisions sont libres." : "Vous n'avez pas le budget. Un meeting toutes les deux semaines, des alliances, puis l'investiture ou l'élection."}</p>
+    <p>Assise du modèle : <b>${f0(S.soutien)}</b>${investiturePossible && !S.executif ? ` · investiture à partir de ${seuil}` : ""}. Meetings : assise de campagne ${f0(p.assise || 0)}. ${p.prochainMeeting && S.date < p.prochainMeeting ? `Prochain meeting le ${esc(fmtCourt(p.prochainMeeting))}.` : "Un meeting est possible maintenant."}</p>
+    <p class=note>Alliances déjà nouées : ${esc((p.alliances || []).join(", ") || "aucune")}. Prochain scrutin : ${esc(fmtCourt(dateElection()))}, ${esc(scrutinCourant().label || "")}.</p>
+    <button type=button id=meeting ${p.prochainMeeting && S.date < p.prochainMeeting ? "disabled" : ""}>Tenir un meeting</button>
+    ${investiturePossible ? `<button type=button id=invest ${S.executif || S.soutien < seuil ? "disabled" : ""}>Demander l'investiture</button>` : "<p class=note>Dans ce régime, l'Assemblée ne nomme pas le chef de l'exécutif. Le chemin passe par l'élection.</p>"}
+    </div>
+    <h2>Alliances</h2>
+    <p class=note>Le rapprochement est une règle du modèle, pas une négociation réelle. Plus les lignes sont éloignées, moins l'appoint est solide.</p>
+    ${groupes.map(g => `<div class=card><b>${esc(g.p)}</b> — ${g.s} sièges · ligne du modèle : ${esc(labelIdeo(ideoGroupe(g.p)))}
+      <div><button type=button data-all="${esc(g.p)}" ${(p.alliances || []).indexOf(g.p) >= 0 ? "disabled" : ""}>${(p.alliances || []).indexOf(g.p) >= 0 ? "Déjà allié" : "Proposer une alliance"}</button></div></div>`).join("")}`);
+  const m = $("#meeting"); if (m) m.onclick = () => actionMeeting();
+  const inv = $("#invest"); if (inv) inv.onclick = () => { const r = actionInvestiture(); if (!r.ok && isBrowser) modal("Investiture", `<p>${esc(r.raison || "")}</p>`); };
+  document.querySelectorAll("[data-all]").forEach(b => b.onclick = () => actionAlliance(b.dataset.all));
+}
+function renderCreation() {
+  const figs = figuresPays();
+  const partis = ((D.politique && D.politique.assemblee) || []).map(g => g.p);
+  const t = typeRegime();
+  const cartes = figs.map(f => `<button type=button class="card choix" data-fig="${esc(f.nom)}"><b>${esc(f.nom)}</b><br><span class=note>${esc(labelRole(f.role))} · ${esc(f.parti)} · ${esc(labelIdeo(f.ideologie))}</span></button>`).join("");
+  $("#main").innerHTML = `<h2>Qui incarnez-vous ?</h2>
+    <p class=note>${esc(D.nom)}. ${esc((D.fiche && D.fiche.resume) || "")} Les personnalités réelles perdent la dernière lettre de leur nom. Un personnage créé garde le nom que vous écrivez. Le programme annoncé ne vous interdit aucune décision : il a un coût si vous vous en écartez. Régime du modèle : ${esc(t)}.</p>
+    <h2>Personnalités</h2><div class="choices">${cartes}</div>
+    <h2>Créer un personnage</h2>
+    <div class=card>
+      <div class=row><label>Nom</label><input id=cnom type=text maxlength=48 placeholder="Votre nom"></div>
+      <div class=row><label>Parti</label><select id=cparti><option value="">Nouveau parti</option>${partis.map(p => `<option>${esc(p)}</option>`).join("")}</select></div>
+      <div class=row><label>Nom du nouveau parti</label><input id=cnpart type=text maxlength=48 placeholder="Si vous n'en choisissez pas un existant"></div>
+      <div class=row><label>Idéologie</label><select id=cido>${IDEOLOGIES.map(i => `<option value="${i.id}">${esc(i.label)}</option>`).join("")}</select></div>
+      <div class=row><label>Départ</label><select id=crole>${ROLES.map(r => `<option value="${r.id}">${esc(r.label)} — ${esc(r.detail)}</option>`).join("")}</select></div>
+      <div class=row><label>Fiscal</label><select id=cfis><option value=baisse>Baisser les prélèvements</option><option value=stable selected>Tenir le cap</option><option value=hausse>Financer par l'impôt</option></select></div>
+      <div class=row><label>Social</label><select id=csoc><option value=coupes>Réduire la dépense sociale</option><option value=stable selected>Tenir le cap</option><option value=depenses>Dépenser davantage</option></select></div>
+      <div class=row><label>Institutions</label><select id=cinst><option value=statut selected>Statu quo</option><option value=reforme>Réforme</option><option value=rupture>Rupture</option></select></div>
+      <p>Deux traits au plus.</p>
+      ${TRAITS.map(tr => `<label class=note><input type=checkbox value="${tr.id}" data-trait> ${esc(tr.label)} — ${esc(tr.detail)}</label><br>`).join("")}
+      <p><button type=button id=cgo class=primary>Fonder la partie</button></p>
+    </div>`;
+  document.querySelectorAll("[data-fig]").forEach(b => b.onclick = () => {
+    const f = figs.find(x => x.nom === b.dataset.fig);
+    if (!f) return;
+    enCreation = false;
+    nouvelle({ ...f, origine: "reel", traits: f.traits || [], programme: { fiscal: "stable", social: "stable", institutions: "statut" } });
+    view = "dash";
+    render();
+  });
+  const go = $("#cgo");
+  if (go) go.onclick = () => {
+    const nom = ($("#cnom").value || "").trim();
+    if (nom.length < 2) { modal("Personnage", "<p>Indiquez un nom d'au moins deux lettres.</p>"); return; }
+    const partiSel = $("#cparti").value;
+    const parti = partiSel || ($("#cnpart").value || "").trim() || "Mouvement";
+    const traits = [];
+    document.querySelectorAll("[data-trait]").forEach(c => { if (c.checked && traits.length < 2) traits.push(c.value); });
+    enCreation = false;
+    nouvelle({
+      origine: "cree", nom, parti, nouveau: !partiSel, ideologie: $("#cido").value, role: $("#crole").value, traits,
+      programme: { fiscal: $("#cfis").value, social: $("#csoc").value, institutions: $("#cinst").value },
+      popularite: $("#crole").value === "citoyen" ? 18 : 28
+    });
+    view = "dash";
+    render();
+  };
+  const dateEl = $("#date"), horloge = $("#horloge");
+  if (dateEl) dateEl.textContent = "Créer un personnage";
+  if (horloge) horloge.textContent = D.nom;
+}
 function renderChoix() {
   const table = tablePays();
-  const cartes = Object.keys(table).map(id => {
+  const cartes = idsPays().map(id => {
     const c = table[id];
     const f = c.fiche || {};
     return `<a class="card choix" href="?pays=${esc(id)}"><h2>${esc(f.drapeau || "")} ${esc(c.nom)}</h2><p>${esc(f.resume || "")}</p></a>`;
   }).join("");
-  $("#main").innerHTML = `<h2>Sovereign</h2><p class=note>Élysée : Pouvoir &amp; Chaos — nom provisoire, le propriétaire peut le changer.</p><p>Choisissez un pays. La France garde ses paramètres de scénario et, dans l'écran Régime, les ruptures constitutionnelles. Les autres pays affichent la source de chaque chiffre. La dernière lettre des noms de candidats est omise.</p><div class="choices">${cartes}</div>`;
+  $("#main").innerHTML = `<h2>Sovereign</h2><p class=note>Élysée : Pouvoir &amp; Chaos — nom provisoire, le propriétaire peut le changer.</p><p>Choisissez un pays. Ensuite, un personnage : une personnalité réelle, ou la vôtre, et un point de départ. Au pouvoir, vous faites votre politique. Sans l'exécutif, la campagne, les alliances et les élections sont le chemin. La dernière lettre des noms réels est omise.</p><div class="choices">${cartes}</div>`;
   const dateEl = $("#date"), horloge = $("#horloge");
   if (dateEl) dateEl.textContent = "Choisir un pays";
   if (horloge) horloge.textContent = "En attente d'un pays";
 }
 function renderElec() {
-  const label = (D.election && D.election.label) || "Présidentielle 2027";
+  const tenu = scrutinCourant();
+  const label = tenu.label || "Élection";
   const liste = candidatsActifs();
-  if (!S.elu) {
-    page(`<h2>${esc(label)}</h2><p class=note>Le scrutin tombe le ${esc(fmtCourt(dateElection()))}. Avancer le temps y mène ; la lecture s'y arrête. ${esc(D.noteCandidats || "")}</p>
-      <div class=card>${liste.map(c => { const brut = c.joueur ? clamp((c.base || 20) * 0.6 + (S.e.popularite - 20) * 0.3, 2, 60) : c.base; const v = Math.max(0.5, brut + partiBiais(c.p)); return `<div class=row><label>${esc(c.n)} (${esc(c.p)})</label><span class=bar style="width:${Math.min(70, v)}%;background:${c.c}"></span>${f0(v)} %</div>`; }).join("")}</div>
-      <p class=note>Les points ajoutés par l'onglet Actu réelle sont une règle du modèle. Ils ne sont pas un sondage.</p>`);
-    return;
-  }
-  const E = S.elu;
-  page(`<h2>${esc(label)}</h2><div class=card>${E.t1.map(c => `<div class=row><label>${esc(c.n)}</label><span class=bar style="width:${c.s * 1.4}%;background:${c.c}"></span>${f1(c.s)} %</div>`).join("")}
-    <p>Second tour : ${esc(E.finale[0].n)} ${f1(E.r2[0])} % — ${esc(E.finale[1].n)} ${f1(E.r2[1])} %. <b>${esc(E.gagnant)}</b> est élu(e).</p>
-    ${S.fini ? "<p class=bad>Votre camp perd. Le temps s'arrête : le bouton du bas est désactivé. Une nouvelle partie le réactive.</p>" : "<p class=good>Votre camp garde l'Élysée. Le temps continue.</p>"}</div>`);
+  const barres = `<div class=card>${liste.map(c => { const brut = c.joueur ? clamp((c.base || 20) * 0.6 + (S.e.popularite - 20) * 0.3 + ((S.perso && !S.executif) ? (S.perso.assise || 0) * 0.15 : 0), 2, 60) : c.base; const v = Math.max(0.5, brut + partiBiais(c.p)); return `<div class=row><label>${esc(c.n)} (${esc(c.p)})</label><span class=bar style="width:${Math.min(70, v)}%;background:${c.c}"></span>${f0(v)} %</div>`; }).join("")}</div>`;
+  const dernier = S.elu ? `<div class=card><b>Dernier scrutin du modèle</b> — ${esc(S.elu.gagnant)} en tête. Second tour : ${esc(S.elu.finale[0].n)} ${f1(S.elu.r2[0])} % — ${esc(S.elu.finale[1].n)} ${f1(S.elu.r2[1])} %. ${S.executif ? "<span class=good>Vous avez l'exécutif.</span>" : "<span class=warn>Vous êtes dans l'opposition. La carrière continue.</span>"}</div>` : "";
+  page(`<h2>${esc(label)}</h2><p class=note>Prochain scrutin le ${esc(fmtCourt(dateElection()))}. Avancer le temps y mène ; la lecture s'y arrête. ${esc(D.noteCandidats || "")}</p>
+    ${barres}
+    <p class=note>Les points ajoutés par l'onglet Actu réelle, et l'assise d'une campagne hors de l'exécutif, sont une règle du modèle. Ils ne sont pas un sondage.</p>
+    ${dernier}`);
 }
 function drawCharts() {
   if (!isBrowser) return;
@@ -1094,8 +1416,11 @@ function boot() {
   let saved = null;
   if (!idDemande()) { renderChoix(); lier(); return; }
   try { saved = JSON.parse(localStorage.getItem(cleSauvegarde()) || "null"); } catch (e) { saved = null; }
-  if (saved && saved.e && saved.date && saved.journal && saved.effets && saved.paysId === D.id) { S = saved; S.lecture = false; }
-  else nouvelle();
+  if (saved && saved.e && saved.date && saved.journal && saved.effets && saved.paysId === D.id) {
+    S = saved; S.lecture = false;
+    if (!S.perso) poserPerso(persoIncumbent());
+    else if (S.executif == null) S.executif = executifDuRole(S.perso.role);
+  } else { enCreation = true; lier(); return; }
   lier();
 }
 function lier() {
@@ -1108,11 +1433,11 @@ function lier() {
   $("#lecture").onclick = () => basculerLecture();
   $("#vitesse").onchange = () => { S.vitesse = +$("#vitesse").value; if (S.lecture) { arreterLecture(); basculerLecture(); } };
   $("#save").onclick = () => sauver(false);
-  $("#reset").onclick = () => { if (!S) return; if (typeof confirm === "function" && !confirm("Recommencer ?")) return; arreterLecture(); try { localStorage.removeItem(cleSauvegarde()); } catch (e) {} nouvelle(); view = "dash"; };
+  $("#reset").onclick = () => { if (typeof confirm === "function" && !confirm("Recommencer ?")) return; arreterLecture(); try { localStorage.removeItem(cleSauvegarde()); } catch (e) {} S = null; enCreation = !!idDemande(); view = "dash"; render(); };
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
   if (S && typeof fetch === "function") fetch("data/actu.json").then(r => r.ok ? r.json() : []).then(j => integrerActu(j)).catch(() => {});
   render();
 }
-const SIM = { nouvelle, avancer, voter, draftInit, deciderBouclier, resoudreSpecial, appliquerRupture, appliquerProgramme, integrerActu, photo, fmtDate, addDays, addMonths, etat: () => S };
+const SIM = { nouvelle, avancer, voter, draftInit, deciderBouclier, resoudreSpecial, appliquerRupture, appliquerProgramme, integrerActu, actionMeeting, actionAlliance, actionInvestiture, photo, fmtDate, addDays, addMonths, etat: () => S, idsPays };
 if (typeof globalThis !== "undefined") globalThis.SIM = SIM;
 boot();

@@ -56,9 +56,9 @@ COUNTRIES.us = {
       ]
     }
   },
-  election: { date: "2026-11-03", label: "Midterms 2026", type: "legislatives", familleFavorisee: "Démocrates", finSiDefaite: false },
+  election: { date: "2026-11-03", label: "Midterms 2026", type: "legislatives", familleFavorisee: "Démocrates", finSiDefaite: false, suite: { date: "2028-11-07", label: "Présidentielle 2028", type: "presidentielle", familleFavorisee: "Démocrates" } },
   candidats: [
-    { n: "Camp de Donal Trum", p: "Républicains", base: 49, c: "#c0392b", joueur: true },
+    { n: "Donal Trum", p: "Républicains", base: 49, c: "#c0392b", joueur: true },
     { n: "Camp démocrate", p: "Démocrates", base: 48, c: "#2471a3" }
   ],
   noteCandidats: "Scénario pédagogique, pas un sondage. Les midterms du 3 novembre 2026 renouvellent la Chambre et une classe du Sénat. Le nom du président en exercice est tronqué (Trum). La présidentielle suivante est en 2028 ; ce module s'arrête au test des chambres. Aucun résultat réel de novembre 2026 n'est affirmé.",
