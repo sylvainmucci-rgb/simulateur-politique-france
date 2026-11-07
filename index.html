@@ -1,8 +1,27 @@
 <!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Simulateur France — Gouverner</title><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#002395">
+<title>Statecraft</title><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#002395">
+<meta name="application-name" content="Statecraft">
 <link rel="icon" href="icon.svg"><link rel="stylesheet" href="style.css"></head><body>
-<header><b>🇫🇷 Gouverner la France</b><span id="date"></span><nav>
-<button data-v="dash">Tableau de bord</button><button data-v="dec">Décisions</button><button data-v="parl">Parlement</button><button data-v="news">Actualités</button><button data-v="elec">2027</button><button data-v="src">Sources</button></nav></header>
+<header><b>Statecraft</b><span id="date">2 novembre 2026</span><nav>
+<button data-v="dash">Tableau de bord</button><button data-v="dec">Décisions</button><button data-v="parl">Parlement</button><button data-v="journal">Journal</button><button data-v="news">Actualités</button><button data-v="elec">2027</button><button data-v="src">Sources</button></nav></header>
 <main id="main"></main>
-<footer><button id="tour" class="primary">▶ Trimestre suivant</button><button id="save">💾 Sauver</button><button id="reset">↺ Nouvelle partie</button></footer>
+<footer id="barreTemps">
+  <div id="horloge" class="horloge">2 novembre 2026</div>
+  <div class="temps-actions">
+    <button type="button" id="lecture" class="primary">▶ Lecture</button>
+    <select id="vitesse" aria-label="Vitesse de lecture">
+      <option value="1">Lent</option>
+      <option value="2" selected>Normal</option>
+      <option value="4">Rapide</option>
+    </select>
+    <button type="button" class="pas" data-pas="semaine">+1 sem.</button>
+    <button type="button" class="pas" data-pas="mois">+1 mois</button>
+    <button type="button" class="pas" data-pas="trimestre">+1 trim.</button>
+    <button type="button" class="pas" data-pas="an">+1 an</button>
+  </div>
+  <div class="temps-outils">
+    <button type="button" id="save">Sauver</button>
+    <button type="button" id="reset">Nouvelle partie</button>
+  </div>
+</footer>
 <script src="data/fr.js"></script><script src="app.js"></script></body></html>
