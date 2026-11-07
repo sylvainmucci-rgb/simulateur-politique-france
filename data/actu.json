@@ -1,0 +1,56 @@
+[
+  {
+    "id": "lfi-livre-2026-11-06",
+    "date": "2026-11-06",
+    "evenement": "LFI publie L'Avenir en commun, 1 069 mesures",
+    "resume": "La nouvelle édition du programme sort en librairie la veille du meeting du Bourget. Environ 150 mesures sont actualisées par rapport à 2021, plus de 200 sont nouvelles. Le financement détaillé du livre est annoncé pour début 2027. La planification écologique passe devant la VIe République dans l'ordre des priorités.",
+    "propositions": ["SMIC à 1 700 € net", "Retour à 62 ans puis retraite à 60 ans pour 40 annuités", "Sortie du nucléaire, objectif 100 % renouvelable repoussé à 2060", "Règle verte à inscrire dans la Constitution"],
+    "source": "RTL, 6 novembre 2026 ; 20 Minutes / AFP, 6 novembre 2026 ; Euronews, 7 novembre 2026.",
+    "biais": { "LFI": 1.2, "popularite": 0 }
+  },
+  {
+    "id": "bourget-2026-11-07",
+    "date": "2026-11-07",
+    "evenement": "Meeting de Mélencho au Bourget",
+    "resume": "Convention présidentielle de La France insoumise au parc des expositions du Bourget. La presse évoque jusqu'à 20 000 personnes et des sondages qui le placent en position de second tour. Le nom est tronqué dans le jeu.",
+    "propositions": ["Présentation publique du programme publié la veille", "Démonstration de campagne, pas un nouveau chiffrage"],
+    "source": "Euronews et France 24, 6 et 7 novembre 2026.",
+    "biais": { "LFI": 0.8 }
+  },
+  {
+    "id": "lfi-budget-2026-10-14",
+    "date": "2026-10-14",
+    "evenement": "Contre-budget LFI : 106,4 Md€ de recettes, 81,7 Md€ de dépenses",
+    "resume": "Éric Coquere et le candidat présentent un budget rectificatif d'arrivée. Ils affichent 25 Md€ de réduction du déficit la première année. Challenges relève le pari de lever cette recette sans casser l'activité, et un avis réservé du Conseil d'État sur la taxe Zucman.",
+    "propositions": ["ISF climatique : 10 Md€ selon LFI", "Fin de la flat tax : 9 Md€ selon LFI", "Taxe Zucman au-delà de 100 M€ : 15 Md€ selon LFI", "Retour à 62 ans : 9 Md€ selon LFI"],
+    "source": "Public Sénat et BFM, 14 octobre 2026 ; Challenges, novembre 2026.",
+    "biais": { "LFI": 0.4, "popularite": -0.3 }
+  },
+  {
+    "id": "rn-retraites-2026-06-12",
+    "date": "2026-06-12",
+    "evenement": "Le Pe et Bardell divergent sur l'âge de la retraite",
+    "resume": "Marine Le Pe dit sur RTL que le retour de l'âge légal reste d'actualité. Jordan Bardell répond que l'âge « ne veut rien dire » et met en avant la durée de cotisation. Louis Alio indique que, s'il était candidat, Bardell aurait son propre programme.",
+    "propositions": ["Le Pe : âge légal vers 62 ans, 60 ans pour les carrières longues", "Bardell : durée de cotisation plutôt qu'âge couperet"],
+    "source": "Public Sénat, 12 juin 2026, repris par les synthèses de programme RN.",
+    "biais": { "RN": -0.4 }
+  },
+  {
+    "id": "montaigne-2024-06-28",
+    "date": "2024-06-28",
+    "evenement": "Institut Montaigne : solde des programmes de législatives",
+    "resume": "À quarante-huit heures du second tour de 2024, l'Institut Montaigne publie un solde annuel : environ +21 Md€ de déficit pour Ensemble, +179 Md€ pour le Nouveau Front populaire, +71 Md€ pour le RN. Ces chiffres concernent 2024, pas le livre LFI de 2026.",
+    "propositions": ["Ensemble : service national et versement automatique des aides, en partie compensés", "NFP : pouvoir d'achat, services publics, retraites", "RN : TVA énergie et âge de départ, économies sur l'immigration jugées incertaines"],
+    "source": "Institut Montaigne, communiqué « Législatives 2024 — Chiffrage global des programmes ».",
+    "biais": { "popularite": 0 }
+  },
+  {
+    "id": "ifrap-2024-programmes",
+    "date": "2024-06-20",
+    "evenement": "IFRAP : trois soldes à l'horizon 2027",
+    "resume": "La Fondation IFRAP, pour Le Figaro Magazine, chiffre les programmes de législatives par écart à la trajectoire du programme de stabilité : RN environ −14,5 Md€ en 2027, Nouveau Front populaire environ −160 Md€, Ensemble environ +4 Md€.",
+    "propositions": ["RN : baisses d'impôts d'environ 20,5 Md€ et économies d'environ 8 Md€", "NFP : retour à 60 ans retenu dans l'hypothèse haute du chiffrage", "Ensemble : peu de mesures hors trajectoire"],
+    "source": "Fondation IFRAP, juin 2024, « le chiffrage des programmes ».",
+    "biais": { "popularite": 0 }
+  }
+]

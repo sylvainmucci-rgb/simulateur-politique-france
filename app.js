@@ -94,6 +94,7 @@ function nouvelle() {
     ret: { ...(D.retraites || { ageLegal: 64, ratioCotRet: 1.5, deficitMd: 0, pensionMoy: 0 }) }, smic: (D.smic && D.smic.brutMensuel) || 0,
     contraintes: D.contraintes ? JSON.parse(JSON.stringify(D.contraintes)) : null, texteHostile: null, paysId: D.id || "fr",
     effets: [], journal: [], news: [], recap: null,
+    biaisSondages: {}, programmesAppliques: [], actu: (S && S.actu) || [], actuAppliquee: {},
     hist: { pib: [], chomage: [], inflation: [], dette: [], oat: [], deficit: [], pop: [] },
     n493: 0, greve: 0, soutien: D.politique.soutienBase, bce: 2.0,
     fini: false, elu: null, draft: null, flexUE: 0, bouclier: false,
@@ -101,6 +102,7 @@ function nouvelle() {
     regime: regimeInitial()
   };
   log(D.intro || "Vous prenez vos fonctions. Chaque décision laissera une ligne au journal, et chaque pas de temps un récapitulatif.", "neg");
+  appliquerActuJusqua();
   snap();
   if (isBrowser) { sauver(true); render(); }
   return S;
@@ -680,6 +682,7 @@ function pasJours(n, sac) {
     election();
     sac.push({ cause: "Présidentielle 2027", statut: "échéance", deltas: {}, important: true, texte: `Présidentielle : ${S.elu.gagnant} est élu(e).` });
   }
+  appliquerActuJusqua(sac);
   S.tour++;
   snap();
 }
@@ -773,6 +776,7 @@ function pasContraintes(q) {
 function election() {
   const c = candidatsActifs().map(x => ({ ...x }));
   const pj = c.find(x => x.joueur);
+  c.forEach(x => { const b = partiBiais(x.p); if (b) x.base = (x.base || 0) + b; });
   if (pj) pj.base = clamp((pj.base || 20) * 0.5 + (S.e.popularite - 20) * 0.45 + (S.e.croissance > 1 ? 3 : 0) - Math.max(0, S.e.chomage - 6) * 0.8, 2, 70);
   c.forEach(x => { x.s = Math.max(0.5, x.base + rnd(-2.5, 2.5)); });
   const t = c.reduce((a, b) => a + b.s, 0);
@@ -865,7 +869,7 @@ function render() {
   const vit = $("#vitesse");
   if (vit && document.activeElement !== vit) vit.value = String(S.vitesse || 2);
   const e = S.e;
-  if (view === "dash") page(`<p class=note>Statecraft — ${esc(D.nom)}. Situation simulée au ${esc(quand)}. ${esc(D.bandeau || "Les chiffres de départ sont documentés dans Sources.")}</p>
+  if (view === "dash") page(`<p class=note>Sovereign — ${esc(D.nom)}. Situation simulée au ${esc(quand)}. ${esc(D.bandeau || "Les chiffres de départ sont documentés dans Sources.")}</p>
     <div class=grid>${kpi("Croissance", f1(e.croissance) + " %", e.croissance < 0.5 ? "bad" : "good")}${kpi("Inflation", f1(e.inflation) + " %", e.inflation > 3 ? "bad" : "")}
     ${kpi("Chômage", f1(e.chomage) + " %", e.chomage > 8 ? "bad" : "")}${kpi("Dette", f1(e.dettePct) + " %", e.dettePct > 100 ? "bad" : "")}${kpi("Déficit", f1(e.deficitPct) + " %", e.deficitPct > 3 ? "bad" : "good")}
     ${kpi(monnaie().taux, f1(e.oat10) + " %", e.oat10 > 4 ? "bad" : "")}${kpi("Popularité", f0(e.popularite) + " %", e.popularite < 30 ? "bad" : "")}
@@ -881,6 +885,8 @@ function render() {
     <h2>Dernières nouvelles</h2>${S.news.slice(0, 4).map(nw).join("")}`);
   if (view === "dec") renderDec();
   if (view === "regime") renderRegime();
+  if (view === "prog") renderProgrammes();
+  if (view === "actu") renderActu();
   if (view === "parl") {
     const P = D.politique.assemblee;
     const maxS = Math.max(...P.map(p => p.s), 1);
@@ -948,6 +954,88 @@ function renderRegime() {
     ${groupes.map(g => `<h2>${esc(g)}</h2>` + liste.filter(r => r.groupe === g).map(r => `<div class=card><b>${esc(r.label)}</b><p>${esc(r.detail)}</p><p class=note>S'y opposent : ${esc((r.opposants || []).join(", ") || "personne de façon structurée")}. Coût immédiat dans le modèle : crise ${r.crise > 0 ? "+" : ""}${r.crise || 0}, appareil ${r.coup > 0 ? "+" : ""}${r.coup || 0}, sanctions ${r.sanctions > 0 ? "+" : ""}${r.sanctions || 0}.</p><button type=button data-rupture="${esc(r.id)}">Engager</button></div>`).join("")).join("")}`);
   document.querySelectorAll("[data-rupture]").forEach(b => b.onclick = () => appliquerRupture(b.dataset.rupture));
 }
+function programmesPays() { return (typeof PROGRAMMES !== "undefined" && PROGRAMMES[D.id]) || D.programmes || []; }
+function partiBiais(p) {
+  const b = (S && S.biaisSondages) || {};
+  if (b[p]) return b[p];
+  if (String(p || "").indexOf("PS") === 0 && b.PS) return b.PS;
+  return 0;
+}
+function appliquerActuJusqua(sac) {
+  if (!S || !S.actu) return;
+  S.actuAppliquee = S.actuAppliquee || {};
+  S.biaisSondages = S.biaisSondages || {};
+  for (const it of S.actu) {
+    if (!it || !it.date || it.date > S.date || S.actuAppliquee[it.id]) continue;
+    S.actuAppliquee[it.id] = true;
+    const b = it.biais || {};
+    const deltas = {};
+    if (b.popularite) appliquerEffet({ popularite: b.popularite }, deltas);
+    const sondages = [];
+    for (const k of Object.keys(b)) {
+      if (k === "popularite") continue;
+      S.biaisSondages[k] = (S.biaisSondages[k] || 0) + b[k];
+      sondages.push(`${k} ${b[k] > 0 ? "+" : ""}${f1(b[k])} pt`);
+    }
+    const texte = `Actu réelle — ${it.evenement}` + (sondages.length ? ` → intentions ${sondages.join(", ")}` : " → pas de biais de sondage");
+    S.journal.unshift({ date: S.date, texte, statut: "actualité", prevus: [it.source || ""], decisionDate: it.date });
+    if (sac) sac.push({ cause: "Actu réelle — " + it.evenement, statut: "actualité", deltas, important: false, texte });
+    log(`${texte}. Règle du jeu, pas un sondage d'institut.`, (b.popularite || 0) < 0 ? "neg" : "");
+  }
+}
+function integrerActu(items) {
+  if (!S) return;
+  S.actu = items || [];
+  appliquerActuJusqua();
+  if (isBrowser && view === "actu") render();
+}
+function appliquerProgramme(id) {
+  const m = programmesPays().flatMap(p => (p.mesures || []).map(x => ({ ...x, parti: p.parti, candidat: p.candidat }))).find(x => x.id === id);
+  if (!m) return { ok: false };
+  S.programmesAppliques = S.programmesAppliques || [];
+  if (S.programmesAppliques.includes(id)) return { ok: false, raison: "Déjà appliquée." };
+  const deltas = {};
+  appliquerEffet(m.immediat, deltas);
+  for (const df of m.differe || []) S.effets.push({ ...df, echeance: addDays(S.date, (df.semaines || 8) * 7), cause: m.titre + " (" + m.parti + ")", decisionDate: S.date, fait: false, important: !!m.important });
+  if (m.biais) {
+    S.biaisSondages = S.biaisSondages || {};
+    for (const k of Object.keys(m.biais)) S.biaisSondages[k] = (S.biaisSondages[k] || 0) + m.biais[k];
+  }
+  S.programmesAppliques.push(id);
+  const texte = (formaterLigne(m.titre + " — " + m.parti, deltas) || m.titre) + " Verdict du module : " + (m.faisable && m.faisable.verdict || "") + ".";
+  S.journal.unshift({ date: S.date, texte, statut: "programme", prevus: [m.source || ""], decisionDate: S.date });
+  log(texte, (deltas.confianceMarches || 0) < -1 || (deltas.popularite || 0) < 0 ? "neg" : "pos", [{ qui: m.parti, texte: m.propose || "" }]);
+  S.recap = { du: S.date, au: S.date, pas: "programme", pause: null, titre: "Mesure de programme", lignes: [{ dejaFormate: true, cause: texte, prevus: [] }], residual: {}, avant: photo(), apres: photo(), decision: true };
+  if (isBrowser) render();
+  return { ok: true };
+}
+function renderProgrammes() {
+  const list = programmesPays();
+  if (!list.length) { page("<h2>Programmes</h2><p class=note>Pas de corpus sourcé pour ce pays dans cette version.</p>"); return; }
+  const bloc = list.map(p => `<h2>${esc(p.parti)} — ${esc(p.candidat)}</h2><p class=note>${esc(p.intro || "")}</p>` + (p.mesures || []).map(m => {
+    const f = m.faisable || {};
+    const deja = (S.programmesAppliques || []).includes(m.id);
+    return `<div class=card><b>${esc(m.titre)}</b> <span class="badge ${f.verdict === "Oui" ? "est" : f.verdict === "Non en l'état" ? "param" : "modele"}">${esc(f.verdict || "")}</span>
+      <p>${esc(m.propose)}</p>
+      <p><b>Coût.</b> ${esc(m.cout)} <span class=note>${esc(m.source)}</span></p>
+      <div class=tablewrap><table><tr><th>Budget</th><th>Constitution</th><th>Droit européen</th><th>Marchés</th><th>Majorité</th></tr>
+      <tr><td>${esc(f.budget || "")}</td><td>${esc(f.constitution || "")}</td><td>${esc(f.europe || "")}</td><td>${esc(f.marches || "")}</td><td>${esc(f.majorite || "")}</td></tr></table></div>
+      <p class=note>${esc(f.pourquoi || "")}</p>
+      <button type=button data-prog="${esc(m.id)}" ${deja ? "disabled" : ""}>${deja ? "Déjà appliquée" : "Appliquer dans la partie"}</button></div>`;
+  }).join("")).join("");
+  page(`<h2>Programmes 2027</h2><p class=note>Mesures relevées sur les sites des partis, dans la presse et dans des chiffrages publiés (Institut Montaigne, IFRAP, déclarations des candidats). Quand un coût n'a pas été isolé par ces sources, c'est écrit. Appliquer une mesure écrit ses effets dans les indicateurs et le journal. Les noms perdent leur dernière lettre.</p>${bloc}`);
+  document.querySelectorAll("[data-prog]").forEach(b => b.onclick = () => appliquerProgramme(b.dataset.prog));
+}
+function renderActu() {
+  const items = (S && S.actu) || [];
+  if (!items.length) { page(`<h2>Actu réelle</h2><p class=note>Le fichier data/actu.json n'est pas encore chargé, ou il est vide.</p>`); return; }
+  const biais = S.biaisSondages || {};
+  const deja = Object.keys(biais).filter(k => biais[k]).map(k => `${k} ${biais[k] > 0 ? "+" : ""}${f1(biais[k])}`).join(", ") || "aucun";
+  page(`<h2>Actu réelle</h2><p class=note>Faits datés, avec leur source. Quand la date du jeu atteint la date de l'événement, un biais de sondage est ajouté. Ce biais est une règle du jeu, pas un sondage d'institut. Biais déjà intégrés : ${esc(deja)}. Ils se voient dans l'onglet Élections.</p>` + items.map(it => {
+    const passe = it.date <= S.date;
+    return `<div class=news><span class=k>${esc(it.date)}</span> — <b>${esc(it.evenement)}</b> <span class="badge ${passe ? "est" : "modele"}">${passe ? "Déjà dans la partie" : "Pas encore atteint"}</span><p>${esc(it.resume)}</p>${(it.propositions || []).length ? `<ul class=propre>${it.propositions.map(p => `<li>${esc(p)}</li>`).join("")}</ul>` : ""}<p class=note>${esc(it.source)}</p></div>`;
+  }).join(""));
+}
 function renderChoix() {
   const table = tablePays();
   const cartes = Object.keys(table).map(id => {
@@ -965,7 +1053,8 @@ function renderElec() {
   const liste = candidatsActifs();
   if (!S.elu) {
     page(`<h2>${esc(label)}</h2><p class=note>Le scrutin tombe le ${esc(fmtCourt(dateElection()))}. Avancer le temps y mène ; la lecture s'y arrête. ${esc(D.noteCandidats || "")}</p>
-      <div class=card>${liste.map(c => { const v = c.joueur ? clamp((c.base || 20) * 0.6 + (S.e.popularite - 20) * 0.3, 2, 60) : c.base; return `<div class=row><label>${esc(c.n)} (${esc(c.p)})</label><span class=bar style="width:${Math.min(70, v)}%;background:${c.c}"></span>${f0(v)} %</div>`; }).join("")}</div>`);
+      <div class=card>${liste.map(c => { const brut = c.joueur ? clamp((c.base || 20) * 0.6 + (S.e.popularite - 20) * 0.3, 2, 60) : c.base; const v = Math.max(0.5, brut + partiBiais(c.p)); return `<div class=row><label>${esc(c.n)} (${esc(c.p)})</label><span class=bar style="width:${Math.min(70, v)}%;background:${c.c}"></span>${f0(v)} %</div>`; }).join("")}</div>
+      <p class=note>Les points ajoutés par l'onglet Actu réelle sont une règle du modèle. Ils ne sont pas un sondage.</p>`);
     return;
   }
   const E = S.elu;
@@ -1021,8 +1110,9 @@ function lier() {
   $("#save").onclick = () => sauver(false);
   $("#reset").onclick = () => { if (!S) return; if (typeof confirm === "function" && !confirm("Recommencer ?")) return; arreterLecture(); try { localStorage.removeItem(cleSauvegarde()); } catch (e) {} nouvelle(); view = "dash"; };
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+  if (S && typeof fetch === "function") fetch("data/actu.json").then(r => r.ok ? r.json() : []).then(j => integrerActu(j)).catch(() => {});
   render();
 }
-const SIM = { nouvelle, avancer, voter, draftInit, deciderBouclier, resoudreSpecial, appliquerRupture, photo, fmtDate, addDays, addMonths, etat: () => S };
+const SIM = { nouvelle, avancer, voter, draftInit, deciderBouclier, resoudreSpecial, appliquerRupture, appliquerProgramme, integrerActu, photo, fmtDate, addDays, addMonths, etat: () => S };
 if (typeof globalThis !== "undefined") globalThis.SIM = SIM;
 boot();

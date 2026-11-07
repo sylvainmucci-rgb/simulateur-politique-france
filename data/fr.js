@@ -24,7 +24,7 @@ COUNTRIES.fr = {
     {n:"Édouard Philipp",p:"Horizons",base:16,c:"#4fa3d1"},{n:"Gabriel Atta",p:"Renaissance",base:0,c:"#f5b700",joueur:true},
     {n:"Bruno Retaillea",p:"LR",base:9,c:"#0066cc"},{n:"Raphaël Glucksman",p:"PS-Place publique",base:12,c:"#e84393"},
     {n:"Marine Tondelie",p:"Écologistes",base:5,c:"#27ae60"},{n:"Éric Zemmou",p:"Reconquête",base:5,c:"#5b3a1a"},{n:"Fabien Rousse",p:"PCF",base:3,c:"#8b0000"}],
-  noteCandidats: "Marine Le Pe (RN) est inéligible en 1re instance (mars 2025) ; le RN présente Jordan Bardell. Emmanuel Macro ne peut pas se représenter.",
+  noteCandidats: "La presse de 2026 dit Marine Le Pe de nouveau éligible après un arrêt d'appel ; le jeu ne certifie pas la décision de justice. Le bulletin du modèle porte Jordan Bardell. Emmanuel Macro ne peut pas se représenter. La dernière lettre des noms est omise.",
   sources: [
    ["Croissance 2026 ~0,4 %, T3 2026 -0,1 %","INSEE, comptes trimestriels (premières estimations, oct. 2026) — chiffres fournis par l'utilisateur, nov. 2026"],
    ["Inflation IPCH 3,8 % (oct. 2026)","INSEE / Eurostat, estimation provisoire oct. 2026 (donnée utilisateur)"],
@@ -42,7 +42,9 @@ COUNTRIES.fr = {
    ["Article 16","Pouvoirs exceptionnels si les institutions, l'indépendance ou l'intégrité du territoire sont menacées de manière grave et immédiate, et si le fonctionnement des pouvoirs publics est interrompu. Le Conseil constitutionnel est consulté. Depuis 2008, il statue d'office après 60 jours."],
    ["Article 38","Ordonnances : le gouvernement demande au Parlement une habilitation, le Conseil d'État examine le projet."],
    ["Article 89","Révision : les deux chambres votent le même texte, puis référendum, ou Congrès à la majorité des trois cinquièmes si le président choisit cette voie. La forme républicaine ne peut pas être abolie."],
-   ["Sortie de l'UE","Article 50 du traité sur l'Union européenne. La sortie de l'euro est un choc monétaire distinct, non prévu comme un bouton dans les traités."]],
+   ["Sortie de l'UE","Article 50 du traité sur l'Union européenne. La sortie de l'euro est un choc monétaire distinct, non prévu comme un bouton dans les traités."],
+   ["Programmes 2027","Mesures et coûts dans l'onglet Programmes. Chiffrages de parti (LFI, 14 oct. 2026 ; LR via LCP ; Attal via IFRAP 2027) distingués des chiffrages Institut Montaigne et IFRAP de juin 2024. Pas de nouveau livre Montaigne ou OFCE de novembre 2026."],
+   ["Actu réelle","data/actu.json : date, fait, résumé, propositions, source. Le biais de sondage est une règle du jeu, appliquée quand la date de la partie atteint la date du fait."]],
   ruptures: [
     { id: "dissolution", groupe: "Parlement", label: "Dissoudre l'Assemblée (article 12)", detail: "Le président dissout. Des législatives suivent. Interdit dans l'année d'une dissolution et pendant l'article 16.", opposants: ["opposition parlementaire", "rue si la dissolution se répète"], immediat: { popularite: -4, tensionSociale: 6 }, coup: 2, crise: 4, flags: { parlement: "dissous" } },
     { id: "suspendre", groupe: "Parlement", label: "Suspendre le Parlement", detail: "Ce n'est pas un pouvoir de la Ve République. Les décrets passent, les contre-pouvoirs cessent d'être électoraux.", opposants: ["Conseil constitutionnel", "Conseil d'État", "Union européenne", "presse", "rue", "armée"], immediat: { popularite: -8, confianceMarches: -12, tensionSociale: 15 }, coup: 25, crise: 30, sanctions: 8, flags: { parlement: "suspendu" } },

@@ -22,4 +22,7 @@ button.pas{background:#163a66;border-color:#4fa3d1;font-weight:700}
 .reaction{font-size:.86em;margin:3px 0 0 8px;border-left:2px solid #33476b;padding-left:8px}
 .choices{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
 a.choix{color:inherit;text-decoration:none;display:block}a.choix:hover{border-color:#4fa3d1}
+.badge{display:inline-block;font-size:.75rem;padding:2px 8px;border-radius:99px;border:1px solid #33476b}
+.badge.est{color:#55efc4}.badge.param{color:#ff7675}.badge.modele{color:#fdcb6e}
+.tablewrap{overflow-x:auto}
 ul.propre{margin:6px 0;padding-left:18px}
