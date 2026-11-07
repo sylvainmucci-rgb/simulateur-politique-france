@@ -97,7 +97,8 @@ function nouvelle() {
     hist: { pib: [], chomage: [], inflation: [], dette: [], oat: [], deficit: [], pop: [] },
     n493: 0, greve: 0, soutien: D.politique.soutienBase, bce: 2.0,
     fini: false, elu: null, draft: null, flexUE: 0, bouclier: false,
-    vitesse: 2, lecture: false, numDecision: 0
+    vitesse: 2, lecture: false, numDecision: 0,
+    regime: regimeInitial()
   };
   log(D.intro || "Vous prenez vos fonctions. Chaque décision laissera une ligne au journal, et chaque pas de temps un récapitulatif.", "neg");
   snap();
@@ -106,6 +107,106 @@ function nouvelle() {
 }
 
 /* ---------- Décisions : effets immédiats et différés, rattachés à une cause ---------- */
+function regimeInitial() {
+  return { parlement: "normal", decrets: false, article16: false, ordonnances: false, constitution: "V", ric: false, votations: false, proportionnelle: false, senat: true, euro: true, ue: true, revision: null, democratieLocale: false, coup: 4, crise: 6, sanctions: 0, semaines16: 0, derniereDissolution: null };
+}
+function assurerRegime() { if (S && !S.regime) S.regime = regimeInitial(); }
+function appliquerRupture(id) {
+  assurerRegime();
+  const r = (D.ruptures || []).find(x => x.id === id);
+  if (!r) return { ok: false, raison: "Option inconnue." };
+  const G = S.regime;
+  if (id === "dissolution") {
+    if (G.article16) return echecRupture(r, "Le Conseil constitutionnel le rappelle : l'article 16 interdit la dissolution.");
+    if (G.derniereDissolution && joursEntre(G.derniereDissolution, S.date) < 365) return echecRupture(r, "L'article 12 interdit une nouvelle dissolution dans l'année.");
+  }
+  if (id === "lever16" && !G.article16) return echecRupture(r, "L'article 16 n'est pas en vigueur.");
+  if (id === "retablir" && G.parlement === "normal" && !G.decrets) return echecRupture(r, "Le Parlement siège déjà.");
+  if (id === "ordonnances" && S.soutien < 180) return echecRupture(r, "L'Assemblée refuse l'habilitation de l'article 38.");
+  if (id === "revision-congres" && S.soutien < 240) return echecRupture(r, "Le Congrès n'a pas les trois cinquièmes. Le Sénat a suffi à bloquer.");
+  if (id === "revision-referendum" && S.e.popularite < 40) {
+    appliquerEffet({ popularite: -5, tensionSociale: 8 }, {});
+    G.crise = clamp(G.crise + 8, 0, 100);
+    return echecRupture(r, "Le référendum de révision est perdu. La Constitution ne change pas.");
+  }
+  if ((id === "ric" || id === "vie" || id === "senat") && !G.revision && G.constitution === "V") {
+    G.coup = clamp(G.coup + 8, 0, 100);
+    log("Le Conseil constitutionnel et le Conseil d'État constatent que l'article 89 n'a pas été suivi. L'acte est tout de même posé dans le scénario : le risque de crise monte.", "neg");
+  }
+  const deltas = {};
+  appliquerEffet(r.immediat, deltas);
+  G.coup = clamp(G.coup + (r.coup || 0), 0, 100);
+  G.crise = clamp(G.crise + (r.crise || 0), 0, 100);
+  G.sanctions = clamp(G.sanctions + (r.sanctions || 0), 0, 100);
+  if (!S.contraintes) S.contraintes = {};
+  if (r.sanctions) S.contraintes.sanctions = { niveau: G.sanctions, label: "Sanctions et isolement" };
+  for (const df of r.differe || []) S.effets.push({ ...df, echeance: addDays(S.date, df.semaines * 7), cause: r.label, decisionDate: S.date, fait: false, important: true });
+  if (r.flags) {
+    if (r.flags.parlement) G.parlement = r.flags.parlement;
+    ["decrets", "article16", "ordonnances", "ric", "votations", "proportionnelle", "senat", "euro", "ue", "democratieLocale"].forEach(k => { if (r.flags[k] !== undefined) G[k] = r.flags[k]; });
+    if (r.flags.constitution) G.constitution = r.flags.constitution;
+    if (r.flags.revision) G.revision = r.flags.revision;
+  }
+  if (id === "dissolution") {
+    G.derniereDissolution = S.date;
+    S.effets.push({ echeance: addDays(S.date, 28), cause: "Législatives après dissolution", decisionDate: S.date, fait: false, important: true, legislatives: true });
+  }
+  if (id === "proportionnelle") S.soutien = Math.round(clamp(Math.min(S.soutien, 210), 120, 260));
+  if (id === "euro" || id === "frexit") {
+    if (!S.contraintes.change) S.contraintes.change = { indice: 100, depart: 100, fragile: true, label: "Indice du change (100 = euro)" };
+    S.contraintes.change.fragile = true;
+  }
+  const qui = (r.opposants || []).length ? ` S'y opposent : ${(r.opposants || []).join(", ")}.` : "";
+  const texte = (formaterLigne(r.label, deltas) || r.label) + qui + ` Risque de crise ${f0(G.crise)}, risque de rupture d'appareil ${f0(G.coup)}, sanctions ${f0(G.sanctions)}.`;
+  S.journal.unshift({ date: S.date, texte, statut: "régime", prevus: (r.opposants || []).map(o => "Opposition : " + o), decisionDate: S.date });
+  log(texte, (r.coup || 0) > 8 ? "neg" : "", (r.opposants || []).slice(0, 4).map(o => ({ qui: o, texte: "« Nous contestons la procédure, pas seulement le fond. »" })));
+  S.recap = { du: S.date, au: S.date, pas: "régime", pause: (r.coup || 0) >= 18 ? "Crise de régime ouverte" : null, titre: "Décision de régime", lignes: [{ dejaFormate: true, cause: texte, prevus: r.opposants || [] }], residual: {}, avant: photo(), apres: photo(), decision: true };
+  if (isBrowser) render();
+  return { ok: true, regime: G };
+}
+function echecRupture(r, raison) {
+  log(`${r.label} : ${raison}`, "neg", [{ qui: "Conseil constitutionnel", texte: "« La compétence existe. Les conditions, non. »" }]);
+  S.journal.unshift({ date: S.date, texte: `${r.label} bloqué → ${raison}`, statut: "régime", prevus: r.opposants || [], decisionDate: S.date });
+  if (isBrowser) render();
+  return { ok: false, raison };
+}
+function pasRegime(q, sac) {
+  if (!S.regime) return;
+  const G = S.regime;
+  if (G.article16) {
+    G.semaines16 += q * 13;
+    G.crise = clamp(G.crise + 1.2 * q * 13, 0, 100);
+    S.e.confianceMarches = clamp(S.e.confianceMarches - 0.35 * q * 13, 0, 100);
+    if (G.semaines16 > 8 && !G.avertissement16) {
+      G.avertissement16 = true;
+      sac.push({ cause: "Conseil constitutionnel", statut: "échéance", deltas: {}, important: true, texte: "Soixante jours d'article 16 : le Conseil constitutionnel statue d'office. Maintenir l'exception sans menace grave aggrave la crise." });
+    }
+  } else G.semaines16 = 0;
+  if (G.parlement === "suspendu") G.coup = clamp(G.coup + 2.2 * q * 13, 0, 100);
+  if (G.decrets) G.coup = clamp(G.coup + 1.1 * q * 13, 0, 100);
+  if (!G.ue) {
+    G.sanctions = clamp(G.sanctions + 0.4 * q * 13, 0, 100);
+    S.e.croissance = clamp(S.e.croissance - 0.08 * q * 13, -6, 8);
+  }
+  if (!G.euro) S.e.inflation = clamp(S.e.inflation + 0.12 * q * 13, -1, 40);
+  if (G.votations && S.tour % 12 === 0 && S.tour > 0) {
+    const sens = S.e.tensionSociale > 55 ? -1 : 1;
+    appliquerEffet({ popularite: sens * 1.5, confianceMarches: -1 }, {});
+    sac.push({ cause: "Votation", statut: "échéance", deltas: { popularite: sens * 1.5, confianceMarches: -1 }, important: false, texte: "Une initiative populaire est votée. Les marchés lisent l'incertitude, pas seulement le résultat." });
+  }
+  if (!S.silenceEvenements && G.coup > 62 && Math.random() < G.coup / 800) {
+    const deltas = {};
+    appliquerEffet({ popularite: -8, confianceMarches: -10, tensionSociale: 12 }, deltas);
+    S.soutien = Math.round(clamp(S.soutien - 25, 80, 400));
+    G.crise = clamp(G.crise + 15, 0, 100);
+    const texte = "Crise de régime : une partie de l'appareil d'État, de la presse et de la rue ne reconnaît plus l'ordre donné. Ce n'est pas un mode d'emploi, c'est la facture.";
+    sac.push({ cause: "Crise de régime", statut: "événement", deltas, important: true, texte });
+    if (G.coup > 90) {
+      S.fini = true;
+      sac.push({ cause: "Effondrement des institutions", statut: "événement", deltas: {}, important: true, texte: "Le régime ne tient plus. La partie s'arrête." });
+    }
+  }
+}
 function draftInit() {
   S.draft = {
     taux: { ...S.taux },
@@ -314,7 +415,16 @@ function voter() {
     return { ok: false, cc: a.cc };
   }
   const R = regles();
-  if (d.mode === "vote") {
+  assurerRegime();
+  if (d.mode === "vote" && S.regime.parlement === "dissous") {
+    log("L'Assemblée est dissoute. Aucun vote tant que les législatives n'ont pas eu lieu.", "neg");
+    if (isBrowser) render();
+    return { ok: false };
+  }
+  if (d.mode === "vote" && (S.regime.parlement === "suspendu" || S.regime.decrets)) {
+    log("Le Parlement ne siège pas librement. Le texte passe par décret, et la crise s'en nourrit.", "neg", [{ qui: "Conseil d'État", texte: "« Un décret ne remplace pas la loi que vous avez écartée. »" }]);
+    S.regime.coup = clamp(S.regime.coup + 4, 0, 100);
+  } else if (d.mode === "vote") {
     const seuil = R.seuilVote || 200;
     const ok = a.voix >= seuil;
     log(ok ? `Le texte est adopté (${a.voix} voix, seuil ${seuil}).` : `Rejet : ${a.voix} voix, seuil ${seuil}. ${R.rejet || "Aucun effet."}`, ok ? "pos" : "neg");
@@ -511,10 +621,17 @@ function pasMacro(q) {
 function pasJours(n, sac) {
   const q = n / 91;
   const horizon = addDays(S.date, n);
+  pasRegime(q, sac);
   for (const e of S.effets) {
     if (e.fait || e.echeance > horizon) continue;
     e.fait = true;
     const deltas = {};
+    if (e.legislatives && S.regime) {
+      S.regime.parlement = "normal";
+      S.soutien = Math.round(clamp(150 + Math.round(rnd(0, 70)), 120, 300));
+      sac.push({ cause: "Législatives anticipées", decisionDate: e.decisionDate, statut: "échéance", deltas: {}, important: true, texte: `L'Assemblée est de retour. Soutien estimé : ${S.soutien}.` });
+      continue;
+    }
     if (e.mpVoix != null) {
       const tient = S.soutien >= ((regles().seuilVote || 200) - 30);
       if (!tient) appliquerEffet({ popularite: -2, croissance: -0.2 }, deltas);
@@ -756,10 +873,14 @@ function render() {
     ${S.contraintes && S.contraintes.petrole ? kpi(S.contraintes.petrole.label, f0(S.contraintes.petrole.prix) + " $") : ""}
     ${S.contraintes && S.contraintes.sanctions ? kpi("Sanctions", f0(S.contraintes.sanctions.niveau) + "/100", S.contraintes.sanctions.niveau > 50 ? "bad" : "") : ""}
     ${S.contraintes && S.contraintes.change ? kpi(S.contraintes.change.label, f0(S.contraintes.change.indice)) : ""}
-    ${S.texteHostile ? kpi("Texte à veto", "en attente", "bad") : ""}</div>
+    ${S.texteHostile ? kpi("Texte à veto", "en attente", "bad") : ""}
+    ${S.regime ? kpi("Régime", S.regime.constitution + (S.regime.article16 ? " · art. 16" : "") + (S.regime.ue ? "" : " · hors UE") + (S.regime.euro ? "" : " · hors euro"), S.regime.crise > 40 ? "bad" : "") : ""}
+    ${S.regime ? kpi("Crise de régime", f0(S.regime.crise) + "/100", S.regime.crise > 40 ? "bad" : "") : ""}
+    ${S.regime ? kpi("Rupture d'appareil", f0(S.regime.coup) + "/100", S.regime.coup > 40 ? "bad" : "") : ""}</div>
     <h2>Évolution</h2><div class=grid style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">${[["pib", "Croissance (%)"], ["chomage", "Chômage (%)"], ["inflation", "Inflation (%)"], ["dette", "Dette (% PIB)"], ["deficit", "Déficit (%)"], ["pop", "Popularité (%)"]].map(([k, l]) => `<div class=card><div class=k>${l}</div><canvas data-h="${k}"></canvas></div>`).join("")}</div>
     <h2>Dernières nouvelles</h2>${S.news.slice(0, 4).map(nw).join("")}`);
   if (view === "dec") renderDec();
+  if (view === "regime") renderRegime();
   if (view === "parl") {
     const P = D.politique.assemblee;
     const maxS = Math.max(...P.map(p => p.s), 1);
@@ -816,6 +937,17 @@ function renderDec() {
   if (flex) flex.onclick = () => deciderFlex();
   if (boucl) boucl.onclick = () => deciderBouclier();
 }
+function renderRegime() {
+  assurerRegime();
+  const G = S.regime;
+  const liste = D.ruptures || [];
+  if (!liste.length) { page(`<h2>Régime</h2><p class=note>Ce pays n'a pas, dans cette version, de menu de rupture constitutionnelle. Les institutions du quotidien sont dans Parlement et Décisions.</p>`); return; }
+  const etat = `Constitution ${esc(G.constitution)}. Parlement : ${esc(G.parlement)}. ${G.article16 ? "Article 16 en vigueur. " : ""}${G.decrets ? "Décrets hors habilitation. " : ""}${G.euro ? "Dans l'euro. " : "Hors de l'euro. "}${G.ue ? "Dans l'UE." : "Hors de l'UE."} Sénat ${G.senat ? "maintenu" : "écarté"}. Proportionnelle ${G.proportionnelle ? "oui" : "non"}. RIC ${G.ric ? "oui" : "non"}.`;
+  const groupes = [...new Set(liste.map(r => r.groupe))];
+  page(`<h2>Régime — décisions de rupture</h2><p>${etat}</p><p class=note>Crise ${f0(G.crise)}/100 · rupture d'appareil ${f0(G.coup)}/100 · sanctions ${f0(G.sanctions)}/100. Ces actes restent possibles. Ils ne sont pas gratuits. Le jeu ne décrit pas comment renverser un régime : il compte qui s'y oppose et ce que cela coûte.</p>
+    ${groupes.map(g => `<h2>${esc(g)}</h2>` + liste.filter(r => r.groupe === g).map(r => `<div class=card><b>${esc(r.label)}</b><p>${esc(r.detail)}</p><p class=note>S'y opposent : ${esc((r.opposants || []).join(", ") || "personne de façon structurée")}. Coût immédiat dans le modèle : crise ${r.crise > 0 ? "+" : ""}${r.crise || 0}, appareil ${r.coup > 0 ? "+" : ""}${r.coup || 0}, sanctions ${r.sanctions > 0 ? "+" : ""}${r.sanctions || 0}.</p><button type=button data-rupture="${esc(r.id)}">Engager</button></div>`).join("")).join("")}`);
+  document.querySelectorAll("[data-rupture]").forEach(b => b.onclick = () => appliquerRupture(b.dataset.rupture));
+}
 function renderChoix() {
   const table = tablePays();
   const cartes = Object.keys(table).map(id => {
@@ -823,7 +955,7 @@ function renderChoix() {
     const f = c.fiche || {};
     return `<a class="card choix" href="?pays=${esc(id)}"><h2>${esc(f.drapeau || "")} ${esc(c.nom)}</h2><p>${esc(f.resume || "")}</p></a>`;
   }).join("");
-  $("#main").innerHTML = `<h2>Statecraft</h2><p>Choisissez un pays. La France garde ses paramètres de scénario. Les autres pays affichent la source de chaque chiffre, et signalent les estimations. La dernière lettre des noms de candidats est omise.</p><div class="choices">${cartes}</div>`;
+  $("#main").innerHTML = `<h2>Sovereign</h2><p class=note>Élysée : Pouvoir &amp; Chaos — nom provisoire, le propriétaire peut le changer.</p><p>Choisissez un pays. La France garde ses paramètres de scénario et, dans l'écran Régime, les ruptures constitutionnelles. Les autres pays affichent la source de chaque chiffre. La dernière lettre des noms de candidats est omise.</p><div class="choices">${cartes}</div>`;
   const dateEl = $("#date"), horloge = $("#horloge");
   if (dateEl) dateEl.textContent = "Choisir un pays";
   if (horloge) horloge.textContent = "En attente d'un pays";
@@ -891,6 +1023,6 @@ function lier() {
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
   render();
 }
-const SIM = { nouvelle, avancer, voter, draftInit, deciderBouclier, resoudreSpecial, photo, fmtDate, addDays, addMonths, etat: () => S };
+const SIM = { nouvelle, avancer, voter, draftInit, deciderBouclier, resoudreSpecial, appliquerRupture, photo, fmtDate, addDays, addMonths, etat: () => S };
 if (typeof globalThis !== "undefined") globalThis.SIM = SIM;
 boot();
