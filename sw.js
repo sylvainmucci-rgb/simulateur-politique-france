@@ -1,4 +1,4 @@
-const C='simfr-v10';const F=['./','index.html','style.css','app.js','data/fr.js','data/us.js','data/ru.js','data/br.js','data/il.js','data/ir.js','data/cn.js','data/de.js','manifest.json','icon.svg'];
+const C='simfr-v11';const F=['./','index.html','style.css','app.js','data/fr.js','data/us.js','data/ru.js','data/br.js','data/il.js','data/ir.js','data/cn.js','data/de.js','data/gb.js','manifest.json','icon.svg'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(F)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
