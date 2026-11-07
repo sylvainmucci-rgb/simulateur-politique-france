@@ -3,17 +3,19 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 
-function load() {
+function load(search) {
   const sandbox = {
     console, Math, Date, JSON, Object, Array, Number, String, Boolean, Error,
     parseInt, parseFloat, isNaN, isFinite, URLSearchParams, NaN, Infinity,
-    location: { search: "" }
+    location: { search: search || "" }
   };
   sandbox.window = sandbox;
   sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
   const root = path.join(__dirname, "..");
   vm.runInContext(fs.readFileSync(path.join(root, "data/fr.js"), "utf8"), sandbox, { filename: "data/fr.js" });
+  const usPath = path.join(root, "data/us.js");
+  if (fs.existsSync(usPath)) vm.runInContext(fs.readFileSync(usPath, "utf8"), sandbox, { filename: "data/us.js" });
   vm.runInContext(fs.readFileSync(path.join(root, "app.js"), "utf8"), sandbox, { filename: "app.js" });
   return sandbox;
 }
@@ -82,8 +84,26 @@ assert(/Alerte test/.test(S.journal.map(j => j.texte).join(" ")), "journal de l'
 const sw = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
 const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
 const manifest = fs.readFileSync(path.join(__dirname, "..", "manifest.json"), "utf8");
-assert(sw.includes("simfr-v3"), "cache SW");
+assert(/simfr-v\d+/.test(sw) && sw.includes("data/us.js"), "cache SW");
 assert(html.includes("<title>Statecraft</title>") && html.includes('data-pas="mois"') && html.includes('id="horloge"'), "titre et barre de temps");
 assert(manifest.includes('"name":"Statecraft"') && manifest.includes('"short_name":"Statecraft"'), "manifest");
+const us = load("?pays=us");
+us.SIM.nouvelle();
+const U = us.SIM.etat();
+U.silenceEvenements = true;
+assert(U.paysId === "us", "pays us");
+assert(us.COUNTRIES.us.politique.assemblee[0].s === 219, "Chambre 219");
+assert(us.COUNTRIES.us.politique.senat.groupes[0].s === 53, "Sénat 53");
+assert(!JSON.stringify(us.COUNTRIES.us).includes("Trump"), "nom tronqué");
+assert(JSON.stringify(us.COUNTRIES.us.candidats).includes("Trum"), "Trum présent");
+us.SIM.draftInit();
+U.draft.mode = "special";
+const voteUs = us.SIM.voter();
+assert(voteUs.ok, "réconciliation US");
+U.texteHostile = { titre: "Projet hostile du Congrès", effet: { popularite: -4 }, echeance: "2026-11-20" };
+const popAvant = U.e.popularite;
+us.SIM.resoudreSpecial({ type: "veto" }, { voix: 235, cc: [] });
+assert(!us.SIM.etat().texteHostile, "le veto bloque le texte du Congrès");
+assert(Math.abs(us.SIM.etat().e.popularite - popAvant) < 0.05, "le texte vetoé ne s'applique pas");
 console.log("Journal et temps : OK");
 console.log(JSON.stringify({ date: S.date, pause: recPause.pause, inflationApresTVA: inf0 }, null, 2));

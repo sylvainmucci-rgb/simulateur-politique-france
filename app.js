@@ -8,19 +8,27 @@ const f0 = x => Math.round(x).toLocaleString("fr-FR");
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 const rnd = (a, b) => a + Math.random() * (b - a);
 const esc = s => String(s ?? "").replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
-const KEY = "simfr_save_v2";
+const KEY_FR = "simfr_save_v2";
 const DEBUT = "2026-11-02";
 const MISSIONS = { retraites: "Retraites", sante: "Santé", education: "Éducation", defense: "Défense", energie: "Énergie", emploi: "Emploi", securite: "Sécurité", collectivites: "Collectivités", autres: "Autres missions" };
 const PHOTO_KEYS = ["inflation", "popularite", "chomage", "croissance", "deficitPct", "dettePct", "oat10", "tensionSociale", "confianceMarches"];
 const NOMS = { inflation: "inflation", popularite: "popularité", chomage: "chômage", croissance: "croissance", deficitPct: "déficit", dettePct: "dette", oat10: "OAT", tensionSociale: "tension", confianceMarches: "confiance des marchés" };
 
-function pays() {
-  let id = "fr";
-  try { if (typeof location !== "undefined" && location.search) id = new URLSearchParams(location.search).get("pays") || "fr"; } catch (e) {}
-  const table = typeof COUNTRIES !== "undefined" ? COUNTRIES : window.COUNTRIES;
-  return table[id] || table.fr;
+function tablePays() { return typeof COUNTRIES !== "undefined" ? COUNTRIES : window.COUNTRIES; }
+function idDemande() {
+  try {
+    const q = new URLSearchParams(location.search).get("pays");
+    if (q) return q;
+  } catch (e) {}
+  return isBrowser ? null : "fr";
 }
-const D = pays();
+let D = tablePays()[idDemande() || "fr"] || tablePays().fr;
+function cleSauvegarde() { return !D || D.id === "fr" || !D.id ? KEY_FR : "statecraft_" + D.id + "_v1"; }
+function regles() { return (D && D.regles) || { seuilVote: 200, seuilCensure: 170, special: { type: "493", label: "Engager le 49.3" }, garde: "Conseil constitutionnel", rejet: "Le 49.3 reste possible." }; }
+function monnaie() { return (D && D.monnaie) || { unite: "Md€", taux: "OAT 10 ans", tauxCourt: "OAT", banque: "BCE" }; }
+function candidatsActifs() { return (D && (D.candidats || D.candidats2027)) || []; }
+function dateElection() { return (D && D.election && D.election.date) || "2027-04-12"; }
+function nomIndic(k) { if (k === "oat10") return monnaie().tauxCourt || monnaie().taux; return NOMS[k] || k; }
 
 let S = null, view = "dash", timer = null;
 
@@ -47,7 +55,7 @@ function photo() {
 }
 function fmtDelta(k, v) {
   if (Math.abs(v) < 0.05) return "";
-  const nom = NOMS[k] || k;
+  const nom = nomIndic(k);
   return `${nom} ${v > 0 ? "+" : ""}${f1(v)} pt`;
 }
 function formaterLigne(cause, deltas, decisionDate) {
@@ -83,14 +91,15 @@ function nouvelle() {
   S = {
     date: DEBUT, annee: D.debut.annee, tri: D.debut.trimestre, tour: 0,
     e: { ...D.eco }, taux: { ...D.taux }, dep: { ...D.depenses }, rec: { ...D.recettes },
-    ret: { ...D.retraites }, smic: D.smic.brutMensuel,
+    ret: { ...(D.retraites || { ageLegal: 64, ratioCotRet: 1.5, deficitMd: 0, pensionMoy: 0 }) }, smic: (D.smic && D.smic.brutMensuel) || 0,
+    contraintes: D.contraintes ? JSON.parse(JSON.stringify(D.contraintes)) : null, texteHostile: null, paysId: D.id || "fr",
     effets: [], journal: [], news: [], recap: null,
     hist: { pib: [], chomage: [], inflation: [], dette: [], oat: [], deficit: [], pop: [] },
     n493: 0, greve: 0, soutien: D.politique.soutienBase, bce: 2.0,
     fini: false, elu: null, draft: null, flexUE: 0, bouclier: false,
     vitesse: 2, lecture: false, numDecision: 0
   };
-  log("Vous prenez vos fonctions. Les chiffres du jour sont des paramètres de scénario : croissance 2026 0,4 %, T3 −0,1 %, inflation 3,8 %, chômage 8,5 %, dette 119 % du PIB, déficit 5,4 %, OAT 4,76 %. Chaque décision laissera une ligne au journal, et chaque pas de temps un récapitulatif.", "neg");
+  log(D.intro || "Vous prenez vos fonctions. Chaque décision laissera une ligne au journal, et chaque pas de temps un récapitulatif.", "neg");
   snap();
   if (isBrowser) { sauver(true); render(); }
   return S;
@@ -125,11 +134,16 @@ function analyse(d) {
   if (da) { r.dDep -= da * 32; r.soutienG -= da * 50; r.soutienD += da * 8; r.greve += Math.max(0, da) * 25; }
   r.dDep += d.smic * 0.9;
   r.soutienG += d.smic * 4; r.soutienD -= d.smic * 2;
-  if (t.IR > 150) r.cc.push("IR : hausse de plus de moitié du barème, jugée confiscatoire (article 13 de la Déclaration de 1789).");
-  if (t.TVA > 25) r.cc.push("TVA au-delà de 25 % : le modèle bloque le texte.");
-  if (d.age > 67 || d.age < 60) r.cc.push("Âge légal hors de 60–67 ans : irréaliste dans une loi de financement.");
-  if (Math.abs(da) > 2) r.cc.push("Variation de l'âge supérieure à 2 ans d'un coup : atteinte excessive aux situations en cours.");
-  if (d.smic > 10) r.alertes.push("SMIC +10 % : forte pression sur les PME et l'emploi peu qualifié.");
+  const pl = regles().plafonds || { IR: 150, TVA: 25, age: true };
+  if (pl.IR && t.IR > pl.IR) r.cc.push(regles().texteIR || "Hausse du barème trop forte pour le contrôle constitutionnel du pays.");
+  if (pl.TVA && t.TVA > pl.TVA) r.cc.push(regles().texteTVA || "Taux de taxe sur la consommation au-delà du plafond du modèle.");
+  if (pl.age !== false && (d.age > 67 || d.age < 60)) r.cc.push("Âge légal hors de 60–67 ans : irréaliste dans ce modèle.");
+  if (pl.age !== false && Math.abs(da) > 2) r.cc.push("Variation de l'âge supérieure à 2 ans d'un coup.");
+  if (d.smic > 10) r.alertes.push("Coup de pouce salarial supérieur à 10 % : choc sur l'emploi peu qualifié.");
+  for (const lr of regles().lignesRouges || []) {
+    if (lr.dep && d.dep[lr.dep] < lr.min) r.cc.push(lr.label);
+    if (lr.taux && (d.taux[lr.taux] - S.taux[lr.taux]) > lr.maxHausse) r.cc.push(lr.label);
+  }
   const g = clamp(r.soutienG, -60, 60), dr = clamp(r.soutienD, -60, 60);
   r.voix = Math.round(clamp(S.soutien + (g > 0 ? g * 1.2 : g * 0.3) + (dr > 0 ? dr : dr * 0.5), 120, 420));
   r.solde = r.dRec - r.dDep;
@@ -295,33 +309,16 @@ function voter() {
   if (!S.draft) draftInit();
   const d = S.draft, a = analyse(d);
   if (a.cc.length) {
-    if (isBrowser) modal("Conseil constitutionnel — censure", `<p>Le texte serait censuré :</p><ul>${a.cc.map(x => `<li>${esc(x)}</li>`).join("")}</ul><p class=note>Modifiez les mesures. Rien n'est appliqué.</p>`);
+    if (isBrowser) modal(regles().garde || "Contrôle", `<p>Le texte serait bloqué :</p><ul>${a.cc.map(x => `<li>${esc(x)}</li>`).join("")}</ul><p class=note>Modifiez les mesures. Rien n'est appliqué.</p>`);
     return { ok: false, cc: a.cc };
   }
+  const R = regles();
   if (d.mode === "vote") {
-    const ok = a.voix >= 200;
-    log(ok ? `Le texte est adopté (${a.voix} voix, majorité relative du bloc).` : `Rejet : ${a.voix} voix, en dessous de 200. Aucun effet. Le 49.3 reste possible.`, ok ? "pos" : "neg");
+    const seuil = R.seuilVote || 200;
+    const ok = a.voix >= seuil;
+    log(ok ? `Le texte est adopté (${a.voix} voix, seuil ${seuil}).` : `Rejet : ${a.voix} voix, seuil ${seuil}. ${R.rejet || "Aucun effet."}`, ok ? "pos" : "neg");
     if (!ok) { if (isBrowser) render(); return { ok: false }; }
-  } else {
-    S.n493++;
-    const censure = a.voix < 170 || (S.n493 > 3 && Math.random() < 0.3);
-    log(`49.3 n°${S.n493}. Motion de censure déposée.`, "neg");
-    if (censure) {
-      const deltas = {};
-      appliquerEffet({ popularite: -6, confianceMarches: -8, soutien: -10, tensionSociale: 6 }, deltas);
-      const texte = formaterLigne("Motion de censure adoptée après le 49.3", deltas);
-      S.journal.unshift({ date: S.date, texte, statut: "immédiat", prevus: [], decisionDate: S.date });
-      log(texte, "neg", [{ qui: "Présidents de groupe", texte: "« La censure efface le texte. Elle n'efface pas la séquence politique. »" }]);
-      S.recap = { du: S.date, au: S.date, pas: "censure", pause: "Le gouvernement est renversé", titre: "Censure", lignes: [{ dejaFormate: true, cause: texte, prevus: [] }], residual: {}, avant: photo(), apres: photo(), decision: true };
-      if (isBrowser) render();
-      return { ok: false, censure: true };
-    }
-    appliquerClause({
-      cause: `49.3 n°${S.n493} (censure rejetée, le texte passe)`,
-      immediat: { popularite: -3, tensionSociale: 5 },
-      reactions: [{ qui: "Opinion", texte: "« L'adoption sans vote se paie tout de suite en popularité. Les effets du texte, eux, suivent leur calendrier. »" }]
-    });
-  }
+  } else if (!resoudreSpecial(R.special || { type: "493" }, a)) return { ok: false };
   const cs = clausesDuTexte(d);
   const resultats = cs.map(appliquerClause);
   S.taux = { ...d.taux };
@@ -335,6 +332,77 @@ function voter() {
   poserRecapDecision(cs.length ? "Effets immédiats de la décision" : "Décision sans effet chiffré", resultats);
   if (isBrowser) render();
   return { ok: true, clauses: cs.length };
+}
+function resoudreSpecial(sp, a) {
+  const type = sp.type || "493";
+  if (type === "493") {
+    S.n493++;
+    const censure = a.voix < (regles().seuilCensure || 170) || (S.n493 > 3 && Math.random() < 0.3);
+    log(`49.3 n°${S.n493}. Motion de censure déposée.`, "neg");
+    if (censure) {
+      const deltas = {};
+      appliquerEffet({ popularite: -6, confianceMarches: -8, soutien: -10, tensionSociale: 6 }, deltas);
+      const texte = formaterLigne("Motion de censure adoptée après le 49.3", deltas);
+      S.journal.unshift({ date: S.date, texte, statut: "immédiat", prevus: [], decisionDate: S.date });
+      log(texte, "neg", [{ qui: "Présidents de groupe", texte: "« La censure efface le texte. Elle n'efface pas la séquence politique. »" }]);
+      S.recap = { du: S.date, au: S.date, pas: "censure", pause: "Le gouvernement est renversé", titre: "Censure", lignes: [{ dejaFormate: true, cause: texte, prevus: [] }], residual: {}, avant: photo(), apres: photo(), decision: true };
+      if (isBrowser) render();
+      return false;
+    }
+    appliquerClause({ cause: `49.3 n°${S.n493} (censure rejetée, le texte passe)`, immediat: { popularite: -3, tensionSociale: 5 }, reactions: [{ qui: "Opinion", texte: "« L'adoption sans vote se paie tout de suite en popularité. Les effets du texte, eux, suivent leur calendrier. »" }] });
+    return true;
+  }
+  if (type === "reconciliation") {
+    const ok = a.voix >= (sp.seuil || 210);
+    log(ok ? `Réconciliation budgétaire adoptée (${a.voix} voix, majorité simple des deux chambres dans le modèle).` : `La réconciliation échoue (${a.voix} voix, seuil ${sp.seuil || 210}) : majorité trop étroite ou texte trop clivant.`, ok ? "pos" : "neg", [{ qui: "Sénat", texte: "« La clôture à 60 voix ne s'applique pas à ce véhicule budgétaire. Le veto présidentiel n'est pas en cause : c'est votre texte. »" }]);
+    if (!ok) { if (isBrowser) render(); return false; }
+    return true;
+  }
+  if (type === "veto") {
+    if (!S.texteHostile) { log("Aucun texte du Congrès en attente. Le veto ne fait pas passer votre propre projet : il bloque celui des chambres.", "neg"); if (isBrowser) render(); return false; }
+    const override = a.voix < (sp.overrideVoixBasses || 140);
+    if (override) {
+      appliquerEffet(S.texteHostile.effet || { popularite: -2 }, {});
+      log(`Veto retoqué : les deux tiers outrepassent (${S.texteHostile.titre}).`, "neg");
+      S.texteHostile = null;
+      if (isBrowser) render();
+      return false;
+    }
+    log(`Veto maintenu. ${S.texteHostile.titre} ne s'applique pas.`, "pos", [{ qui: "Présidence", texte: "« Le Congrès n'a pas les deux tiers. Le texte tombe. »" }]);
+    S.texteHostile = null;
+    if (isBrowser) render();
+    return false;
+  }
+  if (type === "decret") {
+    appliquerClause({ cause: sp.cause || "Décret présidentiel (la chambre enregistre)", immediat: { popularite: -1, confianceMarches: -3 }, reactions: [{ qui: "Observateurs", texte: "« Le décret passe. Le coût est extérieur : sanctions, change, confiance. »" }] });
+    if (S.contraintes && S.contraintes.sanctions) S.contraintes.sanctions.niveau = clamp(S.contraintes.sanctions.niveau + 3, 0, 100);
+    return true;
+  }
+  if (type === "mp") {
+    log("Mesure provisoire en vigueur. Le Congrès peut la laisser expirer.", "neg", [{ qui: "Centrão", texte: "« Sans appointements à la coalition, la mesure ne vivra pas huit semaines. »" }]);
+    S.effets.push({ echeance: addDays(S.date, 56), cause: "Échéance de la mesure provisoire", fait: false, important: true, mpVoix: a.voix, evenement: true });
+    return true;
+  }
+  if (type === "gardiens") {
+    const seuil = regles().seuilVote || 180;
+    if (a.voix < seuil) { log(`Le Majles rejette le texte (${a.voix} voix, seuil ${seuil}).`, "neg"); if (isBrowser) render(); return false; }
+    if (a.cc.length) { log("Le Conseil des gardiens filtre le texte.", "neg"); if (isBrowser) render(); return false; }
+    const bloc = Math.random() < (sp.probaBloc || 0.35);
+    if (bloc) {
+      appliquerEffet({ popularite: -2, confianceMarches: -2 }, {});
+      log("Le Conseil des gardiens ou le Guide bloque le texte après le vote du Majles.", "neg", [{ qui: "Conseil des gardiens", texte: "« Le texte contrevient au cadre fixé. »" }]);
+      if (isBrowser) render();
+      return false;
+    }
+    log("Le Majles a voté et le Conseil des gardiens laisse passer.", "pos");
+    return true;
+  }
+  if (type === "parti") {
+    log(sp.texte || "La direction du Parti tranche. L'assemblée plénière enregistre.", "");
+    appliquerClause({ cause: "Décision du centre du Parti", immediat: { popularite: -0.5 }, reactions: [{ qui: "Assemblée nationale populaire", texte: "« Le vote est un enregistrement, pas un veto. »" }] });
+    return true;
+  }
+  return false;
 }
 function deciderBouclier() {
   const on = !S.bouclier;
@@ -394,7 +462,8 @@ function pasMacro(q) {
   e.croissanceT = g / Math.max(q, 0.01);
   e.croissance = clamp(e.croissance * (1 - 0.25 * q) + (g / Math.max(q, 0.01) * 4) * (0.25 * q), -6, 8);
   e.inflation = clamp(e.inflation + ((2 - e.inflation) * 0.06 + (g / Math.max(q, 0.01) - 0.25) * 0.12) * q + rnd(-0.08, 0.08) * q - (S.bouclier ? 0.08 * q : 0), -1, 15);
-  e.chomage = clamp(e.chomage + (-0.35 * ((g / Math.max(q, 0.01) * 4) - 1) / 4 + (S.smic / D.smic.brutMensuel - 1) * 0.5 / 4) * q + rnd(-0.05, 0.05) * q, 3, 20);
+  const smicRef = (D.smic && D.smic.brutMensuel) || S.smic || 1;
+  e.chomage = clamp(e.chomage + (-0.35 * ((g / Math.max(q, 0.01) * 4) - 1) / 4 + (S.smic / smicRef - 1) * 0.5 / 4) * q + rnd(-0.05, 0.05) * q, 3, 25);
   const gTrim = g / Math.max(q, 0.01);
   const nom = (gTrim * q + Math.max(-0.4, e.inflation) / 4 * q) / 100;
   e.pibMd = clamp(e.pibMd * (1 + nom), 1500, 8000);
@@ -413,6 +482,7 @@ function pasMacro(q) {
   S.greve = clamp(S.greve * (1 - 0.4 * q), 0, 100);
   e.tensionSociale = clamp(e.tensionSociale * (1 - 0.1 * q) + (S.greve * 0.3 + Math.max(0, e.inflation - 2) * 2 + Math.max(0, e.chomage - 7) * 1.5) * q, 0, 100);
   e.popularite = clamp(e.popularite + ((1.2 * (gTrim - 0.2)) - (e.inflation - 2.5) * 0.5 - (e.chomage - 8.5) * 0.8 - (e.tensionSociale - 50) * 0.04) * q + rnd(-1.2, 1.2) * q, 5, 75);
+  pasContraintes(q);
   const notes = ["AAA", "AA+", "AA", "AA-", "A+", "A", "A-", "BBB+", "BBB"];
   let i = notes.indexOf(e.notation); if (i < 0) i = 4;
   if (e.dettePct > 124 && e.deficitPct > 5 && Math.random() < 0.35 * q && i < notes.length - 1) {
@@ -432,12 +502,31 @@ function pasJours(n, sac) {
     if (e.fait || e.echeance > horizon) continue;
     e.fait = true;
     const deltas = {};
+    if (e.mpVoix != null) {
+      const tient = S.soutien >= ((regles().seuilVote || 200) - 30);
+      if (!tient) appliquerEffet({ popularite: -2, croissance: -0.2 }, deltas);
+      sac.push({ cause: tient ? "Le Congrès confirme la mesure provisoire" : "La mesure provisoire expire faute de coalition", decisionDate: e.decisionDate, statut: "échéance", deltas, important: true, texte: tient ? "La mesure provisoire est confirmée." : "La mesure provisoire tombe : la coalition ne tient pas." });
+      continue;
+    }
     appliquerEffet(e, deltas);
     sac.push({ cause: e.cause, decisionDate: e.decisionDate, statut: e.evenement ? "événement différé" : "différé", deltas, important: !!e.important, texte: e.cause });
   }
-  for (const ev of EVENTS) {
+  if (S.texteHostile && S.texteHostile.echeance <= horizon) {
+    const deltas = {};
+    appliquerEffet(S.texteHostile.effet || {}, deltas);
+    sac.push({ cause: S.texteHostile.titre, statut: "texte imposé", deltas, important: true, texte: `${S.texteHostile.titre} entre en vigueur : le veto n'a pas été opposé à temps.` });
+    log(`${S.texteHostile.titre} entre en vigueur.`, "neg");
+    S.texteHostile = null;
+  }
+  for (const ev of (D.evenements || EVENTS)) {
     if (S.silenceEvenements) break;
     if (Math.random() >= ev.p * (n / 7) / 13) continue;
+    if (ev.poseHostile) {
+      S.texteHostile = { titre: ev.titre, effet: ev.poseHostile.effet || ev.immediat || { popularite: -2 }, echeance: addDays(S.date, (ev.poseHostile.semaines || 2) * 7) };
+      sac.push({ cause: ev.cause, statut: "événement", deltas: {}, important: true, texte: ev.titre + " Vous pouvez opposer le veto avant l'échéance, depuis Décisions." });
+      log(ev.titre, "neg");
+      continue;
+    }
     const deltas = {};
     appliquerEffet(ev.immediat, deltas);
     programmerSuite(ev);
@@ -457,7 +546,7 @@ function pasJours(n, sac) {
     sac.push({ cause: "Semestre européen", statut: "échéance", deltas: {}, important: true, texte: titre });
     log(titre, "neg");
   }
-  if (!S.elu && S.date >= "2027-04-12") {
+  if (!S.elu && S.date >= dateElection()) {
     election();
     sac.push({ cause: "Présidentielle 2027", statut: "échéance", deltas: {}, important: true, texte: `Présidentielle : ${S.elu.gagnant} est élu(e).` });
   }
@@ -523,20 +612,53 @@ function avancer(pas) {
   if (isBrowser) render();
   return S.recap;
 }
+function pasContraintes(q) {
+  const c = S.contraintes;
+  if (!c) return;
+  if (c.sanctions) {
+    S.e.croissance = clamp(S.e.croissance - c.sanctions.niveau * 0.004 * q, -6, 8);
+    S.e.confianceMarches = clamp(S.e.confianceMarches - c.sanctions.niveau * 0.01 * q, 0, 100);
+  }
+  if (c.petrole) {
+    c.petrole.prix = clamp(c.petrole.prix + rnd(-2, 2) * q * 8, 25, 140);
+    const ecart = c.petrole.prix - c.petrole.hypothese;
+    if (c.petrole.exportateur) {
+      S.rec.autres += ecart * (c.petrole.sensibilite || 0.2) * q;
+      S.e.croissance = clamp(S.e.croissance + ecart * 0.01 * q, -6, 8);
+    } else S.e.inflation = clamp(S.e.inflation + Math.max(0, ecart) * 0.015 * q, -1, 80);
+  }
+  if (c.change) {
+    c.change.indice = clamp(c.change.indice * (1 + rnd(-0.015, 0.02) * q * 4), 10, 500);
+    if (c.change.fragile) {
+      const dep = (c.change.indice - c.change.depart) / c.change.depart;
+      if (dep > 0) S.e.inflation = clamp(S.e.inflation + dep * 0.4 * q, -1, 80);
+    }
+  }
+  if (c.guerre && c.guerre.niveau > 30) {
+    S.dep.defense += (c.guerre.coutParTrimestre || 1) * q;
+    S.e.tensionSociale = clamp(S.e.tensionSociale + c.guerre.niveau * 0.01 * q, 0, 100);
+  }
+  if (c.commerce && c.commerce.tarifs) S.e.croissance = clamp(S.e.croissance - c.commerce.tarifs * 0.01 * q, -6, 8);
+}
 function election() {
-  const c = D.candidats2027.map(x => ({ ...x }));
+  const c = candidatsActifs().map(x => ({ ...x }));
   const pj = c.find(x => x.joueur);
-  pj.base = clamp(6 + (S.e.popularite - 20) * 0.6 + (S.e.croissance > 1 ? 3 : 0) - (S.e.chomage - 8) * 1.2, 2, 35);
+  if (pj) pj.base = clamp((pj.base || 20) * 0.5 + (S.e.popularite - 20) * 0.45 + (S.e.croissance > 1 ? 3 : 0) - Math.max(0, S.e.chomage - 6) * 0.8, 2, 70);
   c.forEach(x => { x.s = Math.max(0.5, x.base + rnd(-2.5, 2.5)); });
   const t = c.reduce((a, b) => a + b.s, 0);
   c.forEach(x => { x.s = x.s / t * 100; });
   c.sort((a, b) => b.s - a.s);
   const [a, b] = c;
-  const r2a = a.p === "RN" ? clamp(48 + (S.e.tensionSociale - 50) * 0.1 - (b.joueur ? (S.e.popularite - 30) * 0.15 : 0) + rnd(-3, 3), 35, 62) : 55;
+  const famille = (D.election && D.election.familleFavorisee) || "RN";
+  const r2a = a.p === famille ? clamp(48 + (S.e.tensionSociale - 50) * 0.1 - (b.joueur ? (S.e.popularite - 30) * 0.15 : 0) + rnd(-3, 3), 35, 68) : (a.joueur ? clamp(47 + (S.e.popularite - 40) * 0.25, 42, 64) : 54);
   const gagnant = r2a > 50 ? a : b;
-  S.elu = { t1: c, finale: [a, b], r2: [r2a, 100 - r2a], gagnant: gagnant.n };
-  S.fini = !gagnant.joueur;
-  const texte = `Présidentielle : ${gagnant.n} est élu(e) avec ${f1(Math.max(r2a, 100 - r2a))} % au second tour.`;
+  const type = (D.election && D.election.type) || "presidentielle";
+  S.elu = { t1: c, finale: [a, b], r2: [r2a, 100 - r2a], gagnant: gagnant.n, type };
+  if (type === "legislatives") {
+    S.fini = false;
+    S.soutien = Math.round(clamp(S.soutien + (gagnant.joueur ? 15 : -35), 80, 450));
+  } else S.fini = D.election && D.election.finSiDefaite === false ? false : !gagnant.joueur;
+  const texte = `${(D.election && D.election.label) || "Présidentielle"} : ${gagnant.n} arrive en tête avec ${f1(Math.max(r2a, 100 - r2a))} % au second tour du modèle.`;
   S.journal.unshift({ date: S.date, texte, statut: "échéance", decisionDate: null });
   log(texte, gagnant.joueur ? "pos" : "neg");
   view = "elec";
@@ -599,7 +721,8 @@ function htmlAVenir() {
 const nw = n => `<div class="news ${esc(n.c)}"><span class=k>${esc(n.d)}</span> — ${esc(n.t)}${(n.reactions || []).map(r => `<div class=reaction><b>${esc(r.qui)}.</b> ${esc(r.texte)}</div>`).join("")}</div>`;
 function page(html) { $("#main").innerHTML = htmlRecap() + htmlAVenir() + html; }
 function render() {
-  if (!isBrowser || !S) return;
+  if (!isBrowser) return;
+  if (!S) { renderChoix(); return; }
   document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.v === view));
   const quand = fmtDate(S.date);
   const dateEl = $("#date"), horloge = $("#horloge");
@@ -612,19 +735,26 @@ function render() {
   const vit = $("#vitesse");
   if (vit && document.activeElement !== vit) vit.value = String(S.vitesse || 2);
   const e = S.e;
-  if (view === "dash") page(`<p class=note>Statecraft — France. Situation simulée au ${esc(quand)}. Départ (paramètres, non certifiés) : croissance 0,4 %, inflation 3,8 %, chômage 8,5 %, dette 119 %, déficit 5,4 %, OAT 4,76 %.</p>
+  if (view === "dash") page(`<p class=note>Statecraft — ${esc(D.nom)}. Situation simulée au ${esc(quand)}. ${esc(D.bandeau || "Les chiffres de départ sont documentés dans Sources.")}</p>
     <div class=grid>${kpi("Croissance", f1(e.croissance) + " %", e.croissance < 0.5 ? "bad" : "good")}${kpi("Inflation", f1(e.inflation) + " %", e.inflation > 3 ? "bad" : "")}
-    ${kpi("Chômage", f1(e.chomage) + " %", e.chomage > 8 ? "bad" : "")}${kpi("Dette", f1(e.dettePct) + " %", e.dettePct > 115 ? "bad" : "",)}${kpi("Déficit", f1(e.deficitPct) + " %", e.deficitPct > 3 ? "bad" : "good")}
-    ${kpi("OAT 10 ans", f1(e.oat10) + " %", e.oat10 > 4 ? "bad" : "")}${kpi("Popularité", f0(e.popularite) + " %", e.popularite < 30 ? "bad" : "")}
-    ${kpi("Tension", f0(e.tensionSociale), e.tensionSociale > 60 ? "bad" : "")}${kpi("BCE", f1(S.bce) + " %")}${kpi("Note", e.notation)}${kpi("SMIC", f0(S.smic) + " €")}</div>
+    ${kpi("Chômage", f1(e.chomage) + " %", e.chomage > 8 ? "bad" : "")}${kpi("Dette", f1(e.dettePct) + " %", e.dettePct > 100 ? "bad" : "")}${kpi("Déficit", f1(e.deficitPct) + " %", e.deficitPct > 3 ? "bad" : "good")}
+    ${kpi(monnaie().taux, f1(e.oat10) + " %", e.oat10 > 4 ? "bad" : "")}${kpi("Popularité", f0(e.popularite) + " %", e.popularite < 30 ? "bad" : "")}
+    ${kpi("Tension", f0(e.tensionSociale), e.tensionSociale > 60 ? "bad" : "")}${kpi(monnaie().banque, f1(S.bce) + " %")}${kpi("Note", e.notation)}${S.smic ? kpi(D.smic.label || "Salaire minimum", f0(S.smic) + " " + (D.smic.unite || "€")) : ""}
+    ${S.contraintes && S.contraintes.petrole ? kpi(S.contraintes.petrole.label, f0(S.contraintes.petrole.prix) + " $") : ""}
+    ${S.contraintes && S.contraintes.sanctions ? kpi("Sanctions", f0(S.contraintes.sanctions.niveau) + "/100", S.contraintes.sanctions.niveau > 50 ? "bad" : "") : ""}
+    ${S.contraintes && S.contraintes.change ? kpi(S.contraintes.change.label, f0(S.contraintes.change.indice)) : ""}
+    ${S.texteHostile ? kpi("Texte à veto", "en attente", "bad") : ""}</div>
     <h2>Évolution</h2><div class=grid style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">${[["pib", "Croissance (%)"], ["chomage", "Chômage (%)"], ["inflation", "Inflation (%)"], ["dette", "Dette (% PIB)"], ["deficit", "Déficit (%)"], ["pop", "Popularité (%)"]].map(([k, l]) => `<div class=card><div class=k>${l}</div><canvas data-h="${k}"></canvas></div>`).join("")}</div>
     <h2>Dernières nouvelles</h2>${S.news.slice(0, 4).map(nw).join("")}`);
   if (view === "dec") renderDec();
   if (view === "parl") {
     const P = D.politique.assemblee;
-    page(`<h2>Assemblée nationale — 577 sièges</h2><div class=card>${P.map(p => `<div class=row><label>${esc(p.p)}</label><span class=bar style="width:${p.s / 1.6}%;background:${p.c}"></span>${p.s}</div>`).join("")}</div>
-      <div class=card><p>Soutien estimé : <b>${S.soutien}</b> députés. Majorité absolue ${D.politique.majoriteAbsolue}. 49.3 utilisés : ${S.n493}.</p>
-      <p class=note>Le temps se règle dans la barre du bas, pas ici. Une loi votée aujourd'hui inscrit ses effets à la date du jour (immédiats) et à des échéances (inflation, solde, croissance).</p></div>`);
+    const maxS = Math.max(...P.map(p => p.s), 1);
+    const senat = D.politique.senat;
+    page(`<h2>${esc(D.politique.chambreNom || "Assemblée")} — ${D.politique.sieges || ""} sièges</h2><div class=card>${P.map(p => `<div class=row><label>${esc(p.p)}</label><span class=bar style="width:${p.s / maxS * 70}%;background:${p.c}"></span>${p.s}</div>`).join("")}</div>
+      ${senat ? `<h2>${esc(senat.nom)}</h2><div class=card>${senat.groupes.map(p => `<div class=row><label>${esc(p.p)}</label><span class=bar style="width:${p.s / senat.sieges * 70}%;background:${p.c || "#4fa3d1"}"></span>${p.s}</div>`).join("")}<p class=note>${esc(senat.note || "")}</p></div>` : ""}
+      <div class=card><p>Soutien estimé du camp au pouvoir : <b>${S.soutien}</b>. ${esc(D.politique.note || "")}</p>
+      <p class=note>${esc((D.regles && D.regles.modeEmploi) || "Le temps se règle dans la barre du bas.")}</p></div>`);
   }
   if (view === "journal") page(`<h2>Journal des conséquences</h2><p class=note>Chaque ligne rattache un effet à sa cause : décision, événement, ou conjoncture. Les effets différés reviennent à leur date, avec la date de la décision d'origine.</p>
     ${(S.journal || []).map(j => `<div class=news><span class=k>${esc(fmtCourt(j.date))}</span> <span class=quand>${esc(j.statut)}</span> — ${esc(j.texte)}${(j.prevus || []).map(p => `<div class=note>Prévu ${esc(p)}</div>`).join("")}</div>`).join("") || "<p>Le journal est vide.</p>"}`);
@@ -643,11 +773,11 @@ function renderDec() {
     ${sl("Impôt sur les sociétés (%)", "taux.IS", 15, 40, 0.5, d.taux.IS, f1(d.taux.IS) + " %")}${sl("CSG (%)", "taux.CSG", 7, 13, 0.1, d.taux.CSG, f1(d.taux.CSG) + " %")}</div>
     <div class=card><b>Dépenses (%)</b>${Object.keys(d.dep).map(k => sl(MISSIONS[k] || k, "dep." + k, -15, 15, 1, d.dep[k], (d.dep[k] > 0 ? "+" : "") + d.dep[k] + " %")).join("")}</div>
     <div class=card><b>Social</b>${sl("Âge légal", "age", 59, 68, 0.25, d.age, fage(d.age))}${sl("Coup de pouce SMIC", "smic", 0, 15, 0.5, d.smic, "+" + f1(d.smic) + " %")}</div>
-    <div class=card><div class=row><button type=button id=flex ${S.flexUE ? "disabled" : ""}>Flexibilité européenne (défense)</button><button type=button id=boucl>${S.bouclier ? "Lever" : "Activer"} le bouclier tarifaire</button></div></div>
+    ${(D.extra && D.extra.flex === false) ? "" : `<div class=card><div class=row><button type=button id=flex ${S.flexUE ? "disabled" : ""}>Flexibilité européenne (défense)</button><button type=button id=boucl>${S.bouclier ? "Lever" : "Activer"} le bouclier tarifaire</button></div></div>`}
     <div class=card id=est><b>Estimation, avant le vote</b>
-      <p>Solde <b class=${a.solde >= 0 ? "good" : "bad"}>${a.solde >= 0 ? "+" : ""}${f1(a.solde)} Md€/an</b>. Inflation différée liée à la TVA : ${f1(a.inflation)} pt. Voix estimées : ${a.voix} (vote à partir de 200, censure sous 170). ${a.cc.map(x => `<span class=bad>${esc(x)}</span>`).join(" ")}</p>
-      <p class=note>Exemple de lecture, pour +1 point de TVA : popularité −3 pt tout de suite, inflation +0,4 pt répartie à 4 et 8 semaines, recettes en deux fois.</p>
-      <div class=row><button class=primary type=button id=vote>Soumettre au vote</button><button type=button id=v493>Engager le 49.3</button><button type=button id=raz>Annuler</button></div>
+      <p>Solde <b class=${a.solde >= 0 ? "good" : "bad"}>${a.solde >= 0 ? "+" : ""}${f1(a.solde)} ${esc(monnaie().unite)}/an</b>. Inflation différée liée à la taxe sur la consommation : ${f1(a.inflation)} pt. Score politique : ${a.voix} (vote dès ${regles().seuilVote || 200}). ${a.cc.map(x => `<span class=bad>${esc(x)}</span>`).join(" ")}</p>
+      <p class=note>Pour +1 point de taxe sur la consommation : popularité −3 pt tout de suite, inflation +0,4 pt à 4 et 8 semaines.</p>
+      <div class=row><button class=primary type=button id=vote>${esc((D.regles && D.regles.labelVote) || "Soumettre au vote")}</button><button type=button id=v493>${esc((regles().special && regles().special.label) || "Engager le 49.3")}</button>${regles().veto ? `<button type=button id=veto>${esc(regles().veto.label || "Veto")}</button>` : ""}<button type=button id=raz>Annuler</button></div>
     </div>`);
   $("#main").querySelectorAll("input[type=range]").forEach(i => i.oninput = () => {
     const [p, q] = i.dataset.p.split(".");
@@ -662,23 +792,39 @@ function renderDec() {
     const est = $("#est");
     if (!est) return;
     const a2 = analyse(d);
-    est.querySelector("p").innerHTML = `Solde <b class=${a2.solde >= 0 ? "good" : "bad"}>${a2.solde >= 0 ? "+" : ""}${f1(a2.solde)} Md€/an</b>. Inflation différée liée à la TVA : ${f1(a2.inflation)} pt. Voix estimées : ${a2.voix} (vote à partir de 200, censure sous 170). ${a2.cc.map(x => `<span class=bad>${esc(x)}</span>`).join(" ")}`;
+    est.querySelector("p").innerHTML = `Solde <b class=${a2.solde >= 0 ? "good" : "bad"}>${a2.solde >= 0 ? "+" : ""}${f1(a2.solde)} ${esc(monnaie().unite)}/an</b>. Inflation différée liée à la taxe sur la consommation : ${f1(a2.inflation)} pt. Score politique : ${a2.voix} (vote dès ${regles().seuilVote || 200}). ${a2.cc.map(x => `<span class=bad>${esc(x)}</span>`).join(" ")}`;
   });
   $("#vote").onclick = () => { d.mode = "vote"; voter(); };
-  $("#v493").onclick = () => { d.mode = "493"; voter(); };
+  $("#v493").onclick = () => { d.mode = "special"; voter(); };
+  const veto = $("#veto");
+  if (veto) veto.onclick = () => { resoudreSpecial({ type: "veto", ...(regles().veto || {}) }, analyse(d)); };
   $("#raz").onclick = () => { draftInit(); render(); };
   const flex = $("#flex"), boucl = $("#boucl");
   if (flex) flex.onclick = () => deciderFlex();
   if (boucl) boucl.onclick = () => deciderBouclier();
 }
+function renderChoix() {
+  const table = tablePays();
+  const cartes = Object.keys(table).map(id => {
+    const c = table[id];
+    const f = c.fiche || {};
+    return `<a class="card choix" href="?pays=${esc(id)}"><h2>${esc(f.drapeau || "")} ${esc(c.nom)}</h2><p>${esc(f.resume || "")}</p></a>`;
+  }).join("");
+  $("#main").innerHTML = `<h2>Statecraft</h2><p>Choisissez un pays. La France garde ses paramètres de scénario. Les autres pays affichent la source de chaque chiffre, et signalent les estimations. La dernière lettre des noms de candidats est omise.</p><div class="choices">${cartes}</div>`;
+  const dateEl = $("#date"), horloge = $("#horloge");
+  if (dateEl) dateEl.textContent = "Choisir un pays";
+  if (horloge) horloge.textContent = "En attente d'un pays";
+}
 function renderElec() {
+  const label = (D.election && D.election.label) || "Présidentielle 2027";
+  const liste = candidatsActifs();
   if (!S.elu) {
-    page(`<h2>Présidentielle 2027</h2><p class=note>Le scrutin tombe quand la date atteint le 12 avril 2027. Avancer le temps y mène ; la lecture s'y arrête.</p><p>${esc(D.noteCandidats)}</p>
-      <div class=card>${D.candidats2027.map(c => { const v = c.joueur ? clamp(6 + (S.e.popularite - 20) * 0.6, 2, 35) : c.base; return `<div class=row><label>${esc(c.n)} (${esc(c.p)})</label><span class=bar style="width:${v * 2}%;background:${c.c}"></span>${f0(v)} %</div>`; }).join("")}</div>`);
+    page(`<h2>${esc(label)}</h2><p class=note>Le scrutin tombe le ${esc(fmtCourt(dateElection()))}. Avancer le temps y mène ; la lecture s'y arrête. ${esc(D.noteCandidats || "")}</p>
+      <div class=card>${liste.map(c => { const v = c.joueur ? clamp((c.base || 20) * 0.6 + (S.e.popularite - 20) * 0.3, 2, 60) : c.base; return `<div class=row><label>${esc(c.n)} (${esc(c.p)})</label><span class=bar style="width:${Math.min(70, v)}%;background:${c.c}"></span>${f0(v)} %</div>`; }).join("")}</div>`);
     return;
   }
   const E = S.elu;
-  page(`<h2>Présidentielle 2027</h2><div class=card>${E.t1.map(c => `<div class=row><label>${esc(c.n)}</label><span class=bar style="width:${c.s * 2}%;background:${c.c}"></span>${f1(c.s)} %</div>`).join("")}
+  page(`<h2>${esc(label)}</h2><div class=card>${E.t1.map(c => `<div class=row><label>${esc(c.n)}</label><span class=bar style="width:${c.s * 1.4}%;background:${c.c}"></span>${f1(c.s)} %</div>`).join("")}
     <p>Second tour : ${esc(E.finale[0].n)} ${f1(E.r2[0])} % — ${esc(E.finale[1].n)} ${f1(E.r2[1])} %. <b>${esc(E.gagnant)}</b> est élu(e).</p>
     ${S.fini ? "<p class=bad>Votre camp perd. Le temps s'arrête : le bouton du bas est désactivé. Une nouvelle partie le réactive.</p>" : "<p class=good>Votre camp garde l'Élysée. Le temps continue.</p>"}</div>`);
 }
@@ -706,24 +852,32 @@ function modal(titre, html) {
 function sauver(silent) {
   if (typeof localStorage === "undefined" || !S) return;
   const copie = { ...S, lecture: false };
-  try { localStorage.setItem(KEY, JSON.stringify(copie)); } catch (e) {}
+  try { localStorage.setItem(cleSauvegarde(), JSON.stringify(copie)); } catch (e) {}
   if (!silent) modal("Sauvegarde", "<p>Partie enregistrée dans ce navigateur.</p>");
 }
 function boot() {
   if (!isBrowser) return;
   let saved = null;
-  try { saved = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) { saved = null; }
-  if (saved && saved.e && saved.date && saved.journal && saved.effets) { S = saved; S.lecture = false; }
+  if (!idDemande()) { renderChoix(); lier(); return; }
+  try { saved = JSON.parse(localStorage.getItem(cleSauvegarde()) || "null"); } catch (e) { saved = null; }
+  if (saved && saved.e && saved.date && saved.journal && saved.effets && saved.paysId === D.id) { S = saved; S.lecture = false; }
   else nouvelle();
-  document.querySelectorAll("nav button").forEach(b => b.onclick = () => { view = b.dataset.v; render(); });
-  document.querySelectorAll("[data-pas]").forEach(b => b.onclick = () => { if (S.lecture) arreterLecture(); avancer(b.dataset.pas); });
+  lier();
+}
+function lier() {
+  document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
+    if (b.dataset.v === "choix") { location.href = "./index.html"; return; }
+    if (!S) return;
+    view = b.dataset.v; render();
+  });
+  document.querySelectorAll("[data-pas]").forEach(b => b.onclick = () => { if (!S) return; if (S.lecture) arreterLecture(); avancer(b.dataset.pas); });
   $("#lecture").onclick = () => basculerLecture();
   $("#vitesse").onchange = () => { S.vitesse = +$("#vitesse").value; if (S.lecture) { arreterLecture(); basculerLecture(); } };
   $("#save").onclick = () => sauver(false);
-  $("#reset").onclick = () => { if (typeof confirm === "function" && !confirm("Recommencer ?")) return; arreterLecture(); try { localStorage.removeItem(KEY); } catch (e) {} nouvelle(); view = "dash"; };
+  $("#reset").onclick = () => { if (!S) return; if (typeof confirm === "function" && !confirm("Recommencer ?")) return; arreterLecture(); try { localStorage.removeItem(cleSauvegarde()); } catch (e) {} nouvelle(); view = "dash"; };
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
   render();
 }
-const SIM = { nouvelle, avancer, voter, draftInit, deciderBouclier, photo, fmtDate, addDays, addMonths, etat: () => S };
+const SIM = { nouvelle, avancer, voter, draftInit, deciderBouclier, resoudreSpecial, photo, fmtDate, addDays, addMonths, etat: () => S };
 if (typeof globalThis !== "undefined") globalThis.SIM = SIM;
 boot();

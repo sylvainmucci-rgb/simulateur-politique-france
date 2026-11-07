@@ -1,7 +1,14 @@
 // Données pays — ajouter un pays = ajouter un fichier data/xx.js qui définit COUNTRIES.xx
 window.COUNTRIES = window.COUNTRIES || {};
 COUNTRIES.fr = {
-  nom: "France", debut: { annee: 2026, trimestre: 4 },
+  id: "fr", nom: "France",
+  fiche: { drapeau: "🇫🇷", resume: "Assemblée sans majorité, 49.3, TVA, OAT et semestre européen. Les agrégats de départ sont des paramètres de scénario." },
+  intro: "France, 2 novembre 2026. Paramètres de scénario, non certifiés : croissance 0,4 %, T3 −0,1 %, inflation 3,8 %, chômage 8,5 %, dette 119 % du PIB, déficit 5,4 %, OAT 4,76 %. Chaque décision laisse une ligne au journal.",
+  bandeau: "Paramètres de scénario (non certifiés) : croissance 0,4 %, inflation 3,8 %, chômage 8,5 %, dette 119 %, déficit 5,4 %, OAT 4,76 %.",
+  election: { date: "2027-04-12", label: "Présidentielle 2027", type: "presidentielle", familleFavorisee: "RN" },
+  debut: { annee: 2026, trimestre: 4 },
+  monnaie: { unite: "Md€", taux: "OAT 10 ans", tauxCourt: "OAT", banque: "BCE" },
+  regles: { seuilVote: 200, seuilCensure: 170, garde: "Conseil constitutionnel", special: { type: "493", label: "Engager le 49.3" }, rejet: "Le 49.3 reste possible." },
   eco: { pibMd: 3030, croissance: 0.4, croissanceT: -0.1, inflation: 3.8, chomage: 8.5, detteMd: 3600, dettePct: 119,
          deficitPct: 5.4, oat10: 4.76, bund10: 2.7, notation: "A+", popularite: 24, confianceMarches: 45, tensionSociale: 55 },
   // Recettes et dépenses (Md€/an, APU, ordres de grandeur PLF/INSEE)
