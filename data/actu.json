@@ -12,10 +12,86 @@
     "id": "bourget-2026-11-07",
     "date": "2026-11-07",
     "evenement": "Meeting de Mélencho au Bourget",
-    "resume": "Convention présidentielle de La France insoumise au parc des expositions du Bourget. La presse évoque jusqu'à 20 000 personnes et des sondages qui le placent en position de second tour. Le nom est tronqué dans le jeu.",
-    "propositions": ["Présentation publique du programme publié la veille", "Démonstration de campagne, pas un nouveau chiffrage"],
-    "source": "Euronews et France 24, 6 et 7 novembre 2026.",
+    "resume": "Convention de La France insoumise au Bourget. Mélencho dit que, dans une paix, les populations du Donbass occupé devraient être consultées sur la frontière. Le 9 novembre, le porte-parole du ministère ukrainien des Affaires étrangères répond que les Ukrainiens ont déjà tranché en 1991 et qu'un scrutin sous occupation n'est pas un vote. Neuf députés du groupe communiste et ultramarin, sur dix-sept, avaient annoncé le 5 novembre soutenir Mélencho plutôt que Rousse. Les noms sont tronqués.",
+    "propositions": ["Consultation des populations du Donbass en cas de paix : la France ne peut pas l'organiser seule", "Neuf députés PCF et ultramarins se rallient, sans quitter leur groupe pour LFI selon leur lettre"],
+    "source": "Euronews, 9 novembre 2026 ; Huffington Post et Le Dauphiné, 5 novembre 2026.",
     "biais": { "LFI": 0.8 }
+  },
+  {
+    "id": "pcf-melenchon-2026-11-05",
+    "date": "2026-11-05",
+    "evenement": "Neuf députés communistes et ultramarins soutiennent Mélencho",
+    "resume": "Sur les dix-sept membres du groupe à l'Assemblée, neuf écrivent qu'ils soutiennent la candidature de Mélencho, dont le président de groupe. Ils disent n'être pas insoumis. Le conseil national du PCF rappelle ensuite que soutenir un autre candidat que Rousse place un adhérent hors du parti. Les noms sont tronqués.",
+    "propositions": ["Soutien parlementaire, pas une fusion des partis", "Le candidat communiste officiel reste Rousse pour les adhérents qui l'ont désigné"],
+    "source": "Huffington Post et Le Dauphiné, 5 novembre 2026.",
+    "biais": { "LFI": 0.5 }
+  },
+  {
+    "id": "lecornu-social-2026-11-09",
+    "date": "2026-11-09",
+    "evenement": "Conférence sociale : Lecorn annonce un Smic à environ 1 502 € net",
+    "resume": "Après la conférence sociale du 9 novembre, le Premier ministre annonce une hausse de 1,6 % du Smic au 1er décembre : 1 % d'indexation automatique et 0,6 % de coup de pouce, le premier depuis 2012. Le net visé est environ 1 502 €, soit près de 24 € de plus. La prime carburant, jusqu'à 1 000 € et versée par l'employeur, serait prolongée en 2027 dans le PLFSS. Le plafond de défiscalisation des heures supplémentaires passerait de 7 500 à 10 000 €. La prime de partage de la valeur serait exonérée de CSG au-delà de 50 salariés. Des aides aux entreprises seraient conditionnées à des négociations salariales de branche. Le Smic se fait par décret. Le reste dépend d'un budget sans majorité. La CGT parle de miettes, la CFDT d'une hausse insuffisante, FO salue la chute du dogme anti coup de pouce. Le nom est tronqué.",
+    "propositions": ["Smic +1,6 % au 1er décembre, environ 1 502 € net", "Prime carburant jusqu'à 1 000 € prolongée en 2027", "Heures supplémentaires défiscalisées jusqu'à 10 000 €", "PPV exonérée de CSG au-delà de 50 salariés", "Aides aux entreprises liées à des négociations de branche"],
+    "source": "franceinfo, France 24, Euronews et Le Journal de Saône-et-Loire, 9 novembre 2026 ; communiqué FO du 9 novembre.",
+    "biais": { "popularite": 0.4 },
+    "effet": { "tensionSociale": 2 }
+  },
+  {
+    "id": "greve-education-2026-11-10",
+    "date": "2026-11-10",
+    "evenement": "Grève dans l'éducation le 10 novembre",
+    "resume": "L'intersyndicale de l'éducation, du supérieur et de la recherche, avec des organisations de jeunesse, appelle à la grève et aux manifestations le 10 novembre. Elles jugent les annonces insuffisantes sur les salaires, les postes et le bâti, et contestent que la conférence sociale du 9 novembre ait laissé la fonction publique pour un rendez-vous distinct.",
+    "propositions": ["Journée d'action le 10 novembre, avant la réception des syndicats de la fonction publique"],
+    "source": "franceinfo, 7 novembre 2026 ; communiqués FSU.",
+    "biais": {},
+    "effet": { "tensionSociale": 3, "popularite": -0.4 }
+  },
+  {
+    "id": "greve-cgt-2026-11-17",
+    "date": "2026-11-17",
+    "evenement": "La CGT appelle à élargir la grève du 17 novembre",
+    "resume": "Sophie Binet appelle salariés, retraités et jeunes à faire du 17 novembre une journée de grève, au-delà de la mobilisation déjà prévue dans la fonction publique. La CFDT juge le coup de pouce insuffisant. FO se félicite que le refus systématique d'un coup de pouce au Smic ait cédé, tout en disant que ce n'est pas à la hauteur.",
+    "propositions": ["Grève et manifestations le 17 novembre", "CGT : miettes", "CFDT : insuffisant", "FO : le dogme est tombé, le compte n'y est pas"],
+    "source": "France Inter, Le Parisien et franceinfo, 9 novembre 2026 ; communiqué FO.",
+    "biais": {},
+    "effet": { "tensionSociale": 4, "popularite": -0.6 }
+  },
+  {
+    "id": "lepen-cbs-2026-11-10",
+    "date": "2026-11-10",
+    "evenement": "Le Pe sur CBS : « pas de discriminations en France »",
+    "resume": "Dans 60 Minutes, diffusé le 8 novembre, Le Pe dit qu'il n'y a pas de discriminations en France et que le pays serait le moins raciste au monde. La phrase fait polémique le 10 novembre, à gauche et dans l'entourage de Philipp. franceinfo la confronte à des études sur l'embauche. Le bulletin du modèle reste Bardell. Les noms sont tronqués.",
+    "propositions": ["Déclaration politique, pas une mesure législative", "Polémique sur les discriminations à l'embauche"],
+    "source": "CBS, 8 novembre 2026 ; RFI et franceinfo, 10 novembre 2026.",
+    "biais": { "RN": 0.4 },
+    "effet": { "tensionSociale": 3 }
+  },
+  {
+    "id": "bardella-antifa-2026-10-19",
+    "date": "2026-11-10",
+    "evenement": "Bardell veut classer les antifa terroristes et interdire de manifester aux fichés",
+    "resume": "Bardell demande que la France saisisse l'Union européenne pour inscrire des milices antifa, des groupes d'ultragauche et des black blocs sur la liste terroriste européenne, et veut interdire les manifestations aux personnes fichées, sur le modèle des interdictions de stade. La liste européenne se décide à l'unanimité. En droit français, une interdiction générale de manifester se heurte à la liberté de manifestation et, devant la Cour européenne des droits de l'homme, à l'article 11. Ce n'est pas un arrêt déjà rendu : c'est le verrou juridique du module.",
+    "propositions": ["Inscription sur la liste terroriste de l'UE", "Interdiction de manifester pour des personnes fichées"],
+    "source": "Conférence de presse du 19 octobre 2026, rapportée par la presse ; lecture juridique du module (unanimité au Conseil de l'UE, Conseil constitutionnel, article 11 de la CEDH).",
+    "biais": { "RN": 0.3 }
+  },
+  {
+    "id": "primaire-attal-2026-11-10",
+    "date": "2026-11-10",
+    "evenement": "Atta propose une primaire ; Retaillea et Lisnar oui, Philipp et Glucksman non",
+    "resume": "Atta a appelé le 28 octobre à une primaire des démocrates, ouverte à Glucksman, faute d'un candidat du bloc central capable de rassembler les autres. Lisnar dit soutenir un départage depuis longtemps, avec un périmètre qui n'est pas celui d'Atta. Retaillea n'écarte pas une primaire de la droite et du centre, à condition que Philipp y soit. Philipp répond que cette primaire n'aura pas lieu. Glucksman ne s'y joint pas : il est déjà le candidat issu de la primaire sociale-démocrate. Les noms sont tronqués.",
+    "propositions": ["Primaire proposée par Atta", "Soutiens : Retaillea, Lisnar", "Refus : Philipp, Glucksman"],
+    "source": "RTL ; Le Figaro, 3 novembre 2026.",
+    "biais": { "Renaissance": 0.2, "LR": 0.2, "Horizons": -0.4, "PS": -0.2 }
+  },
+  {
+    "id": "sondage-harris-2026-11-09",
+    "date": "2026-11-09",
+    "evenement": "Harris Interactive : Le Pe nettement en tête, Mélencho devant Glucksman",
+    "resume": "Baromètre Toluna Harris Interactive pour RTL et M6, interrogé du 3 au 5 novembre, publié le 9. Le Pe est créditée de 34 % à 36 % selon les hypothèses. Mélencho est à 18 % ou 19 %. Dans l'hypothèse où Atta représente le centre, Glucksman est à 12 %, soit 7 points derrière Mélencho. Le Parisien résume un écart de 5 à 7 points entre Mélencho et ses poursuivants. Ce n'est pas une prédiction. Le jeu n'en fait qu'un biais de modèle. Le bulletin RN du jeu reste Bardell. Les noms sont tronqués.",
+    "propositions": ["Le Pe : 34 % à 36 %", "Mélencho : 18 % à 19 %", "Glucksman : 12 % dans une hypothèse, soit 7 points de moins", "Écart cité de 5 à 7 points selon les configurations"],
+    "source": "RTL, 9 novembre 2026 ; Le Parisien, 9 novembre 2026. Enquête en ligne, 2 101 inscrits, marge d'erreur d'environ 1 à 2,3 points.",
+    "biais": { "RN": 1.2, "LFI": 1.0, "PS": -0.6, "Horizons": -0.5 }
   },
   {
     "id": "lfi-budget-2026-10-14",

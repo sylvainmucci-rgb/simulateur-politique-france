@@ -16,7 +16,7 @@ COUNTRIES.fr = {
   taux: { IR: 100, TVA: 20, IS: 25, CSG: 9.2 }, // IR = indice barème (100 = actuel)
   depenses: { retraites: 410, sante: 260, education: 175, defense: 55, energie: 25, emploi: 80, securite: 45, collectivites: 250, autres: 340, interets: 62 },
   retraites: { ageLegal: 62.75, ratioCotRet: 1.7, deficitMd: -6.6, pensionMoy: 1600 },
-  smic: { brutMensuel: 1823 },
+  smic: { brutMensuel: 1867.02, netMensuel: 1477.93, label: "SMIC brut", unite: "€", note: "En vigueur depuis le 1er juin 2026 : 1 867,02 € brut, environ 1 478 € net (arrêté du 22 mai 2026). Annonce du 9 novembre : +1,6 % au 1er décembre, environ 1 502 € net. Le brut de décembre, environ 1 897 €, est une estimation tant que le décret n'est pas le chiffre de départ." },
   politique: { assemblee: [ {p:"RN + alliés",s:140,c:"#1b2a6b"},{p:"Ensemble",s:160,c:"#f5b700"},{p:"LR",s:47,c:"#0066cc"},{p:"LFI",s:71,c:"#c0392b"},{p:"PS",s:66,c:"#e84393"},{p:"Écologistes",s:38,c:"#27ae60"},{p:"PCF/GDR",s:17,c:"#8b0000"},{p:"LIOT/divers",s:38,c:"#888"} ],
      soutienBase: 207, majoriteAbsolue: 289, ue: { plafondDeficit: 3, procedureDeficitExcessif: true } },
   candidats2027: [
@@ -34,7 +34,7 @@ COUNTRIES.fr = {
    ["OAT 10 ans ~4,76 %","Banque de France / marchés (donnée utilisateur, nov. 2026)"],
    ["Recettes/dépenses par poste","Ordres de grandeur PLF 2026 & INSEE comptes des APU 2024 (dépenses publiques ~57 % PIB) — arrondis"],
    ["Retraites : âge 62 ans 9 mois, ratio 1,7, déficit ~6,6 Md€","COR, rapport annuel juin 2025 ; suspension de la réforme 2023 (LFSS 2026)"],
-   ["SMIC 1 823 € brut","Décret de revalorisation au 1er janv. 2026 (ordre de grandeur, à vérifier)"],
+   ["SMIC 1 867,02 € brut depuis le 1er juin 2026","Arrêté du 22 mai 2026. Net estimé environ 1 478 €. Le 9 novembre 2026, Lecorn annonce +1,6 % au 1er décembre (1 % d'indexation et 0,6 % de coup de pouce), environ 1 502 € net. Le brut de décembre (environ 1 897 €) est une estimation de sites spécialisés, pas encore le décret lu ici."],
    ["Assemblée nationale","Répartition approximative des groupes après législatives 2024 (assemblee-nationale.fr)"],
    ["Règle UE 3 %","Pacte de stabilité réformé (2024), procédure de déficit excessif ouverte contre la France (juil. 2024)"],
    ["Multiplicateurs budgétaires","Littérature OFCE / FMI / Banque de France : 0,5–1,2 selon instrument et cycle"],

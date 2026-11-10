@@ -3,6 +3,25 @@
 window.PROGRAMMES = window.PROGRAMMES || {};
 PROGRAMMES.fr = [
   {
+    parti: "Gouvernement", candidat: "Sébastien Lecorn", cleSondage: "Renaissance",
+    intro: "Annonces de la conférence sociale du 9 novembre 2026. Le Smic se relève par décret. Le reste est renvoyé à des textes budgétaires, sans majorité acquise.",
+    mesures: [
+      { id: "gouv-smic-decembre", titre: "Smic +1,6 % au 1er décembre",
+        propose: "Porter le Smic à environ 1 502 € net le 1er décembre : 1 % d'indexation et 0,6 % de coup de pouce. Au 2 novembre, le brut en vigueur est encore 1 867,02 €.",
+        cout: "Le ministre du Travail parle d'environ 24 € net par mois pour quelque 2 millions de salariés. Ses services estiment 5 000 à 20 000 emplois menacés par cette hausse. Ce n'est pas un chiffrage OFCE.",
+        source: "franceinfo, Euronews et Le Journal de Saône-et-Loire, 9 novembre 2026.",
+        faisable: { verdict: "Oui", budget: "Coût surtout salarial, pas une dépense budgétaire directe.", constitution: "Le Smic se relève par décret.", europe: "Pas d'interdit.", marches: "Les organisations patronales parlent d'une contrainte de plus.", majorite: "Le décret ne demande pas 289 voix.", pourquoi: "C'est la seule annonce du 9 novembre que l'exécutif peut faire seul." },
+        smicBrut: 1897.35,
+        immediat: { popularite: 1, tensionSociale: 2 }, differe: [{ semaines: 4, inflation: 0.1, chomage: 0.05 }], biais: { Renaissance: 0.1 } },
+      { id: "gouv-pouvoir-achat", titre: "Prime carburant, heures supplémentaires, PPV et aides conditionnées",
+        propose: "Prolonger en 2027 la prime carburant jusqu'à 1 000 €, relever le plafond de défiscalisation des heures supplémentaires de 7 500 à 10 000 €, exonérer de CSG la prime de partage de la valeur au-delà de 50 salariés, et conditionner des aides aux entreprises à des négociations salariales de branche.",
+        cout: "Pas de chiffrage agrégé publié le 9 novembre. La prime est versée par l'employeur, pas par l'État. Le plafond d'heures supplémentaires et l'exonération de CSG sont des moins-values de recettes, non isolées ce jour-là.",
+        source: "France 24, franceinfo et Le Journal de Saône-et-Loire, 9 novembre 2026. Roland Lescure rattache la prime au PLFSS.",
+        faisable: { verdict: "Difficile", budget: "Moins-values non chiffrées dans un budget qui n'a pas de majorité.", constitution: "Mesures législatives ordinaires, surtout de financement de la Sécurité sociale.", europe: "Les exonérations ciblées peuvent être regardées comme des aides, sans interdiction annoncée.", marches: "Secondaire.", majorite: "Le gouvernement n'a pas 289 députés. Le 49.3 reste un risque de censure.", pourquoi: "Le Smic passe par décret. Ce paquet-là dépend du budget." },
+        immediat: { popularite: 1, confianceMarches: -1 }, differe: [{ semaines: 8, dRec: -1.5, recKey: "autres" }], biais: { Renaissance: 0.1 } }
+    ]
+  },
+  {
     parti: "LFI", candidat: "Jean-Luc Mélencho", cleSondage: "LFI",
     intro: "L'Avenir en commun, sorti en librairie le 6 novembre 2026 (1 069 mesures). Le contre-budget du 14 octobre 2026 est le seul chiffrage récent publié par le mouvement lui-même.",
     mesures: [
@@ -29,7 +48,13 @@ PROGRAMMES.fr = [
         cout: "Non isolé dans le contre-budget d'octobre 2026. En 2022, l'Institut Montaigne incluait la bifurcation dans un solde de programme d'environ −219 Md€/an, sans ligne nucléaire séparée.",
         source: "Euronews, 7 novembre 2026 ; Institut Montaigne, chiffrage présidentiel 2022.",
         faisable: { verdict: "Non en l'état", budget: "Investissement de remplacement non chiffré par LFI en 2026.", constitution: "Possible par la loi. L'inscrire comme « règle verte » exige l'article 89.", europe: "Le marché européen de l'électricité et la sécurité d'approvisionnement encadrent le calendrier.", marches: "Prix de l'électricité et industrie électro-intensive.", majorite: "Minoritaire, y compris à gauche, sur la sortie du nucléaire.", pourquoi: "Le calendrier politique et électrique n'est pas tenu par une majorité identifiable." },
-        immediat: { popularite: -1, tensionSociale: 3 }, differe: [{ semaines: 16, depMission: { energie: 4 }, inflation: 0.2 }], biais: { LFI: 0.1 } }
+        immediat: { popularite: -1, tensionSociale: 3 }, differe: [{ semaines: 16, depMission: { energie: 4 }, inflation: 0.2 }], biais: { LFI: 0.1 } },
+      { id: "lfi-donbass", titre: "Consulter les populations du Donbass en cas de paix",
+        propose: "Au Bourget, le 7 novembre, Mélencho dit qu'une paix ne peut pas déplacer une frontière ukrainienne sans demander aux populations concernées de quel côté elles se trouvent.",
+        cout: "Pas un coût budgétaire. Kiev répond le 9 novembre que les frontières ont été tranchées en 1991 et qu'un vote sous occupation n'est pas l'expression du peuple.",
+        source: "Euronews, 9 novembre 2026, citant le meeting du 7 novembre et la réponse du porte-parole du ministère ukrainien des Affaires étrangères.",
+        faisable: { verdict: "Non en l'état", budget: "Sans objet.", constitution: "La France ne modifie pas seule la frontière d'un autre État.", europe: "La politique étrangère européenne et les positions de Kiev et des alliés s'y opposent.", marches: "Secondaire.", majorite: "Même une résolution française ne crée pas la consultation.", pourquoi: "La France peut parler. Elle ne peut pas organiser seule un vote sur le Donbass occupé." },
+        immediat: { popularite: -1, tensionSociale: 2 }, biais: { LFI: 0.2 } }
     ]
   },
   {
@@ -59,7 +84,13 @@ PROGRAMMES.fr = [
         cout: "Le parti veut « rendre » 5 Md€ de soutiens, notamment à l'éolien (site RN). Le coût des réacteurs neufs n'est pas dans ce chiffre : c'est un investissement pluriannuel, non chiffré ici.",
         source: "rassemblementnational.fr, mesures 4 et 12.",
         faisable: { verdict: "Difficile", budget: "L'arrêt des soutiens est une économie affichée. Le neuf nucléaire est une dépense différée.", constitution: "Possible.", europe: "Sortir du marché européen de l'électricité se heurte au droit de l'énergie.", marches: "Le nucléaire rassure une partie des industriels. La rupture de marché, non.", majorite: "Introuvable seule sur la sortie du marché européen.", pourquoi: "Relancer le nucléaire est un choix industriel ouvert. Sortir du marché européen ne l'est pas sans conflit juridique." },
-        immediat: { confianceMarches: -1 }, differe: [{ semaines: 20, depMission: { energie: 3 } }], biais: { RN: 0.2 } }
+        immediat: { confianceMarches: -1 }, differe: [{ semaines: 20, depMission: { energie: 3 } }], biais: { RN: 0.2 } },
+      { id: "rn-antifa", titre: "Antifa sur la liste terroriste européenne, fichés interdits de manifestation",
+        propose: "Bardell veut que Paris demande l'inscription de milices antifa, de groupes d'ultragauche et de black blocs sur la liste terroriste de l'UE, et une interdiction de manifester pour des personnes fichées, sur le modèle des interdictions de stade.",
+        cout: "Pas un coût budgétaire publié. Le contentieux et la coopération policière ne sont pas chiffrés.",
+        source: "Conférence de presse du 19 octobre 2026, rapportée par la presse. La fragilité juridique est la lecture du module, pas un arrêt.",
+        faisable: { verdict: "Non en l'état", budget: "Secondaire.", constitution: "La liberté de manifester est constitutionnelle. Une interdiction générale visant des fichés est fragile devant le Conseil constitutionnel.", europe: "La liste terroriste européenne se modifie à l'unanimité. Un seul État peut bloquer.", marches: "Sans objet.", majorite: "Même une loi française ne suffit pas pour la liste de l'UE.", pourquoi: "L'article 11 de la Convention européenne des droits de l'homme protège la réunion pacifique. Le verrou européen est l'unanimité. Rien de tout cela n'est tranché par un juge dans ce module." },
+        immediat: { popularite: 1, tensionSociale: 6 }, biais: { RN: 0.3 }, important: true }
     ]
   },
   {
@@ -83,7 +114,13 @@ PROGRAMMES.fr = [
         cout: "Institut Montaigne, législatives 2024 : l'économie mise en avant par Ensemble sur ce maintien était d'environ 4,5 Md€.",
         source: "Institut Montaigne, communiqué du 28 juin 2024.",
         faisable: { verdict: "Oui", budget: "Économie déjà dans la trajectoire, de l'ordre de 4,5 Md€ selon Montaigne 2024.", constitution: "Le Conseil a déjà contrôlé des réformes d'assurance-chômage. Une nouvelle dégradation des droits peut être recadrée.", europe: "Compatible.", marches: "Légèrement favorable.", majorite: "Fragile : la gauche la déferait, le RN ne la porte pas.", pourquoi: "Faisable si le pouvoir reste. Réversible dès que la majorité change." },
-        immediat: { popularite: -1, confianceMarches: 1 }, differe: [{ semaines: 6, depMission: { emploi: -4 } }], biais: { Renaissance: 0 } }
+        immediat: { popularite: -1, confianceMarches: 1 }, differe: [{ semaines: 6, depMission: { emploi: -4 } }], biais: { Renaissance: 0 } },
+      { id: "epr-primaire", titre: "Primaire des démocrates, ouverte à Glucksman",
+        propose: "Atta propose, depuis le 28 octobre, une primaire faute d'un candidat du bloc central capable de rassembler les autres. Il y inclut Glucksman. Retaillea et Lisnar ne sont pas hostiles à un départage, chacun avec son périmètre. Philipp dit que cette primaire n'aura pas lieu. Glucksman, déjà désigné par sa propre primaire, ne s'y joint pas.",
+        cout: "Coût d'organisation d'un scrutin partisan, non chiffré. Ce n'est pas une dépense de l'État.",
+        source: "RTL ; Le Figaro, 3 novembre 2026.",
+        faisable: { verdict: "Difficile", budget: "Négligeable pour l'État.", constitution: "Une primaire n'est pas une élection officielle. Elle n'existe que si les candidats acceptent d'y entrer.", europe: "Sans objet.", marches: "Sans objet.", majorite: "Il ne s'agit pas d'une loi. Il manque l'accord de Philipp et de Glucksman.", pourquoi: "Atta peut la proposer. Il ne peut pas l'imposer à ceux qui la refusent." },
+        immediat: { popularite: 0.5 }, biais: { Renaissance: 0.2, Horizons: -0.2, PS: -0.1 } }
     ]
   },
   {

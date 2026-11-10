@@ -1223,7 +1223,10 @@ function appliquerActuJusqua(sac) {
     const b = it.biais || {};
     const deltas = {};
     if (b.popularite) appliquerEffet({ popularite: b.popularite }, deltas);
+    if (it.effet) appliquerEffet(it.effet, deltas);
+    if (it.smicBrut) S.smic = it.smicBrut;
     const sondages = [];
+    if (it.smicBrut) sondages.push("SMIC brut " + f0(it.smicBrut) + " €");
     for (const k of Object.keys(b)) {
       if (k === "popularite") continue;
       S.biaisSondages[k] = (S.biaisSondages[k] || 0) + b[k];
@@ -1248,6 +1251,7 @@ function appliquerProgramme(id) {
   if (S.programmesAppliques.includes(id)) return { ok: false, raison: "Déjà appliquée." };
   const deltas = {};
   appliquerEffet(m.immediat, deltas);
+  if (m.smicBrut) S.smic = m.smicBrut;
   for (const df of m.differe || []) S.effets.push({ ...df, echeance: addDays(S.date, (df.semaines || 8) * 7), cause: m.titre + " (" + m.parti + ")", decisionDate: S.date, fait: false, important: !!m.important });
   if (m.biais) {
     S.biaisSondages = S.biaisSondages || {};
