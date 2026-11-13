@@ -94,6 +94,63 @@
     "biais": { "RN": 1.2, "LFI": 1.0, "PS": -0.6, "Horizons": -0.5 }
   },
   {
+    "id": "primaire-retailleau-2026-11-10",
+    "date": "2026-11-10",
+    "evenement": "Retaillea propose une primaire les 31 janvier et 7 février 2027",
+    "resume": "Bruno Retaillea a écrit le 10 novembre à Philipp, Atta et Lisnar pour une primaire de la droite et du centre, les 31 janvier et 7 février 2027. Les directeurs de campagne d'Atta, Retaillea et Lisnar doivent se voir le 17 novembre. Édouard Philipp refuse toujours : il l'a redit le 12 novembre sur franceinfo. Sans lui, la droite peut organiser un scrutin interne et rester divisée. Les noms sont tronqués.",
+    "propositions": ["Faisable : affaire interne aux partis", "Difficile politiquement : sans Philipp, pas d'union de la droite et du centre", "Réunion des états-majors le 17 novembre"],
+    "source": "France 24, 11 novembre 2026 ; franceinfo, 12 novembre 2026.",
+    "biais": { "LR": 0.4, "Horizons": -0.2 }
+  },
+  {
+    "id": "lemaire-plan-2026-11-12",
+    "date": "2026-11-12",
+    "evenement": "Bruno Le Mair présente « Pour une autre France »",
+    "resume": "L'ancien ministre de l'Économie, pas encore candidat, a présenté le 12 novembre un projet d'environ 50 mesures. Le détail et le statut de chaque proposition sont dans Programmes, sous son nom tronqué. Ce n'est pas un chiffrage d'institut.",
+    "propositions": ["TVA +2 à 3 points pour environ 50 Md€ de baisse de cotisations, soit +200 € net par mois selon lui", "Salaire net médian visé à 4 000 €", "Retraite à 65 ans et 45 annuités", "Moratoire d'un an sur l'immigration puis référendum"],
+    "source": "Le Journal du Dimanche, 12 novembre 2026 ; Europe 1, 12 novembre 2026.",
+    "biais": {}
+  },
+  {
+    "id": "energie-gauche-2026-11-12",
+    "date": "2026-11-12",
+    "evenement": "Mélencho et Glucksman s'opposent sur le nucléaire",
+    "resume": "Mélencho promet 100 % de renouvelables au plus tard en 2060, l'arrêt des EPR2 et des réacteurs limités à 60 ans. Glucksman veut pérenniser le nucléaire, construire de nouveaux réacteurs, dans un plan de « révolution écologique » de 200 Md€. L'arrêt des EPR2 est une décision de l'État actionnaire d'EDF. Le financement du plan de 200 Md€ n'est pas détaillé.",
+    "propositions": ["Mélencho : Difficile. RTE juge un horizon 2050-2060 techniquement étudiable. Coût élevé, risque sur l'approvisionnement.", "Glucksman : Faisable. Le financement reste à préciser."],
+    "source": "les-energies-renouvelables.eu ; L'Opinion.",
+    "biais": { "LFI": 0.2, "PS": 0.2 }
+  },
+  {
+    "id": "bardella-plainte-2026-11-12",
+    "date": "2026-11-12",
+    "evenement": "Bardell porte plainte pour faux, et reprend Le Pe sur CBS",
+    "resume": "La plainte contre X pour faux et usage de faux, au sujet d'écrits antisémites que Mediapart lui attribue, a été reçue le 10 novembre. Le 12, Bardell dit partager « à 300 % » la phrase de Le Pe sur CBS : la France serait le pays le moins raciste du monde. Pas de nouvelle mesure de programme. Dans le jeu, l'affaire pèse sur l'intention RN. Les noms sont tronqués.",
+    "propositions": ["Affaire judiciaire et polémique, pas un texte de loi"],
+    "source": "France 24, 12 novembre 2026 ; L'Opinion.",
+    "biais": { "RN": -0.8 },
+    "effet": { "tensionSociale": 2 }
+  },
+  {
+    "id": "zemmour-candidat-2026-11-12",
+    "date": "2026-11-12",
+    "evenement": "Zemmou confirme qu'il est candidat, pas Knaf",
+    "resume": "Éric Zemmou confirme sa candidature pour 2027. Sarah Knaf n'est pas la candidate de Reconquête. franceinfo compte 37 candidats déclarés. Les noms sont tronqués. Ce décompte est celui de la presse, pas une liste du Conseil constitutionnel.",
+    "propositions": ["Candidature Zemmou confirmée", "37 déclarations recensées par la presse"],
+    "source": "franceinfo, 12 novembre 2026.",
+    "biais": { "Reconquête": 0.4 }
+  },
+  {
+    "id": "plfss-senat-2026-11-12",
+    "date": "2026-11-12",
+    "evenement": "Le Sénat adopte l'article 7 du PLFSS 2027",
+    "resume": "Le 12 novembre, le Sénat a adopté l'article 7, qui réduit les exonérations de cotisations patronales sur les bas salaires. L'économie annoncée est d'environ 3,7 Md€, avec une prise d'effet reportée au 1er avril 2027. Le même jour, le Sénat exonère de CSG et de CRDS la prime de partage de la valeur. Les exonérations resteraient d'environ 61 Md€ en 2027. Le modèle inscrit les 3,7 Md€ de recettes de cotisations à la date du 1er avril 2027. Ce n'est pas encore la loi promulguée : le texte peut encore bouger entre les chambres.",
+    "propositions": ["Article 7 : environ 3,7 Md€, effet au 1er avril 2027", "PPV exonérée de CSG/CRDS au Sénat", "Exonérations encore environ 61 Md€ en 2027"],
+    "source": "Sénat, compte rendu analytique du 12 novembre 2026 ; Orange, 12 novembre 2026.",
+    "biais": { "popularite": -0.2 },
+    "cleUnique": "plfss-art7-2027",
+    "differe": [{ "echeance": "2027-04-01", "dRec": 3.7, "recKey": "cotisations" }]
+  },
+  {
     "id": "lfi-budget-2026-10-14",
     "date": "2026-10-14",
     "evenement": "Contre-budget LFI : 106,4 Md€ de recettes, 81,7 Md€ de dépenses",

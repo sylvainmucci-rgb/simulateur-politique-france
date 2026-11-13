@@ -17,6 +17,7 @@ COUNTRIES.fr = {
   depenses: { retraites: 410, sante: 260, education: 175, defense: 55, energie: 25, emploi: 80, securite: 45, collectivites: 250, autres: 340, interets: 62 },
   retraites: { ageLegal: 62.75, ratioCotRet: 1.7, deficitMd: -6.6, pensionMoy: 1600 },
   smic: { brutMensuel: 1867.02, netMensuel: 1477.93, label: "SMIC brut", unite: "€", note: "En vigueur depuis le 1er juin 2026 : 1 867,02 € brut, environ 1 478 € net (arrêté du 22 mai 2026). Annonce du 9 novembre : +1,6 % au 1er décembre, environ 1 502 € net. Le brut de décembre, environ 1 897 €, est une estimation tant que le décret n'est pas le chiffre de départ." },
+  plfss: { annee: 2027, note: "Sénat, 12 novembre 2026 : l'article 7 réduit les exonérations de cotisations patronales sur les bas salaires (environ 3,7 Md€), effet au 1er avril 2027. Le Sénat exonère aussi de CSG/CRDS la prime de partage de la valeur. Les exonérations resteraient d'environ 61 Md€ en 2027. Ce n'est pas encore la loi promulguée." },
   politique: { assemblee: [ {p:"RN + alliés",s:140,c:"#1b2a6b"},{p:"Ensemble",s:160,c:"#f5b700"},{p:"LR",s:47,c:"#0066cc"},{p:"LFI",s:71,c:"#c0392b"},{p:"PS",s:66,c:"#e84393"},{p:"Écologistes",s:38,c:"#27ae60"},{p:"PCF/GDR",s:17,c:"#8b0000"},{p:"LIOT/divers",s:38,c:"#888"} ],
      soutienBase: 207, majoriteAbsolue: 289, ue: { plafondDeficit: 3, procedureDeficitExcessif: true } },
   candidats2027: [
