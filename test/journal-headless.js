@@ -89,7 +89,7 @@ const manifest = fs.readFileSync(path.join(__dirname, "..", "manifest.json"), "u
 assert(/simfr-v\d+/.test(sw) && sw.includes("data/us.js"), "cache SW");
 assert(html.includes("Statecraft") && html.includes('data-pas="mois"') && html.includes('id="horloge"'), "titre et barre de temps");
 assert(html.includes('data-v="prog"') && html.includes("Actu réelle") && html.includes("data/programmes.js"), "onglets programmes et actu");
-assert(sw.includes("data/programmes.js") && sw.includes("data/actu.json") && sw.includes("simfr-v19"), "cache des programmes");
+assert(sw.includes("data/programmes.js") && sw.includes("data/actu.json") && sw.includes("simfr-v20") && sw.includes("og-image.png"), "cache des programmes");
 assert(manifest.includes("Statecraft") && manifest.includes("Élysée"), "manifest");
 const us = load("?pays=us");
 us.SIM.nouvelle();

@@ -121,6 +121,9 @@ function nouvelle(perso) {
     regime: regimeInitial()
   };
   log(D.intro || "Vous prenez vos fonctions. Chaque décision laissera une ligne au journal, et chaque pas de temps un récapitulatif.", "neg");
+  try {
+    if (isBrowser && new URLSearchParams(location.search).get("rapide") === "1") S.rapideJusqua = addMonths(DEBUT, 12);
+  } catch (e) {}
   poserPerso(perso || persoIncumbent());
   appliquerActuJusqua();
   snap();
@@ -721,6 +724,14 @@ function pasJours(n, sac) {
     sac.push({ cause: "Semestre européen", statut: "échéance", deltas: {}, important: true, texte: titre });
     log(titre, "neg");
   }
+  if (S.rapideJusqua && S.date >= S.rapideJusqua && !S.fini) {
+    S.fini = true;
+    verifierBadges();
+    const texte = "Partie rapide terminée : un an est passé. Le bilan est prêt à être partagé.";
+    S.journal.unshift({ date: S.date, texte, statut: "échéance", decisionDate: null });
+    sac.push({ cause: "Partie rapide", statut: "échéance", deltas: {}, important: true, texte });
+    if (isBrowser) montrerBilan();
+  }
   if (S.date >= dateElection() && S.dernierScrutin !== dateElection()) {
     election();
     sac.push({ cause: "Présidentielle 2027", statut: "échéance", deltas: {}, important: true, texte: `Présidentielle : ${S.elu.gagnant} est élu(e).` });
@@ -1270,6 +1281,7 @@ function render() {
   if (view === "src") page(`<h2>Sources</h2><div class=card><table>${D.sources.map(s => `<tr><td><b>${esc(s[0])}</b></td><td>${esc(s[1])}</td></tr>`).join("")}</table></div>
     <p class=note>Le pas interne est d'au plus une semaine (une fraction de semaine en fin de mois pour tomber sur la date civile). Un trimestre de l'ancien modèle est réparti sur treize semaines. Les effets chiffrés d'une décision sont des règles pédagogiques : +1 point de TVA = +0,4 point d'inflation différée et −3 points de popularité immédiate. Ce n'est pas une prévision.</p>`);
   majFlash();
+  montrerTuto();
   drawCharts();
 }
 function renderDec() {
@@ -1539,6 +1551,59 @@ function renderCreation() {
   if (dateEl) dateEl.textContent = "Créer un personnage";
   if (horloge) horloge.textContent = D.nom;
 }
+function textePartage(bilan) {
+  const url = "https://simulateur-politique-france.onrender.com/";
+  if (!bilan || !S || !D) return "Statecraft — simulateur politique. Jouable tout de suite.\n" + url;
+  return `Statecraft — ${D.nom}\n${S.perso ? S.perso.nom : "Partie"} au ${S.date}\nPopularité ${f0(S.e.popularite)} % · déficit ${f1(S.e.deficitPct)} % · dette ${f1(S.e.dettePct)} %\nSuccès : ${(S.badges || []).join(", ") || "aucun"}\n${url}`;
+}
+function partager(bilan) {
+  const text = textePartage(!!bilan);
+  const url = "https://simulateur-politique-france.onrender.com/";
+  if (navigator.share) navigator.share({ title: "Statecraft", text, url }).catch(() => {});
+  else if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => toast("Texte copié", "bien")).catch(() => {});
+}
+function montrerBilan() {
+  if (!isBrowser) return;
+  const d = document.createElement("div");
+  d.className = "modal";
+  d.innerHTML = `<div><h2>Bilan de mandat</h2><p>${esc(textePartage(true)).replace(/\n/g, "<br>")}</p><button type=button id=partageBilan>Partager le bilan</button> <button type=button id=fermeBilan>Fermer</button></div>`;
+  document.body.appendChild(d);
+  d.querySelector("#partageBilan").onclick = () => partager(true);
+  d.querySelector("#fermeBilan").onclick = () => d.remove();
+}
+function montrerTuto() {
+  if (!isBrowser || !S || document.getElementById("tuto")) return;
+  try { if (localStorage.getItem("simfr_tuto") === "1") return; } catch (e) { return; }
+  const etapes = [
+    "Une minute pour entrer. Le temps est dans la barre du bas : +1 semaine fait vivre le pays.",
+    "Décider : un curseur, puis le vote. L'effet s'écrit tout de suite, et plus tard à sa date.",
+    "Programmes : chaque mesure est faisable, difficile ou bloquée. L'appliquer a un coût visible.",
+    "Actu réelle : un fait daté peut bouger les sondages. Ce n'est pas un institut."
+  ];
+  let i = 0;
+  const d = document.createElement("div");
+  d.className = "modal";
+  d.id = "tuto";
+  const paint = () => {
+    d.innerHTML = `<div><h2>Prise en main ${i + 1}/4</h2><p>${esc(etapes[i])}</p><button type=button id=tutoNext>${i === 3 ? "C'est parti" : "Suivant"}</button></div>`;
+    d.querySelector("#tutoNext").onclick = () => {
+      if (i === 3) { try { localStorage.setItem("simfr_tuto", "1"); } catch (e) {} d.remove(); }
+      else { i++; paint(); }
+    };
+  };
+  paint();
+  document.body.appendChild(d);
+}
+let promptInstall = null;
+if (isBrowser) window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); promptInstall = e; });
+function binderPartage() {
+  document.querySelectorAll("#partager, #partagerJeu").forEach(b => b.onclick = () => partager(false));
+  document.querySelectorAll("#installer").forEach(b => b.onclick = async () => {
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent || "");
+    if (promptInstall) { try { await promptInstall.prompt(); } catch (e) {} return; }
+    modal("Installer", ios ? "<p>Sur iPhone ou iPad : bouton Partager, puis Sur l'écran d'accueil.</p>" : "<p>Dans le menu du navigateur : Installer Statecraft, ou Ajouter à l'écran d'accueil.</p>");
+  });
+}
 function sauveTrouvee() {
   try {
     if (typeof localStorage === "undefined") return null;
@@ -1563,6 +1628,15 @@ function renderAccueil() {
   }
   $("#jouer").onclick = () => { location.href = "?pays=fr&nouveau=1"; };
   $("#choisirPerso").onclick = () => { location.href = "?pays=fr&nouveau=1"; };
+  const rapide = document.createElement("button");
+  rapide.className = "gros";
+  rapide.textContent = "Partie rapide · 1 an";
+  rapide.onclick = () => { location.href = "?pays=fr&nouveau=1&rapide=1"; };
+  $("#jouer").parentElement.appendChild(rapide);
+  const outils = document.createElement("div");
+  outils.className = "accueil-outils";
+  outils.innerHTML = `<button type=button id="installer">Installer l'app</button> <button type=button id="partager">Partager</button> <a class="lien-avis" href="https://github.com/sylvainmucci-rgb/simulateur-politique-france/issues/new">Un avis</a>`;
+  $("#jouer").parentElement.appendChild(outils);
   const cont = $("#continuer");
   if (cont && save) cont.onclick = () => { location.href = "?pays=" + encodeURIComponent(save.paysId || "fr"); };
   const dateEl = $("#date"), horloge = $("#horloge");
@@ -1654,6 +1728,7 @@ function lier() {
     majSon();
     sonBtn.onclick = () => { localStorage.setItem("simfr_son", localStorage.getItem("simfr_son") === "1" ? "0" : "1"); majSon(); son("neutre"); };
   }
+  binderPartage();
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
   if (S && typeof fetch === "function") fetch("data/actu.json").then(r => r.ok ? r.json() : []).then(j => integrerActu(j)).catch(() => {});
   render();
