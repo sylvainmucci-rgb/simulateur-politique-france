@@ -139,7 +139,19 @@ PROGRAMMES.fr = [
         cout: "Pas un coût budgétaire. Kiev répond le 9 novembre que les frontières ont été tranchées en 1991 et qu'un vote sous occupation n'est pas l'expression du peuple.",
         source: "Euronews, 9 novembre 2026, citant le meeting du 7 novembre et la réponse du porte-parole du ministère ukrainien des Affaires étrangères.",
         faisable: { verdict: "Non en l'état", budget: "Sans objet.", constitution: "La France ne modifie pas seule la frontière d'un autre État.", europe: "La politique étrangère européenne et les positions de Kiev et des alliés s'y opposent.", marches: "Secondaire.", majorite: "Même une résolution française ne crée pas la consultation.", pourquoi: "La France peut parler. Elle ne peut pas organiser seule un vote sur le Donbass occupé." },
-        immediat: { popularite: -1, tensionSociale: 2 }, biais: { LFI: 0.2 } }
+        immediat: { popularite: -1, tensionSociale: 2 }, biais: { LFI: 0.2 } },
+      { id: "lfi-sru", titre: "Défendre la loi SRU",
+        propose: "Au meeting de Nice du 14 novembre, avec Bompar, Guett et Piquema, Mélencho et les siens défendent la loi SRU contre l'abrogation voulue par le RN et Ciott.",
+        cout: "Garder la loi ne crée pas une dépense nouvelle. C'est le droit actuel.",
+        source: "Nice-Matin, 15 novembre 2026, sur le meeting du 14.",
+        faisable: { verdict: "Faisable", budget: "Pas une dépense nouvelle.", constitution: "La loi SRU existe.", europe: "Pas d'interdit.", marches: "Les maires qui ne l'appliquent pas la contestent.", majorite: "L'abroger demanderait une majorité. La défendre, c'est ne pas voter l'abrogation.", pourquoi: "Le droit actuel tient. L'abrogation n'est pas votée." },
+        immediat: { popularite: 1 }, biais: { LFI: 0.2 } },
+      { id: "lfi-hlm", titre: "Construction massive de HLM",
+        propose: "Au-delà de la défense de la loi SRU, le programme demande une construction massive de logements sociaux.",
+        cout: "Plusieurs milliards d'euros par an. Pas de chiffrage d'institut isolé le 15 novembre.",
+        source: "Nice-Matin, 15 novembre 2026 ; programme L'Avenir en commun.",
+        faisable: { verdict: "Difficile", budget: "Plusieurs Md€ par an, dans un déficit déjà au-dessus de 5 %.", constitution: "Une loi de finances peut ouvrir les crédits.", europe: "Les aides au logement social sont encadrées, pas interdites.", marches: "Dette et spread si ce n'est pas financé.", majorite: "Pas 289 voix.", pourquoi: "Légal, trop cher pour le déficit actuel, sans majorité." },
+        immediat: { popularite: 2, confianceMarches: -2 }, differe: [{ semaines: 12, depMission: { autres: 4 } }], biais: { LFI: 0.2 } }
     ]
   },
   {
@@ -264,7 +276,7 @@ PROGRAMMES.fr = [
   },
   {
     parti: "PS", candidat: "Raphaël Glucksman", cleSondage: "PS",
-    intro: "Pas de programme unique chiffré par l'OFCE ou l'Institut Montaigne pour 2027 à cette date. Les mesures ci-dessous sont des axes publics : fiscalité du capital, conditionnalité du libre-échange, services publics.",
+    intro: "Pas de programme unique chiffré par l'OFCE ou l'Institut Montaigne pour 2027 à cette date. Le 15 novembre, des proches de Faur entrent dans l'équipe de Glucksman. Le PS reste derrière ce candidat.",
     mesures: [
       { id: "ps-isf", titre: "Rétablir un impôt sur la fortune, retoucher la flat tax",
         propose: "Fiscalité plus progressive sur les hauts revenus, retour au moins partiel de l'ISF, revenus du capital moins favorisés que le travail.",

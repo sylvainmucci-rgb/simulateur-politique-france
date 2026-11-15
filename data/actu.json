@@ -258,7 +258,7 @@
     "id": "plf-rejete-2026-11-04",
     "date": "2026-11-04",
     "evenement": "L'Assemblée rejette le PLF 2027",
-    "resume": "Le 4 novembre, l'Assemblée nationale rejette le projet de loi de finances pour 2027. Le Sénat doit l'examiner à partir du 20 novembre. Le budget de l'État n'est donc pas voté. Dans le jeu, c'est un événement : la majorité manque, le texte continue sa navette.",
+    "resume": "Le 4 novembre, l'Assemblée nationale rejette le projet de loi de finances pour 2027, à l'unanimité selon le rappel du 15 novembre. Le texte est au Sénat, qui l'examine à partir du 20 novembre. Faur votera une censure si le gouvernement engage le 49.3. Le RN pourrait négocier. Il faut 289 voix. L'article 47, jamais utilisé sous la Ve, n'est ouvert qu'après 70 jours, et un rejet peut déjà compter comme un vote.",
     "propositions": ["Rejet à l'Assemblée", "Examen au Sénat à partir du 20 novembre"],
     "source": "Navette budgétaire 2027, rappelée au moment du vote du Sénat sur le PLFSS.",
     "biais": { "popularite": -0.4 },
@@ -274,6 +274,63 @@
     "source": "Le Figaro, 13 novembre 2026 ; amendement du gouvernement au Sénat, 13 novembre 2026 ; dossier PLFSS du Sénat.",
     "biais": { "popularite": -0.3 },
     "effet": { "confianceMarches": -1 },
+    "important": true
+  },
+  {
+    "id": "larcher-departage-2026-11-14",
+    "date": "2026-11-14",
+    "evenement": "Larche propose un candidat unique du bloc central",
+    "resume": "Le président du Sénat propose de réunir Retaillea, Lisnar, Atta et Philipp pour une méthode de départage et un candidat unique début 2027. Zemmou et Glucksman ne sont pas invités. Renaissance accepte. Philipp refuse toujours, il le redit en meeting. La réunion des équipes d'Atta, Retaillea et Lisnar reste fixée au 17 novembre. Les sondages, notamment Elabe pour BFMTV, annoncent un second tour Le Pe–Mélencho. Dans le jeu, le choix est sur l'onglet Programmes.",
+    "propositions": ["Méthode de départage, le mot primaire n'est pas dans l'appel", "Faisable entre les partis qui acceptent", "Sans Philipp, le bloc reste divisé"],
+    "source": "France 24, 14 novembre 2026 ; BFMTV, 15 novembre 2026.",
+    "biais": { "LR": 0.3, "Renaissance": 0.2, "Horizons": -0.3, "RN": 0.2, "LFI": 0.2 }
+  },
+  {
+    "id": "nice-sru-2026-11-14",
+    "date": "2026-11-14",
+    "evenement": "Mélencho à Nice : environ 3 000 personnes, défense de la loi SRU",
+    "resume": "Environ 3 000 personnes au gymnase Leyrit, avec Bompar, Guett et Piquema. Ils défendent la loi SRU contre l'abrogation voulue par le RN et Ciott. Garder la loi est le droit actuel. Construire massivement des HLM coûterait plusieurs milliards par an, difficile avec le déficit. Les noms de candidats sont tronqués. Guett et Piquema ne sont pas candidats : la dernière lettre est ôtée parce qu'ils portent la séquence.",
+    "propositions": ["Défendre la loi SRU : faisable", "Construction massive de HLM : difficile, plusieurs Md€/an"],
+    "source": "Nice-Matin, 15 novembre 2026 ; melenchon2027.fr, meeting du 14 novembre.",
+    "biais": { "LFI": 0.4 }
+  },
+  {
+    "id": "acte-v-2026-11-14",
+    "date": "2026-11-14",
+    "evenement": "Acte V : 106 000 manifestants, tension en baisse",
+    "resume": "Le 14 novembre, les autorités comptent 106 000 manifestants, contre 146 000 le 7 novembre. 219 interpellations. Le ministère de l'Intérieur parle d'une situation globalement maîtrisée. Le gouvernement ouvre un mois de discussions avec les syndicats de fonctionnaires. Retaillea dénonce des minorités violentes. Dans le jeu, la jauge de tension baisse, sans s'effacer.",
+    "propositions": ["Moins de monde que le samedi précédent", "Discussions ouvertes avec les syndicats de la fonction publique"],
+    "source": "Le Dauphiné, 14 novembre 2026, d'après le ministère de l'Intérieur.",
+    "biais": { "LR": 0.1 },
+    "effet": { "tensionSociale": -4 }
+  },
+  {
+    "id": "retailleau-pret-2026-11-13",
+    "date": "2026-11-13",
+    "evenement": "Retaillea n'a pas de prêt bancaire",
+    "resume": "Sur France 2, Retaillea dit ne pas avoir de prêt pour sa campagne, comme la plupart des candidats. Il accuse Matignon d'avoir retiré une garantie d'État promise quelques mois plus tôt. Il annonce une campagne sobre. Dans le jeu, un personnage LR ou Retaillea part avec un financement de campagne bas : les meetings rapportent moins.",
+    "propositions": ["Contrainte de financement dans Carrière", "Campagne sobre"],
+    "source": "franceinfo, 13 novembre 2026.",
+    "biais": { "LR": -0.3 }
+  },
+  {
+    "id": "faure-glucksmann-2026-11-15",
+    "date": "2026-11-15",
+    "evenement": "Des proches de Faur rejoignent l'équipe de Glucksman",
+    "resume": "Des proches de Faur entrent dans l'équipe de campagne de Glucksman. Le PS reste derrière ce candidat. Faur a dit qu'il voterait la censure si Lecorn engage le 49.3 sur le budget. Le nom est tronqué.",
+    "propositions": ["Renfort d'équipe, pas une nouvelle mesure chiffrée", "Censure : Faur la votera"],
+    "source": "Séquence politique du 15 novembre 2026.",
+    "biais": { "PS": 0.4 }
+  },
+  {
+    "id": "convention-finances-2026-11-27",
+    "date": "2026-11-27",
+    "evenement": "Convention citoyenne sur les finances publiques",
+    "resume": "Une convention citoyenne sur les finances publiques, 150 personnes tirées au sort, s'ouvre le 27 novembre. Les conventions précédentes (climat, fin de vie, temps de l'enfant) ont eu des suites inégales. Celle-ci ne vote pas le budget.",
+    "propositions": ["150 citoyens tirés au sort", "Avis, pas une loi de finances"],
+    "source": "Le Journal de Saône-et-Loire, 14 novembre 2026.",
+    "biais": {},
+    "effet": { "popularite": 0.4 },
     "important": true
   },
   {

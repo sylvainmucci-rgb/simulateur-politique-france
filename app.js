@@ -485,12 +485,51 @@ function voter() {
   if (isBrowser) render();
   return { ok: true, clauses: cs.length };
 }
+function decompteCensure(d) {
+  const groupes = (D.politique && D.politique.assemblee) || [];
+  let voix = 0;
+  const pour = [];
+  for (const g of groupes) {
+    const n = (g.p || "").toLowerCase();
+    if (/ps|lfi|écolog|pcf|gdr/.test(n)) { voix += g.s; pour.push(g.p); }
+  }
+  const tvaHausse = d && d.taux && S.taux && d.taux.TVA > S.taux.TVA + 0.2;
+  const coupes = d && d.dep && Object.keys(d.dep).some(k => d.dep[k] <= -4);
+  const rn = groupes.find(g => /rn/i.test(g.p));
+  let detail = "Faur et la gauche votent la censure.";
+  if (rn && (tvaHausse || coupes)) {
+    voix += rn.s;
+    pour.push(rn.p);
+    detail = "Le texte est hostile : le RN ne négocie pas et vote la censure avec Faur et la gauche.";
+  } else if (rn) detail = "Faur vote la censure. Le RN négocie et ne la vote pas.";
+  return { voix, adoptee: voix >= 289, detail: detail + " (" + pour.join(", ") + ")." };
+}
+function appliquerArticle47() {
+  if (!S || D.id !== "fr") return { ok: false };
+  assurerRegime();
+  const delai = S.date >= "2027-01-13";
+  const deltas = {};
+  appliquerEffet({ popularite: delai ? -6 : -8, confianceMarches: delai ? -8 : -12, tensionSociale: delai ? 8 : 12 }, deltas);
+  S.regime.crise = clamp(S.regime.crise + (delai ? 16 : 24), 0, 100);
+  S.regime.coup = clamp(S.regime.coup + (delai ? 8 : 14), 0, 100);
+  const texte = (formaterLigne("Ordonnances de l'article 47", deltas) || "Ordonnances de l'article 47") + (delai
+    ? " Le délai de 70 jours est passé. L'Assemblée a pourtant rejeté le PLF le 4 novembre : en 1979 et en 2024, un rejet a été lu comme un vote, et l'ordonnance n'a pas été utilisée. Le faire quand même est constitutionnellement disputé, et politiquement explosif."
+    : " Le délai de 70 jours à compter du rejet du 4 novembre n'est pas écoulé (13 janvier 2027). Forcer l'ordonnance avant est encore plus explosif.");
+  S.journal.unshift({ date: S.date, texte, statut: "régime", prevus: ["Article 47 de la Constitution. Jamais utilisé sous la Ve."], decisionDate: S.date });
+  log(texte, "neg", [{ qui: "Conseil constitutionnel", texte: "« Le Parlement s'est prononcé en rejetant. L'ordonnance n'est pas le chemin tranquille. »" }]);
+  feedback("Article 47 : crise budgétaire", "mal");
+  if (isBrowser) render();
+  return { ok: true };
+}
 function resoudreSpecial(sp, a) {
   const type = sp.type || "493";
   if (type === "493") {
     S.n493++;
-    const censure = a.voix < (regles().seuilCensure || 170) || (S.n493 > 3 && Math.random() < 0.3);
-    log(`49.3 n°${S.n493}. Motion de censure déposée.`, "neg");
+    const siege = decompteCensure(S.draft);
+    const censure = D.id === "fr" ? siege.adoptee : (a.voix < (regles().seuilCensure || 170) || (S.n493 > 3 && Math.random() < 0.3));
+    log(D.id === "fr"
+      ? `49.3 n°${S.n493}. Censure : ${siege.voix} voix sur 289. ${siege.detail}`
+      : `49.3 n°${S.n493}. Motion de censure déposée.`, "neg");
     if (censure) {
       const deltas = {};
       appliquerEffet({ popularite: -6, confianceMarches: -8, soutien: -10, tensionSociale: 6 }, deltas);
@@ -882,6 +921,8 @@ function poserPerso(perso) {
     assise: p.role === "citoyen" ? 4 : (meme ? 12 : 10), alliances: [], prochainMeeting: S.date
   };
   S.executif = executifDuRole(S.perso.role);
+  const parti = S.perso.parti || "";
+  S.financement = /LR|Républicain/.test(parti) || S.perso.nom === "Bruno Retaillea" ? { niveau: 25, label: "Pas de prêt bancaire : campagne sobre. Retaillea accuse Matignon d'avoir retiré une garantie." } : /RN|Rassemblement/.test(parti) ? { niveau: 70, label: "Préaccord de 10,6 M€ avec deux banques européennes, pas encore signé." } : { niveau: 55, label: "Financement de campagne ordinaire (dons et prêt, s'il existe)." };
   S.urne = urneDe(S.perso);
   if (!meme) {
     if (p.popularite) S.e.popularite = clamp(p.popularite, 5, 75);
@@ -934,7 +975,8 @@ function actionMeeting() {
   if (!S || !S.perso) return { ok: false, raison: "Pas de personnage." };
   if (S.perso.prochainMeeting && S.date < S.perso.prochainMeeting) return { ok: false, raison: "Le prochain meeting est possible à partir du " + fmtCourt(S.perso.prochainMeeting) + "." };
   const traits = S.perso.traits || [];
-  const pop = traits.indexOf("orateur") >= 0 ? 3 : 2;
+  const coef = ((S.financement && S.financement.niveau) || 55) / 55;
+  const pop = Math.max(1, Math.round((traits.indexOf("orateur") >= 0 ? 3 : 2) * coef));
   const marche = traits.indexOf("tribune") >= 0 ? -1 : 0;
   appliquerEffet({ popularite: pop, tensionSociale: 1, confianceMarches: marche }, {});
   S.perso.assise = (S.perso.assise || 0) + (traits.indexOf("orateur") >= 0 ? 5 : 3);
@@ -1303,7 +1345,8 @@ function renderDec() {
     <div class=card id=est><b>Estimation, avant le vote</b>
       <p>Solde <b class=${a.solde >= 0 ? "good" : "bad"}>${a.solde >= 0 ? "+" : ""}${f1(a.solde)} ${esc(monnaie().unite)}/an</b>. Inflation différée liée à la taxe sur la consommation : ${f1(a.inflation)} pt. Score politique : ${a.voix} (vote dès ${regles().seuilVote || 200}). ${a.cc.map(x => `<span class=bad>${esc(x)}</span>`).join(" ")}</p>
       <p class=note>Pour +1 point de taxe sur la consommation : popularité −3 pt tout de suite, inflation +0,4 pt à 4 et 8 semaines.</p>
-      <div class=row><button class=primary type=button id=vote>${esc((D.regles && D.regles.labelVote) || "Soumettre au vote")}</button><button type=button id=v493>${esc((regles().special && regles().special.label) || "Engager le 49.3")}</button>${regles().veto ? `<button type=button id=veto>${esc(regles().veto.label || "Veto")}</button>` : ""}<button type=button id=raz>Annuler</button></div>
+      <div class=row><button class=primary type=button id=vote>${esc((D.regles && D.regles.labelVote) || "Soumettre au vote")}</button><button type=button id=v493>${esc((regles().special && regles().special.label) || "Engager le 49.3")}</button>${D.id === "fr" ? `<button type=button id=art47>Ordonnances article 47</button>` : ""}${regles().veto ? `<button type=button id=veto>${esc(regles().veto.label || "Veto")}</button>` : ""}<button type=button id=raz>Annuler</button></div>
+      ${D.id === "fr" ? `<p class=note>49.3 : Faur vote la censure. Le RN ne la vote que si le texte est hostile (TVA en hausse ou coupes fortes). Il faut 289 voix, la majorité absolue. L'article 47, jamais utilisé sous la Ve, ne s'ouvre vraiment qu'après 70 jours sans prononcé. L'Assemblée a rejeté le PLF le 4 novembre : s'en servir quand même est explosif.</p>` : ""}
     </div>`);
   $("#main").querySelectorAll("input[type=range]").forEach(i => i.oninput = () => {
     const [p, q] = i.dataset.p.split(".");
@@ -1322,6 +1365,8 @@ function renderDec() {
   });
   $("#vote").onclick = () => { d.mode = "vote"; voter(); };
   $("#v493").onclick = () => { d.mode = "special"; voter(); };
+  const art47 = $("#art47");
+  if (art47) art47.onclick = () => appliquerArticle47();
   const veto = $("#veto");
   if (veto) veto.onclick = () => { resoudreSpecial({ type: "veto", ...(regles().veto || {}) }, analyse(d)); };
   $("#raz").onclick = () => { draftInit(); render(); };
@@ -1438,8 +1483,8 @@ function choisirPrimaire(oui) {
     lignes.push(`${k} ${b[k] > 0 ? "+" : ""}${f1(b[k])} pt`);
   }
   const texte = oui
-    ? `Primaire de la droite et du centre : vous y participez. Sans Philipp, l'union reste incomplète. Intentions ${lignes.join(", ")}.`
-    : `Primaire de la droite et du centre : vous n'y participez pas. La droite reste divisée. Intentions ${lignes.join(", ")}.`;
+    ? `Candidat unique du bloc central : vous entrez dans la méthode de Larche. Philipp reste dehors, le second tour annoncé demeure Le Pe–Mélencho. Intentions ${lignes.join(", ")}.`
+    : `Candidat unique du bloc central : vous refusez, comme Philipp à Toulouse. Le bloc reste divisé. Intentions ${lignes.join(", ")}.`;
   S.journal.unshift({ date: S.date, texte, statut: "carrière", prevus: ["France 24, 11 novembre 2026 ; franceinfo, 12 novembre 2026."], decisionDate: S.date });
   log(texte, oui ? "pos" : "");
   if (isBrowser) render();
@@ -1448,7 +1493,7 @@ function choisirPrimaire(oui) {
 function renderProgrammes() {
   const list = programmesPays();
   if (!list.length) { page("<h2>Programmes</h2><p class=note>Pas de corpus sourcé pour ce pays dans cette version.</p>"); return; }
-  const primaire = (D.id === "fr") ? `<div class=card><b>Primaire de la droite et du centre</b><p>Retaillea a proposé les 31 janvier et 7 février 2027. Philipp refuse. Le choix est interne aux partis : y aller n'unit que ceux qui acceptent.</p><p>${S.primaire ? "Choix déjà enregistré : " + (S.primaire === "oui" ? "participation" : "refus") + "." : ""}</p><button type=button id=primOui ${S.primaire ? "disabled" : ""}>Y participer</button> <button type=button id=primNon ${S.primaire ? "disabled" : ""}>Ne pas y participer</button></div>` : "";
+  const primaire = (D.id === "fr") ? `<div class=card><b>Primaire / candidat unique du bloc central</b><p>Larche, président du Sénat, propose de réunir Retaillea, Lisnar, Atta et Philipp pour une méthode de départage et un candidat unique début 2027. Zemmou et Glucksman ne sont pas invités. Renaissance accepte. Philipp refuse toujours. Les équipes d'Atta, Retaillea et Lisnar se voient le 17 novembre. Les sondages annoncent un second tour Le Pe–Mélencho.</p><p>${S.primaire ? "Choix déjà enregistré : " + (S.primaire === "oui" ? "vous entrez dans le départage" : "vous refusez, comme Philipp") + "." : ""}</p><button type=button id=primOui ${S.primaire ? "disabled" : ""}>Entrer dans le départage</button> <button type=button id=primNon ${S.primaire ? "disabled" : ""}>Refuser, comme Philipp</button></div>` : "";
   const bloc = list.map(p => `<h2>${esc(p.parti)} — ${esc(p.candidat)}</h2><p class=note>${esc(p.intro || "")}</p>` + (p.mesures || []).map(m => {
     const f = m.faisable || {};
     const deja = (S.programmesAppliques || []).includes(m.id);
@@ -1488,6 +1533,7 @@ function renderCarriere() {
     <div class=card><b>${esc(p.nom || "")}</b> — ${esc(labelRole(p.role))} · ${esc(p.parti || "")} · ${esc(labelIdeo(p.ideologie))}
     <p>${S.executif ? "Vous dirigez. Les décisions de l'onglet Décisions sont libres." : "Vous n'avez pas le budget. Un meeting toutes les deux semaines, des alliances, puis l'investiture ou l'élection."}</p>
     <p>Assise du modèle : <b>${f0(S.soutien)}</b>${investiturePossible && !S.executif ? ` · investiture à partir de ${seuil}` : ""}. Meetings : assise de campagne ${f0(p.assise || 0)}. ${p.prochainMeeting && S.date < p.prochainMeeting ? `Prochain meeting le ${esc(fmtCourt(p.prochainMeeting))}.` : "Un meeting est possible maintenant."}</p>
+    <p class=note>Financement de campagne : <b>${f0((S.financement && S.financement.niveau) || 55)}/100</b>. ${esc((S.financement && S.financement.label) || "")} Un meeting rapporte moins sans prêt.</p>
     <p class=note>Alliances déjà nouées : ${esc((p.alliances || []).join(", ") || "aucune")}. Prochain scrutin : ${esc(fmtCourt(dateElection()))}, ${esc(scrutinCourant().label || "")}.</p>
     <button type=button id=meeting ${p.prochainMeeting && S.date < p.prochainMeeting ? "disabled" : ""}>Tenir un meeting</button>
     ${investiturePossible ? `<button type=button id=invest ${S.executif || S.soutien < seuil ? "disabled" : ""}>Demander l'investiture</button>` : "<p class=note>Dans ce régime, l'Assemblée ne nomme pas le chef de l'exécutif. Le chemin passe par l'élection.</p>"}
