@@ -477,6 +477,8 @@ function voter() {
   }
   draftInit();
   poserRecapDecision(cs.length ? "Effets immédiats de la décision" : "Décision sans effet chiffré", resultats);
+  verifierBadges();
+  feedback(cs.length ? "Texte adopté" : "Texte sans effet chiffré", "bien");
   if (isBrowser) render();
   return { ok: true, clauses: cs.length };
 }
@@ -489,6 +491,7 @@ function resoudreSpecial(sp, a) {
     if (censure) {
       const deltas = {};
       appliquerEffet({ popularite: -6, confianceMarches: -8, soutien: -10, tensionSociale: 6 }, deltas);
+      feedback("Motion de censure adoptée", "mal");
       const texte = formaterLigne("Motion de censure adoptée après le 49.3", deltas);
       S.journal.unshift({ date: S.date, texte, statut: "immédiat", prevus: [], decisionDate: S.date });
       log(texte, "neg", [{ qui: "Présidents de groupe", texte: "« La censure efface le texte. Elle n'efface pas la séquence politique. »" }]);
@@ -497,6 +500,9 @@ function resoudreSpecial(sp, a) {
       return false;
     }
     appliquerClause({ cause: `49.3 n°${S.n493} (censure rejetée, le texte passe)`, immediat: { popularite: -3, tensionSociale: 5 }, reactions: [{ qui: "Opinion", texte: "« L'adoption sans vote se paie tout de suite en popularité. Les effets du texte, eux, suivent leur calendrier. »" }] });
+    S.n493Tenus = (S.n493Tenus || 0) + 1;
+    verifierBadges();
+    feedback("Censure rejetée", "bien");
     return true;
   }
   if (type === "reconciliation") {
@@ -1072,7 +1078,114 @@ function majLecture() {
 }
 
 /* ---------- Interface ---------- */
-function kpi(k, v, cls) { return `<div class=card><div class=k>${k}</div><div class="v ${cls || ""}">${v}</div></div>`; }
+function kpi(k, v, cls, jauge) {
+  const ton = cls === "bad" ? "mauvais" : cls === "good" ? "bon" : cls === "warn" ? "moyen" : "";
+  const w = jauge == null ? 0 : Math.max(4, Math.min(100, jauge));
+  return `<div class="card carte-kpi ${ton}"><div class=k>${k}</div><div class="v ${cls || ""}">${v}</div>${jauge == null ? "" : `<div class=jauge><span style="width:${w}%"></span></div>`}</div>`;
+}
+function fleche(hist, hautBon) {
+  const h = S && S.hist && S.hist[hist];
+  if (!h || h.length < 2) return "";
+  const d = h[h.length - 1] - h[h.length - 2];
+  if (Math.abs(d) < 0.05) return `<span class=stable>→</span>`;
+  const monte = d > 0;
+  const bon = hautBon ? monte : !monte;
+  return `<span class="${bon ? "good" : "bad"}">${monte ? "↑" : "↓"}</span>`;
+}
+function toast(texte, kind) {
+  if (!isBrowser) return;
+  const el = document.createElement("div");
+  el.className = "toast " + (kind || "");
+  el.textContent = texte;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+function confettis() {
+  if (!isBrowser) return;
+  for (let i = 0; i < 36; i++) {
+    const c = document.createElement("i");
+    c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.background = ["#55efc4", "#fdcb6e", "#74b9ff", "#ff7675", "#fff"][i % 5];
+    c.style.animationDelay = (Math.random() * 0.4) + "s";
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 1800);
+  }
+}
+function secousse() {
+  if (!isBrowser) return;
+  document.body.classList.add("secousse");
+  setTimeout(() => document.body.classList.remove("secousse"), 500);
+}
+function son(kind) {
+  try {
+    if (!isBrowser || localStorage.getItem("simfr_son") !== "1") return;
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = "triangle";
+    o.frequency.value = kind === "mal" ? 110 : kind === "fete" ? 660 : 440;
+    g.gain.value = 0.04;
+    o.connect(g); g.connect(ctx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+    o.stop(ctx.currentTime + 0.26);
+  } catch (e) {}
+}
+function feedback(texte, kind) {
+  toast(texte, kind);
+  if (kind === "fete") { confettis(); son("fete"); }
+  else if (kind === "mal") { secousse(); son("mal"); }
+  else son("neutre");
+}
+function majFlash() {
+  if (!isBrowser) return;
+  const el = $("#flashTexte");
+  if (!el || !S) return;
+  const titres = (S.news || []).slice(0, 6).map(n => n.t);
+  el.textContent = titres.length ? titres.join("   ·   FLASH   ·   ") : "En attente d'une dépêche.";
+}
+function verifierBadges() {
+  if (!S) return;
+  S.badges = S.badges || [];
+  const ajouter = (id, label) => {
+    if (S.badges.includes(id)) return;
+    S.badges.push(id);
+    feedback("Succès : " + label, "fete");
+    S.journal.unshift({ date: S.date, texte: "Succès débloqué : " + label, statut: "succès", prevus: [], decisionDate: S.date });
+  };
+  if (S.e.deficitPct <= 3) ajouter("equilibre", "Budget à l'équilibre");
+  if ((S.n493Tenus || 0) >= 3) ajouter("censures", "Survivre à 3 motions de censure");
+  if (S.elu && S.elu.joueur && S.date >= "2032-01-01") ajouter("2032", "Réélu en 2032");
+  if (S.e.notation === "AAA") ajouter("aaa", "Note AAA");
+}
+function carteReigns() {
+  if (!S || S.fini) return "";
+  const sem = S.date;
+  if (S.carteDate === sem) return "";
+  const cartes = [
+    { t: "La rue devant Matignon", d: "Les syndicats demandent un geste tout de suite.", a: "Céder un point de popularité utile", b: "Tenir le cap", ea: { popularite: 2, tensionSociale: -3, confianceMarches: -1 }, eb: { popularite: -2, tensionSociale: 4, confianceMarches: 1 } },
+    { t: "Les marchés ouvrent", d: "Le spread s'élargit avant votre texte.", a: "Rassurer, quitte à déplaire", b: "Ignorer le spread", ea: { confianceMarches: 3, popularite: -1 }, eb: { confianceMarches: -3, tensionSociale: 1 } },
+    { t: "Un allié décroche", d: "Sans un compromis, la semaine parlementaire est morte.", a: "Donner un siège symbolique", b: "Refuser le marchandage", ea: { popularite: 0, tensionSociale: -2 }, eb: { popularite: -1, tensionSociale: 3 } }
+  ];
+  const c = cartes[S.tour % cartes.length];
+  S._carte = c;
+  const boutons = `<button type=button data-reigns="a">${esc(c.a)}</button> <button type=button data-reigns="b">${esc(c.b)}</button>`;
+  return `<div class="carte-choix"><div class=k>Événement</div><h2>${esc(c.t)}</h2><p>${esc(c.d)}</p><div class=row>${boutons}</div></div>`;
+}
+function resoudreCarte(cote) {
+  if (!S || !S._carte || S.carteDate === S.date) return;
+  const e = cote === "a" ? S._carte.ea : S._carte.eb;
+  const deltas = {};
+  appliquerEffet(e, deltas);
+  S.carteDate = S.date;
+  const texte = formaterLigne(S._carte.t, deltas) || S._carte.t;
+  S.journal.unshift({ date: S.date, texte, statut: "choix", prevus: [], decisionDate: S.date });
+  log(texte, (deltas.popularite || 0) < 0 ? "neg" : "pos");
+  feedback(cote === "a" ? S._carte.a : S._carte.b, (deltas.confianceMarches || 0) < -1 || (deltas.popularite || 0) < -1 ? "mal" : "bien");
+  verifierBadges();
+  if (isBrowser) render();
+}
 function htmlMouvements(avant, apres) {
   const bits = [];
   for (const k of PHOTO_KEYS) {
@@ -1097,11 +1210,12 @@ function htmlAVenir() {
   if (!p.length) return "";
   return `<div class=card><b>Effets différés encore devant vous</b><ul class=propre>${p.map(e => `<li>${esc(fmtCourt(e.echeance))} — <span class=cause>${esc(e.cause)}</span> → ${esc(apercuDiffere(e))}${e.decisionDate ? ` <span class=quand>décision du ${esc(fmtCourt(e.decisionDate))}</span>` : ""}</li>`).join("")}</ul></div>`;
 }
-const nw = n => `<div class="news ${esc(n.c)}"><span class=k>${esc(n.d)}</span> — ${esc(n.t)}${(n.reactions || []).map(r => `<div class=reaction><b>${esc(r.qui)}.</b> ${esc(r.texte)}</div>`).join("")}</div>`;
+const nw = n => `<div class="news ${esc(n.c)}"><span class=k>${esc(n.d)}</span> — ${esc(n.t)}${(n.reactions || []).map(r => `<div class=reaction><span class=avatar>${esc(String(r.qui || "?").slice(0, 1))}</span><b>${esc(r.qui)}.</b> ${esc(r.texte)}</div>`).join("")}</div>`;
 function page(html) { $("#main").innerHTML = htmlRecap() + htmlAVenir() + html; }
 function render() {
   if (!isBrowser) return;
-  if (!S) { if (enCreation) renderCreation(); else renderChoix(); return; }
+  document.body.classList.toggle("est-accueil", !S && !enCreation);
+  if (!S) { if (enCreation) renderCreation(); else renderAccueil(); return; }
   document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.v === view));
   const quand = fmtDate(S.date);
   const dateEl = $("#date"), horloge = $("#horloge");
@@ -1114,9 +1228,10 @@ function render() {
   const vit = $("#vitesse");
   if (vit && document.activeElement !== vit) vit.value = String(S.vitesse || 2);
   const e = S.e;
-  if (view === "dash") page(`<p class=note>Sovereign — ${esc(D.nom)}. Situation simulée au ${esc(quand)}. ${esc(D.bandeau || "Les chiffres de départ sont documentés dans Sources.")}</p>
+  if (view === "dash") page(`<div class="pop-hero ${e.popularite < 30 ? "mauvais" : e.popularite < 45 ? "moyen" : "bon"}"><div class=k>Popularité ${fleche("pop", true)}</div><div class=grand>${f0(e.popularite)}<small>%</small></div><div class=jauge><span style="width:${Math.max(6, Math.min(100, e.popularite / 75 * 100))}%"></span></div></div>
+    <p class=note>Statecraft — ${esc(D.nom)}. ${esc(quand)}. ${esc(D.bandeau || "")}</p>
     ${S.perso ? `<div class=card><b>${esc(S.perso.nom)}</b> — ${esc(labelRole(S.perso.role))}, ${esc(S.perso.parti)}, ${esc(labelIdeo(S.perso.ideologie))}. ${S.executif ? "<span class=good>Exécutif : vous faites votre politique.</span>" : "<span class=warn>Pas d'exécutif : la campagne est dans Carrière.</span>"} <span class=note>Traits : ${esc((S.perso.traits || []).join(", ") || "aucun")}. Programme annoncé : fiscal ${esc((S.perso.programme || {}).fiscal || "stable")}, social ${esc((S.perso.programme || {}).social || "stable")}, institutions ${esc((S.perso.programme || {}).institutions || "statut")}.</span></div>` : ""}
-    <div class=grid>${kpi("Croissance", f1(e.croissance) + " %", e.croissance < 0.5 ? "bad" : "good")}${kpi("Inflation", f1(e.inflation) + " %", e.inflation > 3 ? "bad" : "")}
+    <div class=grid>${kpi("Croissance " + fleche("pib", true), f1(e.croissance) + " %", e.croissance < 0.5 ? "bad" : "good", Math.max(8, Math.min(100, (e.croissance + 2) * 16)))}${kpi("Inflation " + fleche("inflation", false), f1(e.inflation) + " %", e.inflation > 3 ? "bad" : e.inflation > 2 ? "warn" : "good", Math.min(100, e.inflation * 10))}
     ${kpi("Chômage", f1(e.chomage) + " %", e.chomage > 8 ? "bad" : "")}${kpi("Dette", f1(e.dettePct) + " %", e.dettePct > 100 ? "bad" : "")}${kpi("Déficit", f1(e.deficitPct) + " %", e.deficitPct > 3 ? "bad" : "good")}
     ${kpi(monnaie().taux, f1(e.oat10) + " %", e.oat10 > 4 ? "bad" : "")}${kpi("Popularité", f0(e.popularite) + " %", e.popularite < 30 ? "bad" : "")}
     ${kpi("Tension", f0(e.tensionSociale), e.tensionSociale > 60 ? "bad" : "")}${kpi(monnaie().banque, f1(S.bce) + " %")}${kpi("Note", e.notation)}${S.smic ? kpi(D.smic.label || "Salaire minimum", f0(S.smic) + " " + (D.smic.unite || "€")) : ""}
@@ -1128,7 +1243,12 @@ function render() {
     ${S.regime ? kpi("Crise de régime", f0(S.regime.crise) + "/100", S.regime.crise > 40 ? "bad" : "") : ""}
     ${S.regime ? kpi("Rupture d'appareil", f0(S.regime.coup) + "/100", S.regime.coup > 40 ? "bad" : "") : ""}</div>
     <h2>Évolution</h2><div class=grid style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">${[["pib", "Croissance (%)"], ["chomage", "Chômage (%)"], ["inflation", "Inflation (%)"], ["dette", "Dette (% PIB)"], ["deficit", "Déficit (%)"], ["pop", "Popularité (%)"]].map(([k, l]) => `<div class=card><div class=k>${l}</div><canvas data-h="${k}"></canvas></div>`).join("")}</div>
+    ${(S.badges || []).length ? `<h2>Succès</h2><p>${S.badges.map(b => `<span class="badge est">${esc(b)}</span>`).join(" ")}</p>` : ""}
+    ${carteReigns()}
+    <h2>Une du jour</h2><div class=une><div class=k>JOURNAL FICTIF</div><b>${esc((S.news[0] && S.news[0].t) || "La semaine politique s'ouvre.")}</b></div>
     <h2>Dernières nouvelles</h2>${S.news.slice(0, 4).map(nw).join("")}`);
+    document.querySelectorAll("[data-reigns]").forEach(b => b.onclick = () => resoudreCarte(b.dataset.reigns));
+    majFlash();
   if (view === "vie") renderCarriere();
   if (view === "dec") renderDec();
   if (view === "regime") renderRegime();
@@ -1149,6 +1269,7 @@ function render() {
   if (view === "elec") renderElec();
   if (view === "src") page(`<h2>Sources</h2><div class=card><table>${D.sources.map(s => `<tr><td><b>${esc(s[0])}</b></td><td>${esc(s[1])}</td></tr>`).join("")}</table></div>
     <p class=note>Le pas interne est d'au plus une semaine (une fraction de semaine en fin de mois pour tomber sur la date civile). Un trimestre de l'ancien modèle est réparti sur treize semaines. Les effets chiffrés d'une décision sont des règles pédagogiques : +1 point de TVA = +0,4 point d'inflation différée et −3 points de popularité immédiate. Ce n'est pas une prévision.</p>`);
+  majFlash();
   drawCharts();
 }
 function renderDec() {
@@ -1418,6 +1539,37 @@ function renderCreation() {
   if (dateEl) dateEl.textContent = "Créer un personnage";
   if (horloge) horloge.textContent = D.nom;
 }
+function sauveTrouvee() {
+  try {
+    if (typeof localStorage === "undefined") return null;
+    const clefs = [];
+    for (let i = 0; i < localStorage.length; i++) clefs.push(localStorage.key(i));
+    for (const k of clefs) {
+      if (k !== KEY_FR && !String(k).startsWith("statecraft_")) continue;
+      const s = JSON.parse(localStorage.getItem(k) || "null");
+      if (s && s.e && s.date && s.paysId) return s;
+    }
+  } catch (e) {}
+  return null;
+}
+function renderAccueil() {
+  const save = sauveTrouvee();
+  const marianne = `<svg class="marianne" viewBox="0 0 120 140" aria-hidden="true"><circle cx="60" cy="38" r="22" fill="#f3d5b5"/><path d="M28 36c6-24 58-24 64 0-8 6-16-8-32-8S36 42 28 36z" fill="#ed2939"/><path d="M38 34c8-16 36-16 44 0" fill="none" stroke="#f5b700" stroke-width="4"/><path d="M24 78c8-22 64-22 72 0v48H24z" fill="#002395"/><path d="M24 92h72" stroke="#fff" stroke-width="8"/><circle cx="60" cy="108" r="6" fill="#f5b700"/></svg>`;
+  $("#main").innerHTML = `<section class="accueil">${marianne}<p class="kicker">Le pouvoir, semaine après semaine</p><h1>Statecraft</h1><p class="soustitre-accueil">Élysée : Pouvoir &amp; Chaos</p><p>Un simulateur politique. Les chiffres ont une source. Les noms perdent leur dernière lettre.</p><div class="accueil-actions"><button type=button class="primary gros" id="jouer">Jouer</button><button type=button class="gros" id="continuer" ${save ? "" : "disabled"}>${save ? "Continuer · " + esc(save.paysId || "fr") + " · " + esc(save.date) : "Continuer"}</button><button type=button class="gros" id="choisirPerso">Choisir son personnage</button><a class="gros lien" href="#pays">Tous les pays</a></div><div id="pays"></div></section>`;
+  const pays = $("#pays");
+  if (pays) {
+    const table = tablePays();
+    pays.innerHTML = `<div class="choices">${idsPays().map(id => { const c = table[id]; const f = c.fiche || {}; return `<a class="card choix" href="?pays=${esc(id)}"><h2>${esc(f.drapeau || "")} ${esc(c.nom)}</h2><p>${esc(f.resume || "")}</p></a>`; }).join("")}</div>`;
+  }
+  $("#jouer").onclick = () => { location.href = "?pays=fr&nouveau=1"; };
+  $("#choisirPerso").onclick = () => { location.href = "?pays=fr&nouveau=1"; };
+  const cont = $("#continuer");
+  if (cont && save) cont.onclick = () => { location.href = "?pays=" + encodeURIComponent(save.paysId || "fr"); };
+  const dateEl = $("#date"), horloge = $("#horloge");
+  if (dateEl) dateEl.textContent = "Statecraft";
+  if (horloge) horloge.textContent = "Choisir une partie";
+  document.body.classList.add("est-accueil");
+}
 function renderChoix() {
   const table = tablePays();
   const cartes = idsPays().map(id => {
@@ -1471,7 +1623,10 @@ function sauver(silent) {
 function boot() {
   if (!isBrowser) return;
   let saved = null;
-  if (!idDemande()) { renderChoix(); lier(); return; }
+  if (!idDemande()) { renderAccueil(); lier(); return; }
+  let forcerNouveau = false;
+  try { forcerNouveau = new URLSearchParams(location.search).get("nouveau") === "1"; } catch (e) {}
+  if (forcerNouveau) { try { localStorage.removeItem(cleSauvegarde()); } catch (e) {} }
   try { saved = JSON.parse(localStorage.getItem(cleSauvegarde()) || "null"); } catch (e) { saved = null; }
   if (saved && saved.e && saved.date && saved.journal && saved.effets && saved.paysId === D.id) {
     S = saved; S.lecture = false;
@@ -1491,6 +1646,14 @@ function lier() {
   $("#vitesse").onchange = () => { S.vitesse = +$("#vitesse").value; if (S.lecture) { arreterLecture(); basculerLecture(); } };
   $("#save").onclick = () => sauver(false);
   $("#reset").onclick = () => { if (typeof confirm === "function" && !confirm("Recommencer ?")) return; arreterLecture(); try { localStorage.removeItem(cleSauvegarde()); } catch (e) {} S = null; enCreation = !!idDemande(); view = "dash"; render(); };
+  const plus = $("#plusNav");
+  if (plus) plus.onclick = () => document.body.classList.toggle("nav-ouverte");
+  const sonBtn = $("#sonBtn");
+  if (sonBtn) {
+    const majSon = () => { sonBtn.textContent = localStorage.getItem("simfr_son") === "1" ? "Sons : oui" : "Sons : non"; };
+    majSon();
+    sonBtn.onclick = () => { localStorage.setItem("simfr_son", localStorage.getItem("simfr_son") === "1" ? "0" : "1"); majSon(); son("neutre"); };
+  }
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
   if (S && typeof fetch === "function") fetch("data/actu.json").then(r => r.ok ? r.json() : []).then(j => integrerActu(j)).catch(() => {});
   render();

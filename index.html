@@ -1,10 +1,14 @@
 <!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sovereign — Élysée : Pouvoir &amp; Chaos</title><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#002395">
-<meta name="application-name" content="Sovereign">
+<title>Statecraft — Élysée : Pouvoir &amp; Chaos</title><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#07111f">
+<meta name="application-name" content="Statecraft">
 <link rel="icon" href="icon.svg"><link rel="stylesheet" href="style.css"></head><body>
-<header><b>Sovereign</b><span class="soustitre">Élysée : Pouvoir &amp; Chaos</span><span id="date">2 novembre 2026</span><nav>
+<header><div class="marque"><b>Statecraft</b><span class="soustitre">Élysée : Pouvoir &amp; Chaos</span></div><span id="date">2 novembre 2026</span><nav id="navHaut">
 <button data-v="choix">Pays</button><button data-v="dash">Tableau de bord</button><button data-v="dec">Décisions</button><button data-v="vie">Carrière</button><button data-v="prog">Programmes</button><button data-v="actu">Actu réelle</button><button data-v="regime">Régime</button><button data-v="parl">Parlement</button><button data-v="journal">Journal</button><button data-v="news">Actualités</button><button data-v="elec">Élections</button><button data-v="src">Sources</button></nav></header>
+<div id="flash" class="flash"><b>FLASH</b><div class="flash-piste"><span id="flashTexte">La semaine politique va s'ouvrir.</span></div></div>
 <main id="main"></main>
+<nav id="navBas" class="navbas" aria-label="Navigation principale">
+<button data-v="dash">Tableau</button><button data-v="dec">Décider</button><button data-v="actu">Actu</button><button data-v="elec">Votes</button><button type="button" id="plusNav">Plus</button>
+</nav>
 <footer id="barreTemps">
   <div id="horloge" class="horloge">2 novembre 2026</div>
   <div class="temps-actions">
@@ -21,6 +25,7 @@
   </div>
   <div class="temps-outils">
     <button type="button" id="save">Sauver</button>
+    <button type="button" id="sonBtn">Sons : non</button>
     <button type="button" id="reset">Nouvelle partie</button>
   </div>
 </footer>

@@ -39,6 +39,6 @@ SIM.avancer("semaine");
 assert(S.date === "2026-11-09", "le temps avance encore");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const man = fs.readFileSync(path.join(root, "manifest.json"), "utf8");
-assert(html.includes("Sovereign"), "titre");
-assert(man.includes("Sovereign") && man.includes("Élysée"), "manifest");
+assert(html.includes("Statecraft"), "titre");
+assert(man.includes("Statecraft") && man.includes("Élysée"), "manifest");
 console.log("Régime : OK", { coup: S.regime.coup, crise: S.regime.crise, sanctions: S.regime.sanctions });
