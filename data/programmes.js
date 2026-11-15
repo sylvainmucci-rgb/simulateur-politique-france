@@ -336,14 +336,19 @@ PROGRAMMES.fr = [
   },
   {
     parti: "Nouvelle Énergie", candidat: "David Lisnar", cleSondage: "Nouvelle Énergie",
-    intro: "Lisnar est la cible de la pique de Mélencho à Gentioux le 11 novembre. Son offre sociale, telle qu'elle est portée dans la campagne, mélange répartition et un peu de capitalisation, baisse de charges, et travail au-delà de 35 heures seulement s'il est volontaire.",
+    intro: "Lisnar reste dans les discussions de départage avec Retaillea et Atta : leurs équipes se voient le 17 novembre. Le paquet « répartition, part de capitalisation, baisse de charges, heures au-delà de 35 h volontaires » n'est pas le sien. C'est celui de Rine.",
+    mesures: []
+  },
+  {
+    parti: "Ni droite ni gauche", candidat: "Teddy Rine", cleSondage: "Ni droite ni gauche",
+    intro: "Judoka, candidat depuis le 9 novembre. Il se dit ni de droite ni de gauche. Mélencho, le 11, le range à droite : « la droite a enfin un candidat qui ressemble à quelque chose ». Les pistes ci-dessous viennent de son entretien au Parisien, pas d'un programme chiffré.",
     mesures: [
-      { id: "lisnar-travail", titre: "Répartition, un peu de capitalisation, charges en baisse, 35 heures volontaires",
-        propose: "Garder la répartition, ajouter une part limitée de capitalisation, baisser les charges, et n'ouvrir le travail au-delà de 35 heures que sur la base du volontariat.",
-        cout: "Pas de chiffrage d'institut isolé au 14 novembre 2026.",
-        source: "Campagne Nouvelle Énergie, séquence de novembre 2026. Le coût n'est pas un audit.",
-        faisable: { verdict: "Difficile", budget: "La baisse de charges est une moins-value. La capitalisation limitée n'est pas une dépense immédiate.", constitution: "Lois ordinaires et accords.", europe: "Les allègements trop ciblés peuvent devenir des aides.", marches: "Plutôt favorable.", majorite: "Pas de groupe assez large.", pourquoi: "Juridiquement ouvert, politiquement minoritaire." },
-        immediat: { popularite: 1, confianceMarches: 1 }, biais: { "Nouvelle Énergie": 0.3 } }
+      { id: "rine-travail", titre: "Répartition, une part de capitalisation, charges en baisse, heures au-delà de 35 h volontaires",
+        propose: "Garder la répartition, ne pas exclure une part de capitalisation, augmenter le salaire net en réduisant les charges, et laisser ceux qui le veulent travailler au-delà de 35 heures sans supprimer la durée légale.",
+        cout: "Pas de chiffrage d'institut. La baisse de charges est une moins-value dont le montant n'est pas donné. La part de capitalisation n'est ni chiffrée ni décrite.",
+        source: "Capital et BFMTV, 11 novembre 2026, d'après Le Parisien du 10.",
+        faisable: { verdict: "Difficile", budget: "Les allègements de charges coûtent, sans tableau. La capitalisation, si elle ne détourne pas les cotisations, n'est pas une dépense immédiate. Si elle les détourne, les pensions en cours ne sont plus payées.", constitution: "Retraites, cotisations et durée du travail : loi ordinaire. Les heures au-delà de 35 h existent déjà.", europe: "Un allègement trop ciblé peut être une aide d'État.", marches: "Plutôt favorable si le déficit ne s'en trouve pas creusé.", majorite: "Rine n'a pas de groupe. Il faut 289 voix.", pourquoi: "Chaque brique peut se voter. Rien n'est chiffré, et la durée légale permet déjà les heures supplémentaires." },
+        immediat: { popularite: 1, confianceMarches: 1 }, biais: { "Ni droite ni gauche": 0.3 } }
     ]
   },
   {

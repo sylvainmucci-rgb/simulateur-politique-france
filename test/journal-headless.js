@@ -89,7 +89,11 @@ const manifest = fs.readFileSync(path.join(__dirname, "..", "manifest.json"), "u
 assert(/simfr-v\d+/.test(sw) && sw.includes("data/us.js"), "cache SW");
 assert(html.includes("Statecraft") && html.includes('data-pas="mois"') && html.includes('id="horloge"'), "titre et barre de temps");
 assert(html.includes('data-v="prog"') && html.includes("Actu réelle") && html.includes("data/programmes.js"), "onglets programmes et actu");
-assert(sw.includes("data/programmes.js") && sw.includes("data/actu.json") && sw.includes("simfr-v21") && sw.includes("og-image.png"), "cache des programmes");
+assert(sw.includes("data/programmes.js") && sw.includes("data/actu.json") && sw.includes("simfr-v22") && sw.includes("og-image.png"), "cache des programmes");
+const actuTxt = fs.readFileSync(path.join(__dirname, "..", "data/actu.json"), "utf8");
+const progTxt = fs.readFileSync(path.join(__dirname, "..", "data/programmes.js"), "utf8");
+assert(actuTxt.includes("la pique vise Rine") && actuTxt.includes("rine-programme-2026-11-11") && !actuTxt.includes("pique à Lisnar"), "actu : le programme et la pique sont ceux de Rine");
+assert(progTxt.includes("Teddy Rine") && progTxt.includes("rine-travail") && !progTxt.includes("lisnar-travail"), "programmes : Rine a le paquet social");
 assert(manifest.includes("Statecraft") && manifest.includes("Élysée"), "manifest");
 const us = load("?pays=us");
 us.SIM.nouvelle();

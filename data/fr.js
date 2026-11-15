@@ -25,8 +25,9 @@ COUNTRIES.fr = {
     {n:"Édouard Philipp",p:"Horizons",base:16,c:"#4fa3d1"},{n:"Gabriel Atta",p:"Renaissance",base:0,c:"#f5b700",joueur:true},
     {n:"Bruno Retaillea",p:"LR",base:9,c:"#0066cc"},{n:"Raphaël Glucksman",p:"PS-Place publique",base:12,c:"#e84393"},
     {n:"Marine Tondelie",p:"Écologistes",base:5,c:"#27ae60"},{n:"Éric Zemmou",p:"Reconquête",base:5,c:"#5b3a1a"},{n:"Fabien Rousse",p:"PCF",base:3,c:"#8b0000"},
-    {n:"David Lisnar",p:"Nouvelle Énergie",base:7,c:"#1a5276"},{n:"François Ruffi",p:"Gauche",base:4,c:"#d35400"}],
-  noteCandidats: "La presse de 2026 dit Marine Le Pe de nouveau éligible après un arrêt d'appel ; le jeu ne certifie pas la décision de justice. Le bulletin du modèle porte Jordan Bardell. Emmanuel Macro ne peut pas se représenter. La dernière lettre des noms est omise.",
+    {n:"David Lisnar",p:"Nouvelle Énergie",base:7,c:"#1a5276"},{n:"François Ruffi",p:"Gauche",base:4,c:"#d35400"},
+    {n:"Teddy Rine",p:"Ni droite ni gauche",base:4.5,c:"#b8860b"}],
+  noteCandidats: "La presse de 2026 dit Marine Le Pe de nouveau éligible après un arrêt d'appel ; le jeu ne certifie pas la décision de justice. Le bulletin du modèle porte Jordan Bardell. Emmanuel Macro ne peut pas se représenter. Rine, judoka, se dit ni de droite ni de gauche : Elabe pour BFMTV et La Tribune Dimanche (12-13 novembre) le crédite d'environ 4,5 %. Ce n'est pas une prévision. La dernière lettre des noms est omise.",
   sources: [
    ["Croissance 2026 ~0,4 %, T3 2026 -0,1 %","INSEE, comptes trimestriels (premières estimations, oct. 2026) — chiffres fournis par l'utilisateur, nov. 2026"],
    ["Inflation IPCH 3,8 % (oct. 2026)","INSEE / Eurostat, estimation provisoire oct. 2026 (donnée utilisateur)"],

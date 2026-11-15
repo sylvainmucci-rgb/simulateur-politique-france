@@ -173,10 +173,10 @@
   {
     "id": "melenchon-creuse-2026-11-11",
     "date": "2026-11-11",
-    "evenement": "Mélencho à Gentioux : paix en Ukraine, pique à Lisnar",
-    "resume": "Devant le monument pacifiste de Gentioux, en Creuse, Mélencho dit que rien n'est plus important en Europe que la fin de l'invasion russe en Ukraine. Il ironise sur les propos de Lisnar au sujet de prétendus camps d'entraînement sur le plateau de Millevaches. Les noms sont tronqués.",
-    "propositions": ["Priorité à la fin de la guerre en Ukraine", "Pique contre Lisnar, pas une nouvelle mesure chiffrée"],
-    "source": "France 3 Nouvelle-Aquitaine, 11 novembre 2026.",
+    "evenement": "Mélencho en Creuse : la pique vise Rine",
+    "resume": "Le 11 novembre, en meeting à La Souterraine, Mélencho ironise sur Rine, le judoka entré dans la course : « la droite a enfin un candidat qui ressemble à quelque chose ». Rine se dit ni de droite ni de gauche. Mélencho le range à droite et dit préférer une droite « qui a de la gueule ». La pique ne vise pas Lisnar. Les noms sont tronqués.",
+    "propositions": ["Pique contre Rine, pas une mesure chiffrée", "Lisnar n'est pas la cible"],
+    "source": "BFMTV, 11 novembre 2026 ; TF1, 11-12 novembre 2026.",
     "biais": { "LFI": 0.2 }
   },
   {
@@ -187,6 +187,15 @@
     "propositions": ["Faisabilité très faible : asile, CEDH, réadmission", "Le chiffre de deux millions n'a pas de périmètre statistique publié"],
     "source": "TF1, 10 novembre 2026, repris par la presse.",
     "biais": { "Reconquête": 0.5 }
+  },
+  {
+    "id": "rine-programme-2026-11-11",
+    "date": "2026-11-11",
+    "evenement": "Rine : répartition, une part de capitalisation, charges, heures au-delà de 35 h",
+    "resume": "Teddy Rine, judoka, se dit ni de droite ni de gauche. Candidature annoncée le 9 novembre. Dans Le Parisien du 10, repris le 11 : garder la répartition, ne pas exclure une part de capitalisation, relever le salaire net par une baisse de charges, et permettre à ceux qui le veulent de travailler au-delà de 35 heures sans supprimer cette durée légale. Ce paquet n'est pas celui de Lisnar. Aucun chiffrage d'institut.",
+    "propositions": ["Répartition maintenue, capitalisation non exclue", "Baisse de charges pour relever le net : coût non chiffré", "Heures au-delà de 35 h seulement pour les volontaires"],
+    "source": "Capital et BFMTV, 11 novembre 2026, d'après l'entretien au Parisien du 10.",
+    "biais": { "Ni droite ni gauche": 0.4 }
   },
   {
     "id": "precarite-energie-2026-11-12",
