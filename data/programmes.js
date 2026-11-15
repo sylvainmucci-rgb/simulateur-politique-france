@@ -175,7 +175,19 @@ PROGRAMMES.fr = [
         cout: "Pas un coût budgétaire publié. Le contentieux et la coopération policière ne sont pas chiffrés.",
         source: "Conférence de presse du 19 octobre 2026, rapportée par la presse. La fragilité juridique est la lecture du module, pas un arrêt.",
         faisable: { verdict: "Non en l'état", budget: "Secondaire.", constitution: "La liberté de manifester est constitutionnelle. Une interdiction générale visant des fichés est fragile devant le Conseil constitutionnel.", europe: "La liste terroriste européenne se modifie à l'unanimité. Un seul État peut bloquer.", marches: "Sans objet.", majorite: "Même une loi française ne suffit pas pour la liste de l'UE.", pourquoi: "L'article 11 de la Convention européenne des droits de l'homme protège la réunion pacifique. Le verrou européen est l'unanimité. Rien de tout cela n'est tranché par un juge dans ce module." },
-        immediat: { popularite: 1, tensionSociale: 6 }, biais: { RN: 0.3 }, important: true }
+        immediat: { popularite: 1, tensionSociale: 6 }, biais: { RN: 0.3 }, important: true },
+      { id: "rn-article11", titre: "Référendum article 11 pour la préférence nationale",
+        propose: "Le Pe veut réviser la Constitution par référendum de l'article 11, sans le vote identique de l'Assemblée et du Sénat, pour la préférence nationale et l'immigration. Discours d'unité à Hénin-Beaumont le 11 novembre.",
+        cout: "Pas un coût budgétaire. Le contentieux institutionnel est le prix.",
+        source: "Tribune de 110 constitutionnalistes, Le Monde, 11 novembre 2026 ; Ferran, président du Conseil constitutionnel, mi-octobre ; franceinfo et BFMTV.",
+        faisable: { verdict: "Bloqué", budget: "Sans objet.", constitution: "L'article 89 exige un vote identique des deux chambres avant le référendum. L'article 11 ne révise pas la Constitution. Le Conseil peut contrôler le décret de convocation.", europe: "La préférence nationale se heurte aussi au droit de l'UE.", marches: "Une crise institutionnelle élargit le spread.", majorite: "Même une majorité à l'Assemblée ne lève pas le Sénat.", pourquoi: "Le choix est jouable. Il porte un risque de censure du Conseil constitutionnel et une crise institutionnelle. La Constitution ne change pas." },
+        immediat: { popularite: 1, tensionSociale: 6, confianceMarches: -4 }, coup: 8, crise: 14, biais: { RN: 0.4 }, important: true },
+      { id: "rn-salaires", titre: "+10 % de salaire sans charges, Smic indexé, 62 ans et 42 annuités",
+        propose: "Bardell promet une hausse de salaire de 10 % sans charges, un Smic indexé, et un départ à 62 ans pour 42 annuités. Il veut aussi ne pas renouveler un titre de séjour après six mois sans emploi.",
+        cout: "La hausse sans charges se chiffre en plusieurs milliards, sans audit unique. Le retour à 62 ans est estimé par la Cour des comptes, pour le seul âge, à environ 10,4 Md€/an en 2035 ; les 42 annuités ajouteraient environ 3,9 Md€. Le titre de séjour n'a pas de coût budgétaire publié.",
+        source: "BFMTV, 10 novembre 2026, citant la Cour des comptes (février et mars 2025).",
+        faisable: { verdict: "Difficile", budget: "Plus de 10 Md€/an pour les retraites, plusieurs milliards pour les charges. Pas financé.", constitution: "Les retraites et les charges passent par la loi. Le non-renouvellement d'un titre est une loi possible, sous le contrôle du Conseil constitutionnel et de la directive résidents de longue durée.", europe: "La directive résidents de longue durée limite le non-renouvellement automatique.", marches: "Déficit et spread.", majorite: "Le RN ne l'a pas seul.", pourquoi: "Le salaire et la retraite sont chers et sans majorité. Le titre de séjour est le seul morceau législatif ouvert, et encore pas entièrement." },
+        immediat: { popularite: 2, confianceMarches: -3 }, differe: [{ semaines: 12, depMission: { retraites: 10 } }], biais: { RN: 0.3 } }
     ]
   },
   {
@@ -205,7 +217,13 @@ PROGRAMMES.fr = [
         cout: "Coût d'organisation d'un scrutin partisan, non chiffré. Ce n'est pas une dépense de l'État.",
         source: "RTL ; Le Figaro, 3 novembre 2026.",
         faisable: { verdict: "Difficile", budget: "Négligeable pour l'État.", constitution: "Une primaire n'est pas une élection officielle. Elle n'existe que si les candidats acceptent d'y entrer.", europe: "Sans objet.", marches: "Sans objet.", majorite: "Il ne s'agit pas d'une loi. Il manque l'accord de Philipp et de Glucksman.", pourquoi: "Atta peut la proposer. Il ne peut pas l'imposer à ceux qui la refusent." },
-        immediat: { popularite: 0.5 }, biais: { Renaissance: 0.2, Horizons: -0.2, PS: -0.1 } }
+        immediat: { popularite: 0.5 }, biais: { Renaissance: 0.2, Horizons: -0.2, PS: -0.1 } },
+      { id: "epr-services", titre: "Aucun poste supprimé dans l'Éducation, caution universelle, banque de l'accession",
+        propose: "Atta est pour la primaire et dit garder « un siège » pour Philipp. Il ne supprime aucun poste dans l'Éducation nationale, propose une caution universelle et une banque publique de l'accession.",
+        cout: "Le coût de la caution et de la banque publique n'est pas chiffré au 14 novembre. Ne pas supprimer de postes est un refus d'économie, pas une dépense nouvelle isolée.",
+        source: "Journée franceinfo « Nos services publics », 12 novembre 2026.",
+        faisable: { verdict: "Difficile", budget: "La caution et la banque sont à financer. Le gel des suppressions de postes maintient la dépense.", constitution: "Possible par la loi et par des véhicules publics.", europe: "Une banque publique reste sous le droit des aides.", marches: "Neutre si le coût est borné.", majorite: "Pas 289 voix. La primaire qu'il veut n'a pas l'accord de Philipp.", pourquoi: "Chaque outil est légal. Le financement et la majorité manquent." },
+        immediat: { popularite: 1 }, differe: [{ semaines: 10, depMission: { education: 1 } }], biais: { Renaissance: 0.2 } }
     ]
   },
   {
@@ -229,7 +247,19 @@ PROGRAMMES.fr = [
         cout: "Le candidat rattache ce levier aux 96 Md€ d'économies sur l'État. Le rendement d'un non-remplacement n'est pas certifié par la Cour des comptes dans une note unique.",
         source: "Public Sénat et LCP, reprises des déclarations de campagne.",
         faisable: { verdict: "Difficile", budget: "Économie lente, les départs ne sont pas tous évitables.", constitution: "Le statut ne se défait pas par un communiqué.", europe: "Sans objet.", marches: "Secondaire.", majorite: "Conflit social immédiat, majorité introuvable seule.", pourquoi: "Une partie du non-remplacement se fait déjà. L'ampleur annoncée suppose un conflit que LR ne peut pas gagner seul." },
-        immediat: { popularite: -2, tensionSociale: 6 }, differe: [{ semaines: 16, depMission: { autres: -5 } }], biais: { LR: 0.1 } }
+        immediat: { popularite: -2, tensionSociale: 6 }, differe: [{ semaines: 16, depMission: { autres: -5 } }], biais: { LR: 0.1 } },
+      { id: "lr-primaire-ouverte", titre: "Primaire ouverte et payante, 31 janvier et 7 février",
+        propose: "Retaillea veut une primaire ouverte et payante les 31 janvier et 7 février, même sans Philipp. Réunion des équipes Atta, Retaillea et Lisnar le 17 novembre. Il se retire s'il perd, sans promettre de soutenir Atta.",
+        cout: "Scrutin partisan payant. Pas une dépense de l'État.",
+        source: "France 24, 11 novembre 2026 ; franceinfo, 12 novembre 2026.",
+        faisable: { verdict: "Faisable", budget: "Négligeable pour l'État.", constitution: "Affaire interne aux partis.", europe: "Sans objet.", marches: "Sans objet.", majorite: "Il faut l'accord des candidats, pas 289 députés. Philipp refuse. Sans lui, la droite reste divisée.", pourquoi: "Le scrutin peut avoir lieu. Il n'unit pas la droite et le centre." },
+        immediat: { popularite: 0.5 }, biais: { LR: 0.4, Horizons: -0.3 } },
+      { id: "lr-asile-tiers", titre: "Référendum immigration et asile dans des pays tiers sûrs",
+        propose: "Un référendum constitutionnel sur l'immigration, et le traitement de l'asile dans des « pays tiers sûrs ».",
+        cout: "Le dispositif tiers n'est pas chiffré ici.",
+        source: "Campagne Retaillea, séquence du 14 novembre 2026.",
+        faisable: { verdict: "Difficile", budget: "Non isolé.", constitution: "Un référendum constitutionnel passe par l'article 89, pas par l'article 11 seul.", europe: "Le droit de l'UE et la CEDH encadrent l'asile. Une partie du régime « pays tiers sûrs » se négocie à Bruxelles, elle ne se décrète pas.", marches: "Secondaire.", majorite: "Les deux chambres, puis les partenaires européens.", pourquoi: "Partiellement négociable à Bruxelles. Bloqué si l'on prétend s'affranchir de la CEDH et des traités par un seul référendum." },
+        immediat: { popularite: 1, tensionSociale: 3 }, biais: { LR: 0.2 } }
     ]
   },
   {
@@ -270,7 +300,7 @@ PROGRAMMES.fr = [
         propose: "Inscrire dans la Constitution une trajectoire ramenant le déficit vers 2 % du PIB en fin de quinquennat.",
         cout: "L'objectif est un solde, pas une liste de mesures. Aucun institut n'a publié, à cette date, le détail des économies qui fermeraient cet écart (plusieurs dizaines de milliards).",
         source: "Déclarations d'Édouard Philipp reprises par les observatoires de programmes 2027.",
-        faisable: { verdict: "Non en l'état", budget: "L'inscription constitutionnelle ne crée pas les économies.", constitution: "Article 89 : Congrès ou référendum. Le Sénat et l'Assemblée doivent d'abord voter le même texte.", europe: "Va dans le sens du pacte. Ne le remplace pas.", marches: "Très favorable si la règle est crédible, indifférente si elle reste un article sans mesures.", majorite: "Pas de majorité des trois cinquièmes en vue.", pourquoi: "La phrase est claire. La révision et les économies qui vont avec ne sont pas réunies." },
+        faisable: { verdict: "Difficile", budget: "Environ 100 Md€ d'effort annoncés le 12 novembre : moitié sociale, quart État et collectivités, quart croissance. Très ambitieux, pas un audit.", constitution: "Article 89 : les deux chambres votent d'abord le même texte, puis référendum. L'article 11 ne suffit pas.", europe: "Va dans le sens du pacte.", marches: "Favorable si la trajectoire est crédible.", majorite: "Pas de majorité des deux chambres, encore moins des trois cinquièmes.", pourquoi: "Philipp refuse toujours la primaire. La règle d'or est le bon article, sans la majorité pour l'ouvrir." },
         immediat: { popularite: -2, confianceMarches: 3 }, coup: 0, biais: { Horizons: 0.2 } },
       { id: "hor-depenses", titre: "Baisser la dépense publique pour alléger les prélèvements productifs",
         propose: "Moins de dépense, charges allégées sur l'investissement, réindustrialisation.",
@@ -283,7 +313,37 @@ PROGRAMMES.fr = [
         cout: "Pas un coût budgétaire de premier ordre. Risque : garantie publique implicite, non chiffrée.",
         source: "Déclarations de campagne sur l'épargne et les marchés de capitaux.",
         faisable: { verdict: "Oui", budget: "Faible si l'État ne garantit pas le capital.", constitution: "Possible.", europe: "S'inscrit dans l'union des marchés de capitaux.", marches: "Favorable.", majorite: "Un véhicule fiscal se vote plus facilement qu'une règle d'or.", pourquoi: "Mesure étroite, juridiquement simple, effet macro limité." },
-        immediat: { confianceMarches: 1 }, differe: [{ semaines: 16, croissance: 0.05 }], biais: { Horizons: 0.1 } }
+        immediat: { confianceMarches: 1 }, differe: [{ semaines: 16, croissance: 0.05 }], biais: { Horizons: 0.1 } },
+      { id: "hor-65", titre: "Retraite à 65 ans et une part de capitalisation",
+        propose: "Reculer progressivement l'âge légal à 65 ans, garder des départs anticipés, ajouter une dose de capitalisation collective. Trois jours de carence, public et privé. Un départ de fonctionnaire sur trois non remplacé, soit plus de 250 000 postes. Zéro impôt nouveau pendant cinq ans.",
+        cout: "L'effort global annoncé est d'environ 100 Md€. Le rendement de chaque levier n'est pas isolé par un institut.",
+        source: "Midi Libre, 13 novembre 2026, sur le programme publié le 12.",
+        faisable: { verdict: "Difficile", budget: "L'ordre de grandeur est très au-dessus des textes votés.", constitution: "Les retraites et la carence passent par la loi ou le décret. Le non-remplacement aussi. Pas de révision pour cela.", europe: "Compatible avec une baisse du déficit.", marches: "Favorable.", majorite: "Horizons n'a pas la chambre. Philipp refuse la primaire qui pourrait la lui donner.", pourquoi: "Chaque brique est légale. Le paquet entier n'a pas de majorité." },
+        immediat: { popularite: -4, confianceMarches: 4, tensionSociale: 6 }, differe: [{ semaines: 20, depMission: { retraites: -6, autres: -4 } }], biais: { Horizons: 0.3 } }
+    ]
+  },
+  {
+    parti: "Nouvelle Énergie", candidat: "David Lisnar", cleSondage: "Nouvelle Énergie",
+    intro: "Lisnar est la cible de la pique de Mélencho à Gentioux le 11 novembre. Son offre sociale, telle qu'elle est portée dans la campagne, mélange répartition et un peu de capitalisation, baisse de charges, et travail au-delà de 35 heures seulement s'il est volontaire.",
+    mesures: [
+      { id: "lisnar-travail", titre: "Répartition, un peu de capitalisation, charges en baisse, 35 heures volontaires",
+        propose: "Garder la répartition, ajouter une part limitée de capitalisation, baisser les charges, et n'ouvrir le travail au-delà de 35 heures que sur la base du volontariat.",
+        cout: "Pas de chiffrage d'institut isolé au 14 novembre 2026.",
+        source: "Campagne Nouvelle Énergie, séquence de novembre 2026. Le coût n'est pas un audit.",
+        faisable: { verdict: "Difficile", budget: "La baisse de charges est une moins-value. La capitalisation limitée n'est pas une dépense immédiate.", constitution: "Lois ordinaires et accords.", europe: "Les allègements trop ciblés peuvent devenir des aides.", marches: "Plutôt favorable.", majorite: "Pas de groupe assez large.", pourquoi: "Juridiquement ouvert, politiquement minoritaire." },
+        immediat: { popularite: 1, confianceMarches: 1 }, biais: { "Nouvelle Énergie": 0.3 } }
+    ]
+  },
+  {
+    parti: "Gauche", candidat: "François Ruffi", cleSondage: "Gauche",
+    intro: "Ruffi se déclare candidat et veut une primaire allant de Poutou à Hollande. Le PS, lui, est déjà derrière Glucksman.",
+    mesures: [
+      { id: "ruffi-primaire", titre: "Primaire de la gauche, de Poutou à Hollande",
+        propose: "Un départage de toute la gauche, pas seulement de la gauche de rupture ni seulement des sociaux-démocrates.",
+        cout: "Coût d'un scrutin partisan, non chiffré, pas une dépense de l'État.",
+        source: "Séquence de campagne du 14 novembre 2026.",
+        faisable: { verdict: "Difficile", budget: "Négligeable pour l'État.", constitution: "Une primaire n'existe que si les candidats y entrent.", europe: "Sans objet.", marches: "Sans objet.", majorite: "Glucksman est déjà le candidat du PS. Mélencho a son propre meeting. L'accord manque.", pourquoi: "Ruffi peut la proposer. Il ne peut pas l'imposer à ceux qui ont déjà leur candidat." },
+        immediat: { popularite: 0.5 }, biais: { Gauche: 0.4, PS: -0.1 } }
     ]
   }
 ];

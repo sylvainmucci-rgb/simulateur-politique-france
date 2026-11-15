@@ -1245,7 +1245,11 @@ function appliquerActuJusqua(sac) {
     }
     const texte = `Actu réelle — ${it.evenement}` + (sondages.length ? ` → intentions ${sondages.join(", ")}` : " → pas de biais de sondage");
     S.journal.unshift({ date: S.date, texte, statut: "actualité", prevus: [it.source || ""], decisionDate: it.date });
-    if (sac) sac.push({ cause: "Actu réelle — " + it.evenement, statut: "actualité", deltas, important: false, texte });
+    if ((it.coup || it.crise) && S.regime) {
+      S.regime.coup = clamp(S.regime.coup + (it.coup || 0), 0, 100);
+      S.regime.crise = clamp(S.regime.crise + (it.crise || 0), 0, 100);
+    }
+    if (sac) sac.push({ cause: "Actu réelle — " + it.evenement, statut: "actualité", deltas, important: !!it.important, texte });
     log(`${texte}. Règle du jeu, pas un sondage d'institut.`, (b.popularite || 0) < 0 ? "neg" : "");
   }
 }
@@ -1271,6 +1275,11 @@ function appliquerProgramme(id) {
   for (const df of m.differe || []) {
     const echeance = df.echeance || addDays(S.date, (df.semaines || 8) * 7);
     S.effets.push({ ...df, echeance, cause: m.titre + " (" + m.parti + ")", decisionDate: S.date, fait: false, important: !!m.important });
+  }
+  if (m.coup || m.crise) {
+    assurerRegime();
+    S.regime.coup = clamp(S.regime.coup + (m.coup || 0), 0, 100);
+    S.regime.crise = clamp(S.regime.crise + (m.crise || 0), 0, 100);
   }
   if (m.biais) {
     S.biaisSondages = S.biaisSondages || {};

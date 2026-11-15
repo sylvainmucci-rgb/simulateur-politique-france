@@ -17,14 +17,15 @@ COUNTRIES.fr = {
   depenses: { retraites: 410, sante: 260, education: 175, defense: 55, energie: 25, emploi: 80, securite: 45, collectivites: 250, autres: 340, interets: 62 },
   retraites: { ageLegal: 62.75, ratioCotRet: 1.7, deficitMd: -6.6, pensionMoy: 1600 },
   smic: { brutMensuel: 1867.02, netMensuel: 1477.93, label: "SMIC brut", unite: "€", note: "En vigueur depuis le 1er juin 2026 : 1 867,02 € brut, environ 1 478 € net (arrêté du 22 mai 2026). Annonce du 9 novembre : +1,6 % au 1er décembre, environ 1 502 € net. Le brut de décembre, environ 1 897 €, est une estimation tant que le décret n'est pas le chiffre de départ." },
-  plfss: { annee: 2027, note: "Sénat, 12 novembre 2026 : l'article 7 réduit les exonérations de cotisations patronales sur les bas salaires (environ 3,7 Md€), effet au 1er avril 2027. Le Sénat exonère aussi de CSG/CRDS la prime de partage de la valeur. Les exonérations resteraient d'environ 61 Md€ en 2027. Ce n'est pas encore la loi promulguée." },
+  plfss: { annee: 2027, note: "L'Assemblée a rejeté le PLF 2027 le 4 novembre. Le Sénat l'examine à partir du 20 novembre. Le 13 novembre, le Sénat a adopté la partie recettes du PLFSS par 200 voix contre 110. Le gouvernement chiffre un trou de 3,2 Md€ par rapport à son texte. La majorité sénatoriale veut rétablir la réforme des retraites suspendue (environ 600 M€ en 2027 selon le Sénat). L'article 7 réduit les exonérations sur les bas salaires d'environ 3,7 Md€ au 1er avril. Ce n'est pas la loi promulguée." },
   politique: { assemblee: [ {p:"RN + alliés",s:140,c:"#1b2a6b"},{p:"Ensemble",s:160,c:"#f5b700"},{p:"LR",s:47,c:"#0066cc"},{p:"LFI",s:71,c:"#c0392b"},{p:"PS",s:66,c:"#e84393"},{p:"Écologistes",s:38,c:"#27ae60"},{p:"PCF/GDR",s:17,c:"#8b0000"},{p:"LIOT/divers",s:38,c:"#888"} ],
      soutienBase: 207, majoriteAbsolue: 289, ue: { plafondDeficit: 3, procedureDeficitExcessif: true } },
   candidats2027: [
     {n:"Jordan Bardell",p:"RN",base:33,c:"#1b2a6b"},{n:"Jean-Luc Mélencho",p:"LFI",base:13,c:"#c0392b"},
     {n:"Édouard Philipp",p:"Horizons",base:16,c:"#4fa3d1"},{n:"Gabriel Atta",p:"Renaissance",base:0,c:"#f5b700",joueur:true},
     {n:"Bruno Retaillea",p:"LR",base:9,c:"#0066cc"},{n:"Raphaël Glucksman",p:"PS-Place publique",base:12,c:"#e84393"},
-    {n:"Marine Tondelie",p:"Écologistes",base:5,c:"#27ae60"},{n:"Éric Zemmou",p:"Reconquête",base:5,c:"#5b3a1a"},{n:"Fabien Rousse",p:"PCF",base:3,c:"#8b0000"}],
+    {n:"Marine Tondelie",p:"Écologistes",base:5,c:"#27ae60"},{n:"Éric Zemmou",p:"Reconquête",base:5,c:"#5b3a1a"},{n:"Fabien Rousse",p:"PCF",base:3,c:"#8b0000"},
+    {n:"David Lisnar",p:"Nouvelle Énergie",base:7,c:"#1a5276"},{n:"François Ruffi",p:"Gauche",base:4,c:"#d35400"}],
   noteCandidats: "La presse de 2026 dit Marine Le Pe de nouveau éligible après un arrêt d'appel ; le jeu ne certifie pas la décision de justice. Le bulletin du modèle porte Jordan Bardell. Emmanuel Macro ne peut pas se représenter. La dernière lettre des noms est omise.",
   sources: [
    ["Croissance 2026 ~0,4 %, T3 2026 -0,1 %","INSEE, comptes trimestriels (premières estimations, oct. 2026) — chiffres fournis par l'utilisateur, nov. 2026"],

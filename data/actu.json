@@ -151,6 +151,132 @@
     "differe": [{ "echeance": "2027-04-01", "dRec": 3.7, "recKey": "cotisations" }]
   },
   {
+    "id": "lepen-article11-2026-11-11",
+    "date": "2026-11-11",
+    "evenement": "Le Pe veut l'article 11 pour réviser la Constitution",
+    "resume": "À Hénin-Beaumont, le 11 novembre, Le Pe tient un discours d'unité et maintient l'idée de réviser la Constitution par référendum de l'article 11, pour la préférence nationale et l'immigration, sans le vote identique de l'Assemblée et du Sénat. Le même jour, 110 constitutionnalistes écrivent dans Le Monde que ce chemin est irrégulier. Ferran, président du Conseil constitutionnel, l'avait déjà dit mi-octobre. L'article 89 exige d'abord le même texte dans les deux chambres. Dans le jeu, appliquer cette mesure monte la crise institutionnelle : le Conseil peut censurer le décret, la Constitution ne change pas.",
+    "propositions": ["Bloqué : article 89, pas article 11", "Risque de censure du Conseil constitutionnel", "Crise institutionnelle si on passe outre"],
+    "source": "franceinfo et BFMTV, 11 novembre 2026 ; tribune du Monde ; Public Sénat sur Ferran.",
+    "biais": { "RN": 0.3 },
+    "effet": { "tensionSociale": 2 },
+    "important": true
+  },
+  {
+    "id": "rn-pret-2026-11-10",
+    "date": "2026-11-10",
+    "evenement": "Préaccord bancaire du RN : 10,6 M€",
+    "resume": "Le trésorier du RN annonce un préaccord avec deux banques européennes, non françaises, pour un prêt de 10,6 millions d'euros destiné à la campagne. Ce n'est pas encore le prêt signé. Les banques françaises sollicitées ont refusé de financer la vie politique. Un prêt d'un établissement de l'UE ou de l'EEE est permis par le code électoral. Les noms des banques ne sont pas donnés.",
+    "propositions": ["Préaccord, réponse espérée avant la fin novembre", "10,6 M€, proche du plafond remboursable d'une campagne au second tour"],
+    "source": "France 24 et Euronews, 10 novembre 2026, d'après l'AFP et franceinfo.",
+    "biais": { "RN": 0.2 }
+  },
+  {
+    "id": "melenchon-creuse-2026-11-11",
+    "date": "2026-11-11",
+    "evenement": "Mélencho à Gentioux : paix en Ukraine, pique à Lisnar",
+    "resume": "Devant le monument pacifiste de Gentioux, en Creuse, Mélencho dit que rien n'est plus important en Europe que la fin de l'invasion russe en Ukraine. Il ironise sur les propos de Lisnar au sujet de prétendus camps d'entraînement sur le plateau de Millevaches. Les noms sont tronqués.",
+    "propositions": ["Priorité à la fin de la guerre en Ukraine", "Pique contre Lisnar, pas une nouvelle mesure chiffrée"],
+    "source": "France 3 Nouvelle-Aquitaine, 11 novembre 2026.",
+    "biais": { "LFI": 0.2 }
+  },
+  {
+    "id": "zemmour-deux-millions-2026-11-10",
+    "date": "2026-11-10",
+    "evenement": "Zemmou : « deux millions d'immigrés en moins »",
+    "resume": "Sur TF1, Zemmou veut deux millions d'immigrés en moins en cinq ans, y compris des étrangers au chômage depuis six mois et en situation régulière. La faisabilité est très faible : droit d'asile, CEDH, et aujourd'hui le titre de séjour salarié ne se retire pas seulement parce que l'emploi a été perdu. Il évoque un référendum pour passer outre le juge. Ce n'est pas un mode d'emploi.",
+    "propositions": ["Faisabilité très faible : asile, CEDH, réadmission", "Le chiffre de deux millions n'a pas de périmètre statistique publié"],
+    "source": "TF1, 10 novembre 2026, repris par la presse.",
+    "biais": { "Reconquête": 0.5 }
+  },
+  {
+    "id": "precarite-energie-2026-11-12",
+    "date": "2026-11-12",
+    "evenement": "Précarité énergétique, thème de la journée des services publics",
+    "resume": "Le 12 novembre, franceinfo consacre une journée « Nos services publics » à huit candidats. La précarité énergétique y est un thème de campagne : factures, logement et prix de l'énergie, sans qu'un chiffrage commun n'en sorte.",
+    "propositions": ["Thème de campagne, pas une mesure unique"],
+    "source": "franceinfo, journée du 12 novembre 2026.",
+    "biais": {},
+    "effet": { "tensionSociale": 1 }
+  },
+  {
+    "id": "philippe-programme-2026-11-12",
+    "date": "2026-11-12",
+    "evenement": "Philipp publie son programme et refuse encore la primaire",
+    "resume": "Programme publié le 12 novembre : déficit à 2 % du PIB en fin de mandat, règle d'or constitutionnelle par référendum après le vote des deux chambres (article 89), aucun impôt nouveau pendant cinq ans, un départ sur trois non remplacé (plus de 250 000 postes), retraite à 65 ans avec une part de capitalisation, trois jours de carence dans le public et le privé. L'effort annoncé est d'environ 100 Md€. Le même jour sur franceinfo, il refuse toujours la primaire.",
+    "propositions": ["Difficile : effort d'environ 100 Md€, très ambitieux", "Règle d'or : article 89, pas un référendum seul", "Refus de la primaire maintenu"],
+    "source": "Midi Libre, 13 novembre 2026 ; franceinfo, 12 novembre 2026.",
+    "biais": { "Horizons": 0.5 }
+  },
+  {
+    "id": "retailleau-primaire-2026-11-12",
+    "date": "2026-11-12",
+    "evenement": "Retaillea tient la primaire même sans Philipp",
+    "resume": "Primaire ouverte et payante les 31 janvier et 7 février. Réunion des équipes d'Atta, Retaillea et Lisnar le 17 novembre. Retaillea se retire s'il perd, sans promettre de soutenir Atta. Il veut aussi un référendum constitutionnel sur l'immigration et l'asile dans des pays tiers sûrs : le droit de l'UE et la CEDH encadrent le sujet, une partie se négocie à Bruxelles.",
+    "propositions": ["Primaire faisable entre partis, union incomplète sans Philipp", "Asile en pays tiers : difficile, partiellement négociable"],
+    "source": "franceinfo, 12 novembre 2026 ; France 24, 11 novembre 2026.",
+    "biais": { "LR": 0.3, "Horizons": -0.2 }
+  },
+  {
+    "id": "attal-services-2026-11-12",
+    "date": "2026-11-12",
+    "evenement": "Atta : primaire, siège pour Philipp, école et logement",
+    "resume": "Sur franceinfo, Atta est pour la primaire et laisse « un siège » à Philipp. Il ne veut aucun poste supprimé dans l'Éducation nationale. Il propose une caution universelle et une banque publique de l'accession, dont le coût reste à financer.",
+    "propositions": ["Primaire : difficile sans Philipp", "École, caution, banque : difficile, coût non chiffré"],
+    "source": "franceinfo, journée « Nos services publics », 12 novembre 2026.",
+    "biais": { "Renaissance": 0.2 }
+  },
+  {
+    "id": "lepen-salon-2026-11-13",
+    "date": "2026-11-13",
+    "evenement": "Le Pe chahutée au salon Made in France",
+    "resume": "Le 13 novembre, Le Pe est chahutée au salon Made in France. L'incident pèse sur l'image de campagne, sans nouvelle proposition.",
+    "propositions": ["Incident de campagne"],
+    "source": "Séquence du salon Made in France, 13 novembre 2026.",
+    "biais": { "RN": -0.3 },
+    "effet": { "tensionSociale": 1 }
+  },
+  {
+    "id": "israel-melenchon-2026-11-12",
+    "date": "2026-11-12",
+    "evenement": "Mélencho et Panot interdits d'entrée en Israël",
+    "resume": "Le 12 novembre, Israël interdit l'entrée à Mélencho et à la présidente du groupe LFI. Mélencho répond qu'il n'avait rien demandé. Barrot, ministre des Affaires étrangères, juge la décision « démagogique ». Les noms de candidats sont tronqués. Panot n'est pas une candidate : le nom reste entier.",
+    "propositions": ["Décision d'un État étranger, pas une mesure française"],
+    "source": "RTL et franceinfo, 12 novembre 2026.",
+    "biais": { "LFI": 0.3 },
+    "effet": { "tensionSociale": 2 }
+  },
+  {
+    "id": "ruffin-candidat-2026-11-14",
+    "date": "2026-11-14",
+    "evenement": "Ruffi est candidat et veut une primaire de toute la gauche",
+    "resume": "Ruffi se déclare candidat et appelle une primaire allant de Poutou à Hollande. Le PS, de son côté, reste derrière Glucksman, déjà désigné.",
+    "propositions": ["Primaire de la gauche : difficile, les candidats en place ne s'y rangent pas"],
+    "source": "Séquence de campagne des 12-14 novembre 2026.",
+    "biais": { "Gauche": 0.5, "PS": 0.2 }
+  },
+  {
+    "id": "plf-rejete-2026-11-04",
+    "date": "2026-11-04",
+    "evenement": "L'Assemblée rejette le PLF 2027",
+    "resume": "Le 4 novembre, l'Assemblée nationale rejette le projet de loi de finances pour 2027. Le Sénat doit l'examiner à partir du 20 novembre. Le budget de l'État n'est donc pas voté. Dans le jeu, c'est un événement : la majorité manque, le texte continue sa navette.",
+    "propositions": ["Rejet à l'Assemblée", "Examen au Sénat à partir du 20 novembre"],
+    "source": "Navette budgétaire 2027, rappelée au moment du vote du Sénat sur le PLFSS.",
+    "biais": { "popularite": -0.4 },
+    "effet": { "confianceMarches": -2 },
+    "important": true
+  },
+  {
+    "id": "plfss-recettes-2026-11-13",
+    "date": "2026-11-13",
+    "evenement": "Le Sénat adopte les recettes du PLFSS, 200 voix contre 110",
+    "resume": "Le 13 novembre, le Sénat adopte la partie recettes du PLFSS 2027 par 200 voix contre 110. La gauche et le RN votent contre. Le gouvernement chiffre un trou de 3,2 Md€ entre son texte et le vote des sénateurs. La majorité sénatoriale veut rétablir la réforme des retraites suspendue, pour environ 600 M€ en 2027 selon le Sénat. Le déficit affiché après les recettes tombe vers 15,9 Md€ dans l'amendement du gouvernement, contre 12,7 Md€ dans le texte initial.",
+    "propositions": ["Recettes adoptées, dépenses encore ouvertes", "Trou de 3,2 Md€ selon le gouvernement", "Rétablissement envisagé de la réforme des retraites"],
+    "source": "Le Figaro, 13 novembre 2026 ; amendement du gouvernement au Sénat, 13 novembre 2026 ; dossier PLFSS du Sénat.",
+    "biais": { "popularite": -0.3 },
+    "effet": { "confianceMarches": -1 },
+    "important": true
+  },
+  {
     "id": "lfi-budget-2026-10-14",
     "date": "2026-10-14",
     "evenement": "Contre-budget LFI : 106,4 Md€ de recettes, 81,7 Md€ de dépenses",
