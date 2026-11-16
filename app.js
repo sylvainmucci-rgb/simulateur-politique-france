@@ -1514,7 +1514,7 @@ function renderProgrammes() {
       <p class=note>${esc(f.pourquoi || "")}</p>
       <button type=button data-prog="${esc(m.id)}" ${deja ? "disabled" : ""}>${deja ? "Déjà appliquée" : "Appliquer dans la partie"}</button></div>`;
   }).join("")).join("");
-  page(`<h2>Programmes 2027</h2><p class=note>Mesures relevées sur les sites des partis, dans la presse et dans des chiffrages publiés. Quand un coût n'a pas été isolé, c'est écrit. Faisable, difficile ou bloqué : budget, Constitution, droit européen, marchés, majorité. Les noms perdent leur dernière lettre.</p>${primaire}${bloc}`);
+  page(`<h2>Programmes 2027</h2><p class=note>Mesures relevées sur les sites des partis, dans la presse et dans des chiffrages publiés. Quand un coût n'a pas été isolé, c'est écrit. Faisable, difficile ou bloqué : budget, Constitution, droit européen, marchés, majorité. Seuls les candidats à la présidentielle perdent la dernière lettre.</p>${primaire}${bloc}`);
   document.querySelectorAll("[data-prog]").forEach(b => b.onclick = () => appliquerProgramme(b.dataset.prog));
   const oui = $("#primOui"), non = $("#primNon");
   if (oui) oui.onclick = () => choisirPrimaire(true);
@@ -1559,7 +1559,7 @@ function renderCreation() {
   const t = typeRegime();
   const cartes = figs.map(f => `<button type=button class="card choix" data-fig="${esc(f.nom)}"><b>${esc(f.nom)}</b><br><span class=note>${esc(labelRole(f.role))} · ${esc(f.parti)} · ${esc(labelIdeo(f.ideologie))}</span></button>`).join("");
   $("#main").innerHTML = `<h2>Qui incarnez-vous ?</h2>
-    <p class=note>${esc(D.nom)}. ${esc((D.fiche && D.fiche.resume) || "")} Les personnalités réelles perdent la dernière lettre de leur nom. Un personnage créé garde le nom que vous écrivez. Le programme annoncé ne vous interdit aucune décision : il a un coût si vous vous en écartez. Régime du modèle : ${esc(t)}.</p>
+    <p class=note>${esc(D.nom)}. ${esc((D.fiche && D.fiche.resume) || "")} Seuls les candidats à la présidentielle perdent la dernière lettre. Les autres personnalités gardent leur nom. Un personnage créé garde le nom que vous écrivez. Le programme annoncé ne vous interdit aucune décision : il a un coût si vous vous en écartez. Régime du modèle : ${esc(t)}.</p>
     <h2>Personnalités</h2><div class="choices">${cartes}</div>
     <h2>Créer un personnage</h2>
     <div class=card>
@@ -1673,7 +1673,7 @@ function sauveTrouvee() {
 function renderAccueil() {
   const save = sauveTrouvee();
   const marianne = `<svg class="marianne" viewBox="0 0 120 140" aria-hidden="true"><circle cx="60" cy="38" r="22" fill="#f3d5b5"/><path d="M28 36c6-24 58-24 64 0-8 6-16-8-32-8S36 42 28 36z" fill="#ed2939"/><path d="M38 34c8-16 36-16 44 0" fill="none" stroke="#f5b700" stroke-width="4"/><path d="M24 78c8-22 64-22 72 0v48H24z" fill="#002395"/><path d="M24 92h72" stroke="#fff" stroke-width="8"/><circle cx="60" cy="108" r="6" fill="#f5b700"/></svg>`;
-  $("#main").innerHTML = `<section class="accueil">${marianne}<p class="kicker">Le pouvoir, semaine après semaine</p><h1>Statecraft</h1><p class="soustitre-accueil">Élysée : Pouvoir &amp; Chaos</p><p>Un simulateur politique. Les chiffres ont une source. Les noms perdent leur dernière lettre.</p><div class="accueil-actions"><button type=button class="primary gros" id="jouer">Jouer</button><button type=button class="gros" id="continuer" ${save ? "" : "disabled"}>${save ? "Continuer · " + esc(save.paysId || "fr") + " · " + esc(save.date) : "Continuer"}</button><button type=button class="gros" id="choisirPerso">Choisir son personnage</button><a class="gros lien" href="#pays">Tous les pays</a></div><div id="pays"></div></section>`;
+  $("#main").innerHTML = `<section class="accueil">${marianne}<p class="kicker">Le pouvoir, semaine après semaine</p><h1>Statecraft</h1><p class="soustitre-accueil">Élysée : Pouvoir &amp; Chaos</p><p>Un simulateur politique. Les chiffres ont une source. Seuls les candidats à la présidentielle perdent la dernière lettre.</p><div class="accueil-actions"><button type=button class="primary gros" id="jouer">Jouer</button><button type=button class="gros" id="continuer" ${save ? "" : "disabled"}>${save ? "Continuer · " + esc(save.paysId || "fr") + " · " + esc(save.date) : "Continuer"}</button><button type=button class="gros" id="choisirPerso">Choisir son personnage</button><a class="gros lien" href="#pays">Tous les pays</a></div><div id="pays"></div></section>`;
   const pays = $("#pays");
   if (pays) {
     const table = tablePays();
@@ -1704,7 +1704,7 @@ function renderChoix() {
     const f = c.fiche || {};
     return `<a class="card choix" href="?pays=${esc(id)}"><h2>${esc(f.drapeau || "")} ${esc(c.nom)}</h2><p>${esc(f.resume || "")}</p></a>`;
   }).join("");
-  $("#main").innerHTML = `<h2>Sovereign</h2><p class=note>Élysée : Pouvoir &amp; Chaos — nom provisoire, le propriétaire peut le changer.</p><p>Choisissez un pays. Ensuite, un personnage : une personnalité réelle, ou la vôtre, et un point de départ. Au pouvoir, vous faites votre politique. Sans l'exécutif, la campagne, les alliances et les élections sont le chemin. La dernière lettre des noms réels est omise.</p><div class="choices">${cartes}</div>`;
+  $("#main").innerHTML = `<h2>Statecraft</h2><p class=note>Élysée : Pouvoir &amp; Chaos</p><p>Choisissez un pays. Ensuite, un personnage : une personnalité réelle, ou la vôtre, et un point de départ. Au pouvoir, vous faites votre politique. Sans l'exécutif, la campagne, les alliances et les élections sont le chemin. Seuls les candidats à la présidentielle perdent la dernière lettre.</p><div class="choices">${cartes}</div>`;
   const dateEl = $("#date"), horloge = $("#horloge");
   if (dateEl) dateEl.textContent = "Choisir un pays";
   if (horloge) horloge.textContent = "En attente d'un pays";

@@ -89,7 +89,7 @@ const manifest = fs.readFileSync(path.join(__dirname, "..", "manifest.json"), "u
 assert(/simfr-v\d+/.test(sw) && sw.includes("data/us.js"), "cache SW");
 assert(html.includes("Statecraft") && html.includes('data-pas="mois"') && html.includes('id="horloge"'), "titre et barre de temps");
 assert(html.includes('data-v="prog"') && html.includes("Actu réelle") && html.includes("data/programmes.js"), "onglets programmes et actu");
-assert(sw.includes("data/programmes.js") && sw.includes("data/actu.json") && sw.includes("simfr-v23") && sw.includes("og-image.png"), "cache des programmes");
+assert(sw.includes("data/programmes.js") && sw.includes("data/actu.json") && sw.includes("simfr-v24") && sw.includes("og-image.png"), "cache des programmes");
 const actuTxt = fs.readFileSync(path.join(__dirname, "..", "data/actu.json"), "utf8");
 const progTxt = fs.readFileSync(path.join(__dirname, "..", "data/programmes.js"), "utf8");
 assert(actuTxt.includes("la pique vise Rine") && actuTxt.includes("rine-programme-2026-11-11") && !actuTxt.includes("pique à Lisnar"), "actu : le programme et la pique sont ceux de Rine");
