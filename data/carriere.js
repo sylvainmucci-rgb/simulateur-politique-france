@@ -11,7 +11,7 @@ window.CARRIERE = {
       { nom: "Édouard Philipp", parti: "Horizons", ideologie: "liberal", role: "chef", traits: ["gestionnaire"], popularite: 33 },
       { nom: "Bruno Retaillea", parti: "LR", ideologie: "droite", role: "chef", traits: ["rigoriste"], popularite: 28 },
       { nom: "Raphaël Glucksman", parti: "PS", ideologie: "gauche", role: "chef", traits: ["orateur"], popularite: 30 },
-      { nom: "Bruno Le Mair", parti: "Pour une autre France", ideologie: "liberal", role: "chef", traits: ["gestionnaire", "rigoriste"], popularite: 18 },
+      { nom: "Bruno Le Maire", parti: "Pour une autre France", ideologie: "liberal", role: "chef", traits: ["gestionnaire", "rigoriste"], popularite: 18 },
       { nom: "Éric Zemmou", parti: "Reconquête", ideologie: "souverainiste", role: "chef", traits: ["orateur", "tribune"], popularite: 12 },
       { nom: "David Lisnar", parti: "Nouvelle Énergie", ideologie: "liberal", role: "chef", traits: ["gestionnaire"], popularite: 22 },
       { nom: "Teddy Rine", parti: "Ni droite ni gauche", ideologie: "centre", role: "chef", traits: ["orateur"], popularite: 24 },

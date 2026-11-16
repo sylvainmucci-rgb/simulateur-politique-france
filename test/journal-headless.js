@@ -89,7 +89,7 @@ const manifest = fs.readFileSync(path.join(__dirname, "..", "manifest.json"), "u
 assert(/simfr-v\d+/.test(sw) && sw.includes("data/us.js"), "cache SW");
 assert(html.includes("Statecraft") && html.includes('data-pas="mois"') && html.includes('id="horloge"'), "titre et barre de temps");
 assert(html.includes('data-v="prog"') && html.includes("Actu réelle") && html.includes("data/programmes.js"), "onglets programmes et actu");
-assert(sw.includes("data/programmes.js") && sw.includes("data/actu.json") && sw.includes("simfr-v22") && sw.includes("og-image.png"), "cache des programmes");
+assert(sw.includes("data/programmes.js") && sw.includes("data/actu.json") && sw.includes("simfr-v23") && sw.includes("og-image.png"), "cache des programmes");
 const actuTxt = fs.readFileSync(path.join(__dirname, "..", "data/actu.json"), "utf8");
 const progTxt = fs.readFileSync(path.join(__dirname, "..", "data/programmes.js"), "utf8");
 assert(actuTxt.includes("la pique vise Rine") && actuTxt.includes("rine-programme-2026-11-11") && !actuTxt.includes("pique à Lisnar"), "actu : le programme et la pique sont ceux de Rine");
@@ -140,7 +140,17 @@ assert(baseLfi + S.biaisSondages.LFI > baseLfi + 2, "les intentions LFI intègre
 const prim = SIM.choisirPrimaire(true);
 assert(prim.ok && S.primaire === "oui" && S.biaisSondages.LR > 0, "primaire : participer bouge LR");
 assert(!SIM.choisirPrimaire(false).ok, "primaire déjà choisie");
-assert(sb.PROGRAMMES.fr.some(p => p.candidat === "Bruno Le Mair" && p.mesures.some(m => m.faisable.verdict === "Bloqué")), "programme Le Mair");
+assert(sb.PROGRAMMES.fr.some(p => p.candidat === "Bruno Le Maire" && p.mesures.some(m => m.faisable.verdict === "Bloqué")), "programme Le Maire");
+const depAvant = S.dep.autres;
+S.date = "2026-12-01";
+SIM.integrerActu(actu);
+S = SIM.etat();
+assert(S.smicNet === 1502, "Smic net au 1er décembre " + S.smicNet);
+assert(Math.abs(S.smic - 1867.02) < 0.01, "le brut de décembre n'est pas inventé");
+assert(S.dep.autres >= depAvant + 1 - 0.01, "dépense +1 Md€ " + S.dep.autres);
+assert(actu.some(it => it.id === "philippe-reunion-2026-11-16"), "actu Philipp");
+assert(sb.PROGRAMMES.fr.some(p => (p.mesures || []).some(m => m.id === "rn-retraites" && m.faisable.verdict === "Difficile" && /non chiffré/i.test(m.cout))), "retraites RN non chiffrées");
+assert(sb.PROGRAMMES.fr.some(p => (p.mesures || []).some(m => m.id === "lfi-donbass" && m.faisable.verdict === "Infaisable")), "Donbass infaisable");
 const plf = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "data/actu.json"), "utf8")).find(x => x.id === "plfss-senat-2026-11-12");
 assert(plf && plf.differe[0].echeance === "2027-04-01" && plf.differe[0].dRec === 3.7, "article 7 daté au 1er avril");
 console.log("Journal et temps : OK");

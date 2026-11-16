@@ -110,7 +110,7 @@ function nouvelle(perso) {
   S = {
     date: DEBUT, annee: D.debut.annee, tri: D.debut.trimestre, tour: 0,
     e: { ...D.eco }, taux: { ...D.taux }, dep: { ...D.depenses }, rec: { ...D.recettes },
-    ret: { ...(D.retraites || { ageLegal: 64, ratioCotRet: 1.5, deficitMd: 0, pensionMoy: 0 }) }, smic: (D.smic && D.smic.brutMensuel) || 0,
+    ret: { ...(D.retraites || { ageLegal: 64, ratioCotRet: 1.5, deficitMd: 0, pensionMoy: 0 }) }, smic: (D.smic && D.smic.brutMensuel) || 0, smicNet: (D.smic && D.smic.netMensuel) || 0,
     contraintes: D.contraintes ? JSON.parse(JSON.stringify(D.contraintes)) : null, texteHostile: null, paysId: D.id || "fr",
     effets: [], journal: [], news: [], recap: null,
     biaisSondages: {}, programmesAppliques: [], actu: (S && S.actu) || [], actuAppliquee: {},
@@ -313,6 +313,8 @@ function appliquerEffet(e, deltas) {
     else if (k === "confianceMarches") S.e.confianceMarches = clamp(S.e.confianceMarches + e[champ], 0, 100);
     deltas[k] = (deltas[k] || 0) + e[champ];
   }
+  if (e.smicNet) S.smicNet = e.smicNet;
+  if (e.smicBrut) S.smic = e.smicBrut;
   if (e.greve) S.greve = clamp(S.greve + e.greve, 0, 100);
   if (e.bce) S.bce = clamp(S.bce + e.bce, 0, 5);
   if (e.soutien) S.soutien = Math.round(clamp(S.soutien + e.soutien, 80, 400));
@@ -496,12 +498,12 @@ function decompteCensure(d) {
   const tvaHausse = d && d.taux && S.taux && d.taux.TVA > S.taux.TVA + 0.2;
   const coupes = d && d.dep && Object.keys(d.dep).some(k => d.dep[k] <= -4);
   const rn = groupes.find(g => /rn/i.test(g.p));
-  let detail = "Faur et la gauche votent la censure.";
+  let detail = "Faure et la gauche votent la censure.";
   if (rn && (tvaHausse || coupes)) {
     voix += rn.s;
     pour.push(rn.p);
-    detail = "Le texte est hostile : le RN ne négocie pas et vote la censure avec Faur et la gauche.";
-  } else if (rn) detail = "Faur vote la censure. Le RN négocie et ne la vote pas.";
+    detail = "Le texte est hostile : le RN ne négocie pas et vote la censure avec Faure et la gauche.";
+  } else if (rn) detail = "Faure vote la censure. Le RN négocie et ne la vote pas.";
   return { voix, adoptee: voix >= 289, detail: detail + " (" + pour.join(", ") + ")." };
 }
 function appliquerArticle47() {
@@ -1195,8 +1197,10 @@ function majFlash() {
   if (!isBrowser) return;
   const el = $("#flashTexte");
   if (!el || !S) return;
-  const titres = (S.news || []).slice(0, 6).map(n => n.t);
-  el.textContent = titres.length ? titres.join("   ·   FLASH   ·   ") : "En attente d'une dépêche.";
+  const reelles = ((S.actu) || []).filter(it => it && it.date && it.date <= S.date).sort((a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0).slice(0, 4).map(it => it.evenement);
+  const titres = (S.news || []).slice(0, 3).map(n => n.t);
+  const tout = reelles.concat(titres);
+  el.textContent = tout.length ? tout.join("   ·   FLASH   ·   ") : "En attente d'une dépêche.";
 }
 function verifierBadges() {
   if (!S) return;
@@ -1287,7 +1291,7 @@ function render() {
     <div class=grid>${kpi("Croissance " + fleche("pib", true), f1(e.croissance) + " %", e.croissance < 0.5 ? "bad" : "good", Math.max(8, Math.min(100, (e.croissance + 2) * 16)))}${kpi("Inflation " + fleche("inflation", false), f1(e.inflation) + " %", e.inflation > 3 ? "bad" : e.inflation > 2 ? "warn" : "good", Math.min(100, e.inflation * 10))}
     ${kpi("Chômage", f1(e.chomage) + " %", e.chomage > 8 ? "bad" : "")}${kpi("Dette", f1(e.dettePct) + " %", e.dettePct > 100 ? "bad" : "")}${kpi("Déficit", f1(e.deficitPct) + " %", e.deficitPct > 3 ? "bad" : "good")}
     ${kpi(monnaie().taux, f1(e.oat10) + " %", e.oat10 > 4 ? "bad" : "")}${kpi("Popularité", f0(e.popularite) + " %", e.popularite < 30 ? "bad" : "")}
-    ${kpi("Tension", f0(e.tensionSociale), e.tensionSociale > 60 ? "bad" : "")}${kpi(monnaie().banque, f1(S.bce) + " %")}${kpi("Note", e.notation)}${S.smic ? kpi(D.smic.label || "Salaire minimum", f0(S.smic) + " " + (D.smic.unite || "€")) : ""}
+    ${kpi("Tension", f0(e.tensionSociale), e.tensionSociale > 60 ? "bad" : "")}${kpi(monnaie().banque, f1(S.bce) + " %")}${kpi("Note", e.notation)}${S.smic ? kpi(D.smic.label || "Salaire minimum", f0(S.smic) + " " + (D.smic.unite || "€")) : ""}${S.smicNet ? kpi("SMIC net", f0(S.smicNet) + " €") : ""}
     ${S.contraintes && S.contraintes.petrole ? kpi(S.contraintes.petrole.label, f0(S.contraintes.petrole.prix) + " $") : ""}
     ${S.contraintes && S.contraintes.sanctions ? kpi("Sanctions", f0(S.contraintes.sanctions.niveau) + "/100", S.contraintes.sanctions.niveau > 50 ? "bad" : "") : ""}
     ${S.contraintes && S.contraintes.change ? kpi(S.contraintes.change.label, f0(S.contraintes.change.indice)) : ""}
@@ -1346,7 +1350,7 @@ function renderDec() {
       <p>Solde <b class=${a.solde >= 0 ? "good" : "bad"}>${a.solde >= 0 ? "+" : ""}${f1(a.solde)} ${esc(monnaie().unite)}/an</b>. Inflation différée liée à la taxe sur la consommation : ${f1(a.inflation)} pt. Score politique : ${a.voix} (vote dès ${regles().seuilVote || 200}). ${a.cc.map(x => `<span class=bad>${esc(x)}</span>`).join(" ")}</p>
       <p class=note>Pour +1 point de taxe sur la consommation : popularité −3 pt tout de suite, inflation +0,4 pt à 4 et 8 semaines.</p>
       <div class=row><button class=primary type=button id=vote>${esc((D.regles && D.regles.labelVote) || "Soumettre au vote")}</button><button type=button id=v493>${esc((regles().special && regles().special.label) || "Engager le 49.3")}</button>${D.id === "fr" ? `<button type=button id=art47>Ordonnances article 47</button>` : ""}${regles().veto ? `<button type=button id=veto>${esc(regles().veto.label || "Veto")}</button>` : ""}<button type=button id=raz>Annuler</button></div>
-      ${D.id === "fr" ? `<p class=note>49.3 : Faur vote la censure. Le RN ne la vote que si le texte est hostile (TVA en hausse ou coupes fortes). Il faut 289 voix, la majorité absolue. L'article 47, jamais utilisé sous la Ve, ne s'ouvre vraiment qu'après 70 jours sans prononcé. L'Assemblée a rejeté le PLF le 4 novembre : s'en servir quand même est explosif.</p>` : ""}
+      ${D.id === "fr" ? `<p class=note>49.3 : Faure vote la censure. Le RN ne la vote que si le texte est hostile (TVA en hausse ou coupes fortes). Il faut 289 voix, la majorité absolue. L'article 47, jamais utilisé sous la Ve, ne s'ouvre vraiment qu'après 70 jours sans prononcé. L'Assemblée a rejeté le PLF le 4 novembre : s'en servir quand même est explosif.</p>` : ""}
     </div>`);
   $("#main").querySelectorAll("input[type=range]").forEach(i => i.oninput = () => {
     const [p, q] = i.dataset.p.split(".");
@@ -1404,6 +1408,7 @@ function appliquerActuJusqua(sac) {
     if (b.popularite) appliquerEffet({ popularite: b.popularite }, deltas);
     if (it.effet) appliquerEffet(it.effet, deltas);
     if (it.smicBrut) S.smic = it.smicBrut;
+    if (it.smicNet) S.smicNet = it.smicNet;
     let suite = it.differe || [];
     if (it.cleUnique) {
       S.faitsUniques = S.faitsUniques || {};
@@ -1416,6 +1421,7 @@ function appliquerActuJusqua(sac) {
     }
     const sondages = [];
     if (it.smicBrut) sondages.push("SMIC brut " + f0(it.smicBrut) + " €");
+    if (it.smicNet) sondages.push("SMIC net " + f0(it.smicNet) + " €");
     for (const k of Object.keys(b)) {
       if (k === "popularite") continue;
       S.biaisSondages[k] = (S.biaisSondages[k] || 0) + b[k];
@@ -1445,6 +1451,7 @@ function appliquerProgramme(id) {
   const deltas = {};
   appliquerEffet(m.immediat, deltas);
   if (m.smicBrut) S.smic = m.smicBrut;
+  if (m.smicNet) S.smicNet = m.smicNet;
   if (m.cleUnique) {
     S.faitsUniques = S.faitsUniques || {};
     if (S.faitsUniques[m.cleUnique]) return { ok: false, raison: "Déjà inscrite par l'actualité ou une autre mesure." };
@@ -1483,8 +1490,8 @@ function choisirPrimaire(oui) {
     lignes.push(`${k} ${b[k] > 0 ? "+" : ""}${f1(b[k])} pt`);
   }
   const texte = oui
-    ? `Candidat unique du bloc central : vous entrez dans la méthode de Larche. Philipp reste dehors, le second tour annoncé demeure Le Pe–Mélencho. Intentions ${lignes.join(", ")}.`
-    : `Candidat unique du bloc central : vous refusez, comme Philipp à Toulouse. Le bloc reste divisé. Intentions ${lignes.join(", ")}.`;
+    ? `Candidat unique : vous entrez dans la primaire. Philipp accepte la réunion de Gérard Larcher pour le rassemblement, la présidentielle et les législatives, mais pas la primaire. « Cette primaire, je n'y participerai pas. Point. » Le candidat unique dépend de ce refus. Intentions ${lignes.join(", ")}.`
+    : `Candidat unique : vous refusez la primaire, comme Philipp. Il veut bien la réunion, pas le départage. Sans lui, il n'y a pas de candidat unique. Intentions ${lignes.join(", ")}.`;
   S.journal.unshift({ date: S.date, texte, statut: "carrière", prevus: ["France 24, 11 novembre 2026 ; franceinfo, 12 novembre 2026."], decisionDate: S.date });
   log(texte, oui ? "pos" : "");
   if (isBrowser) render();
@@ -1493,12 +1500,12 @@ function choisirPrimaire(oui) {
 function renderProgrammes() {
   const list = programmesPays();
   if (!list.length) { page("<h2>Programmes</h2><p class=note>Pas de corpus sourcé pour ce pays dans cette version.</p>"); return; }
-  const primaire = (D.id === "fr") ? `<div class=card><b>Primaire / candidat unique du bloc central</b><p>Larche, président du Sénat, propose de réunir Retaillea, Lisnar, Atta et Philipp pour une méthode de départage et un candidat unique début 2027. Zemmou et Glucksman ne sont pas invités. Renaissance accepte. Philipp refuse toujours. Les équipes d'Atta, Retaillea et Lisnar se voient le 17 novembre. Les sondages annoncent un second tour Le Pe–Mélencho.</p><p>${S.primaire ? "Choix déjà enregistré : " + (S.primaire === "oui" ? "vous entrez dans le départage" : "vous refusez, comme Philipp") + "." : ""}</p><button type=button id=primOui ${S.primaire ? "disabled" : ""}>Entrer dans le départage</button> <button type=button id=primNon ${S.primaire ? "disabled" : ""}>Refuser, comme Philipp</button></div>` : "";
+  const primaire = (D.id === "fr") ? `<div class=card><b>Primaire / candidat unique du bloc central</b><p>Gérard Larcher propose de réunir Retaillea, Lisnar, Atta et Philipp. Le 16 novembre, Philipp accepte la réunion, seulement pour le rassemblement, la présidentielle et les législatives. « Cette primaire, je n'y participerai pas. Point. » Il tacle Lisnar : la liberté qu'il revendique n'est pas l'ultralibéralisme de Javier Milei. Atta, Retaillea et Lisnar sont pour la primaire. Leurs directeurs de campagne se voient le 17 novembre, sans l'équipe de Philipp. Le candidat unique dépend surtout de ce refus.</p><p>${S.primaire ? "Choix déjà enregistré : " + (S.primaire === "oui" ? "vous entrez dans la primaire, Philipp reste dehors" : "vous refusez la primaire, comme Philipp") + "." : ""}</p><button type=button id=primOui ${S.primaire ? "disabled" : ""}>Entrer dans la primaire</button> <button type=button id=primNon ${S.primaire ? "disabled" : ""}>Refuser la primaire</button></div>` : "";
   const bloc = list.map(p => `<h2>${esc(p.parti)} — ${esc(p.candidat)}</h2><p class=note>${esc(p.intro || "")}</p>` + (p.mesures || []).map(m => {
     const f = m.faisable || {};
     const deja = (S.programmesAppliques || []).includes(m.id);
     const v = f.verdict || "";
-    const cls = /faisable|^oui$/i.test(v) ? "est" : /bloqu|non en/i.test(v) ? "param" : "modele";
+    const cls = /infaisable|bloqu|non en/i.test(v) ? "param" : /faisable|^oui$/i.test(v) ? "est" : "modele";
     return `<div class=card><b>${esc(m.titre)}</b> <span class="badge ${cls}">${esc(v)}</span>
       <p>${esc(m.propose)}</p>
       <p><b>Coût.</b> ${esc(m.cout)} <span class=note>${esc(m.source)}</span></p>

@@ -29,8 +29,8 @@
   {
     "id": "lecornu-social-2026-11-09",
     "date": "2026-11-09",
-    "evenement": "Conférence sociale : Lecorn annonce un Smic à environ 1 502 € net",
-    "resume": "Après la conférence sociale du 9 novembre, le Premier ministre annonce une hausse de 1,6 % du Smic au 1er décembre : 1 % d'indexation automatique et 0,6 % de coup de pouce, le premier depuis 2012. Le net visé est environ 1 502 €, soit près de 24 € de plus. La prime carburant, jusqu'à 1 000 € et versée par l'employeur, serait prolongée en 2027 dans le PLFSS. Le plafond de défiscalisation des heures supplémentaires passerait de 7 500 à 10 000 €. La prime de partage de la valeur serait exonérée de CSG au-delà de 50 salariés. Des aides aux entreprises seraient conditionnées à des négociations salariales de branche. Le Smic se fait par décret. Le reste dépend d'un budget sans majorité. La CGT parle de miettes, la CFDT d'une hausse insuffisante, FO salue la chute du dogme anti coup de pouce. Le nom est tronqué.",
+    "evenement": "Conférence sociale : Lecornu annonce un Smic à environ 1 502 € net",
+    "resume": "Après la conférence sociale du 9 novembre, le Premier ministre Sébastien Lecornu annonce une hausse de 1,6 % du Smic au 1er décembre : 1 % d'indexation automatique et 0,6 % de coup de pouce, le premier depuis 2012. Le net visé est environ 1 502 €, soit près de 24 € de plus. Le brut de décembre n'est pas dans ces dépêches. La prime carburant, jusqu'à 1 000 € et versée par l'employeur, serait prolongée en 2027 dans le PLFSS. Le plafond de défiscalisation des heures supplémentaires passerait de 7 500 à 10 000 €. La prime de partage de la valeur serait exonérée de CSG au-delà de 50 salariés. Des aides aux entreprises seraient conditionnées à des négociations salariales de branche. Le Smic se fait par décret. Le reste dépend d'un budget sans majorité. La CGT parle de miettes, la CFDT d'une hausse insuffisante, FO salue la chute du dogme anti coup de pouce.",
     "propositions": ["Smic +1,6 % au 1er décembre, environ 1 502 € net", "Prime carburant jusqu'à 1 000 € prolongée en 2027", "Heures supplémentaires défiscalisées jusqu'à 10 000 €", "PPV exonérée de CSG au-delà de 50 salariés", "Aides aux entreprises liées à des négociations de branche"],
     "source": "franceinfo, France 24, Euronews et Le Journal de Saône-et-Loire, 9 novembre 2026 ; communiqué FO du 9 novembre.",
     "biais": { "popularite": 0.4 },
@@ -50,7 +50,7 @@
     "id": "greve-cgt-2026-11-17",
     "date": "2026-11-17",
     "evenement": "La CGT appelle à élargir la grève du 17 novembre",
-    "resume": "Sophie Binet appelle salariés, retraités et jeunes à faire du 17 novembre une journée de grève, au-delà de la mobilisation déjà prévue dans la fonction publique. La CFDT juge le coup de pouce insuffisant. FO se félicite que le refus systématique d'un coup de pouce au Smic ait cédé, tout en disant que ce n'est pas à la hauteur.",
+    "resume": "Sophie Binet appelle salariés, retraités et jeunes à faire du 17 novembre une journée de grève, au-delà de la mobilisation déjà prévue dans la fonction publique et après l'acte « vie chère » du 14 novembre. La CFDT juge le coup de pouce insuffisant. FO se félicite que le refus systématique d'un coup de pouce au Smic ait cédé, tout en disant que ce n'est pas à la hauteur. La tension remonte avec cette nouvelle journée.",
     "propositions": ["Grève et manifestations le 17 novembre", "CGT : miettes", "CFDT : insuffisant", "FO : le dogme est tombé, le compte n'y est pas"],
     "source": "France Inter, Le Parisien et franceinfo, 9 novembre 2026 ; communiqué FO.",
     "biais": {},
@@ -105,8 +105,8 @@
   {
     "id": "lemaire-plan-2026-11-12",
     "date": "2026-11-12",
-    "evenement": "Bruno Le Mair présente « Pour une autre France »",
-    "resume": "L'ancien ministre de l'Économie, pas encore candidat, a présenté le 12 novembre un projet d'environ 50 mesures. Le détail et le statut de chaque proposition sont dans Programmes, sous son nom tronqué. Ce n'est pas un chiffrage d'institut.",
+    "evenement": "Bruno Le Maire présente « Pour une autre France »",
+    "resume": "L'ancien ministre de l'Économie n'est pas candidat. Il a présenté le 12 novembre un projet d'environ 50 mesures. Le détail est dans Programmes, sous son nom complet. Ce n'est pas un chiffrage d'institut.",
     "propositions": ["TVA +2 à 3 points pour environ 50 Md€ de baisse de cotisations, soit +200 € net par mois selon lui", "Salaire net médian visé à 4 000 €", "Retraite à 65 ans et 45 annuités", "Moratoire d'un an sur l'immigration puis référendum"],
     "source": "Le Journal du Dimanche, 12 novembre 2026 ; Europe 1, 12 novembre 2026.",
     "biais": {}
@@ -154,9 +154,9 @@
     "id": "lepen-article11-2026-11-11",
     "date": "2026-11-11",
     "evenement": "Le Pe veut l'article 11 pour réviser la Constitution",
-    "resume": "À Hénin-Beaumont, le 11 novembre, Le Pe tient un discours d'unité et maintient l'idée de réviser la Constitution par référendum de l'article 11, pour la préférence nationale et l'immigration, sans le vote identique de l'Assemblée et du Sénat. Le même jour, 110 constitutionnalistes écrivent dans Le Monde que ce chemin est irrégulier. Ferran, président du Conseil constitutionnel, l'avait déjà dit mi-octobre. L'article 89 exige d'abord le même texte dans les deux chambres. Dans le jeu, appliquer cette mesure monte la crise institutionnelle : le Conseil peut censurer le décret, la Constitution ne change pas.",
+    "resume": "À Hénin-Beaumont, le 11 novembre, Le Pe tient un discours d'unité et maintient l'idée de réviser la Constitution par référendum de l'article 11, pour la préférence nationale et l'immigration, sans le vote identique de l'Assemblée et du Sénat. Le même jour, 110 constitutionnalistes écrivent dans Le Monde que ce chemin est irrégulier. Richard Ferrand, président du Conseil constitutionnel, l'avait déjà dit mi-octobre. L'article 89 exige d'abord le même texte dans les deux chambres. Dans le jeu, appliquer cette mesure monte la crise institutionnelle : le Conseil peut censurer le décret, la Constitution ne change pas.",
     "propositions": ["Bloqué : article 89, pas article 11", "Risque de censure du Conseil constitutionnel", "Crise institutionnelle si on passe outre"],
-    "source": "franceinfo et BFMTV, 11 novembre 2026 ; tribune du Monde ; Public Sénat sur Ferran.",
+    "source": "franceinfo et BFMTV, 11 novembre 2026 ; tribune du Monde ; Public Sénat sur Richard Ferrand.",
     "biais": { "RN": 0.3 },
     "effet": { "tensionSociale": 2 },
     "important": true
@@ -267,7 +267,7 @@
     "id": "plf-rejete-2026-11-04",
     "date": "2026-11-04",
     "evenement": "L'Assemblée rejette le PLF 2027",
-    "resume": "Le 4 novembre, l'Assemblée nationale rejette le projet de loi de finances pour 2027, à l'unanimité selon le rappel du 15 novembre. Le texte est au Sénat, qui l'examine à partir du 20 novembre. Faur votera une censure si le gouvernement engage le 49.3. Le RN pourrait négocier. Il faut 289 voix. L'article 47, jamais utilisé sous la Ve, n'est ouvert qu'après 70 jours, et un rejet peut déjà compter comme un vote.",
+    "resume": "Le 4 novembre, l'Assemblée nationale rejette le projet de loi de finances pour 2027. Le texte est au Sénat, qui l'examine à partir du 20 novembre. Olivier Faure votera une censure si le gouvernement engage le 49.3. Le RN pourrait négocier. Il faut 289 voix. L'article 47, jamais utilisé sous la Ve, n'est ouvert qu'après 70 jours, et un rejet peut déjà compter comme un vote.",
     "propositions": ["Rejet à l'Assemblée", "Examen au Sénat à partir du 20 novembre"],
     "source": "Navette budgétaire 2027, rappelée au moment du vote du Sénat sur le PLFSS.",
     "biais": { "popularite": -0.4 },
@@ -288,8 +288,8 @@
   {
     "id": "larcher-departage-2026-11-14",
     "date": "2026-11-14",
-    "evenement": "Larche propose un candidat unique du bloc central",
-    "resume": "Le président du Sénat propose de réunir Retaillea, Lisnar, Atta et Philipp pour une méthode de départage et un candidat unique début 2027. Zemmou et Glucksman ne sont pas invités. Renaissance accepte. Philipp refuse toujours, il le redit en meeting. La réunion des équipes d'Atta, Retaillea et Lisnar reste fixée au 17 novembre. Les sondages, notamment Elabe pour BFMTV, annoncent un second tour Le Pe–Mélencho. Dans le jeu, le choix est sur l'onglet Programmes.",
+    "evenement": "Gérard Larcher propose un candidat unique du bloc central",
+    "resume": "Le président du Sénat, Gérard Larcher, propose de réunir Retaillea, Lisnar, Atta et Philipp pour une méthode de départage et un candidat unique début 2027. Zemmou et Glucksman ne sont pas invités. Renaissance accepte. Philipp refuse encore la primaire, en meeting à Toulouse. La réunion des directeurs de campagne d'Atta, Retaillea et Lisnar reste fixée au 17 novembre. Les sondages annoncent un second tour Le Pe–Mélencho. Dans le jeu, le choix est sur l'onglet Programmes. Au 16 novembre, le candidat unique dépend surtout du refus de Philipp.",
     "propositions": ["Méthode de départage, le mot primaire n'est pas dans l'appel", "Faisable entre les partis qui acceptent", "Sans Philipp, le bloc reste divisé"],
     "source": "France 24, 14 novembre 2026 ; BFMTV, 15 novembre 2026.",
     "biais": { "LR": 0.3, "Renaissance": 0.2, "Horizons": -0.3, "RN": 0.2, "LFI": 0.2 }
@@ -298,7 +298,7 @@
     "id": "nice-sru-2026-11-14",
     "date": "2026-11-14",
     "evenement": "Mélencho à Nice : environ 3 000 personnes, défense de la loi SRU",
-    "resume": "Environ 3 000 personnes au gymnase Leyrit, avec Bompar, Guett et Piquema. Ils défendent la loi SRU contre l'abrogation voulue par le RN et Ciott. Garder la loi est le droit actuel. Construire massivement des HLM coûterait plusieurs milliards par an, difficile avec le déficit. Les noms de candidats sont tronqués. Guett et Piquema ne sont pas candidats : la dernière lettre est ôtée parce qu'ils portent la séquence.",
+    "resume": "Environ 3 000 personnes au gymnase Leyrit, avec Manuel Bompard, Clémence Guetté et François Piquemal. Ils défendent la loi SRU contre l'abrogation voulue par le RN et Éric Ciotti. Garder la loi est le droit actuel. Construire massivement des HLM coûterait plusieurs milliards par an, difficile avec le déficit. Seul Mélencho, candidat, perd la dernière lettre.",
     "propositions": ["Défendre la loi SRU : faisable", "Construction massive de HLM : difficile, plusieurs Md€/an"],
     "source": "Nice-Matin, 15 novembre 2026 ; melenchon2027.fr, meeting du 14 novembre.",
     "biais": { "LFI": 0.4 }
@@ -306,12 +306,12 @@
   {
     "id": "acte-v-2026-11-14",
     "date": "2026-11-14",
-    "evenement": "Acte V : 106 000 manifestants, tension en baisse",
-    "resume": "Le 14 novembre, les autorités comptent 106 000 manifestants, contre 146 000 le 7 novembre. 219 interpellations. Le ministère de l'Intérieur parle d'une situation globalement maîtrisée. Le gouvernement ouvre un mois de discussions avec les syndicats de fonctionnaires. Retaillea dénonce des minorités violentes. Dans le jeu, la jauge de tension baisse, sans s'effacer.",
-    "propositions": ["Moins de monde que le samedi précédent", "Discussions ouvertes avec les syndicats de la fonction publique"],
-    "source": "Le Dauphiné, 14 novembre 2026, d'après le ministère de l'Intérieur.",
+    "evenement": "Acte V : 106 000 manifestants, plus de 400 interpellations",
+    "resume": "Le 14 novembre, le ministère de l'Intérieur compte 106 000 manifestants, contre 146 000 le 7 novembre. Le décompte de 18 heures donnait 219 interpellations. Le rappel du 15 novembre porte le total à plus de 400. Deux journalistes de BFMTV ont été agressés en marge du cortège. Une nouvelle journée est appelée le 17 novembre. La jauge de tension baisse moins que le seul recul du nombre de manifestants ne le suggérait.",
+    "propositions": ["106 000 personnes selon l'Intérieur", "Plus de 400 interpellations dans le décompte ultérieur", "Nouvelle journée le 17 novembre"],
+    "source": "Le Dauphiné, 14 novembre 2026, d'après le ministère de l'Intérieur ; France 24, 15 novembre 2026.",
     "biais": { "LR": 0.1 },
-    "effet": { "tensionSociale": -4 }
+    "effet": { "tensionSociale": -2 }
   },
   {
     "id": "retailleau-pret-2026-11-13",
@@ -325,11 +325,69 @@
   {
     "id": "faure-glucksmann-2026-11-15",
     "date": "2026-11-15",
-    "evenement": "Des proches de Faur rejoignent l'équipe de Glucksman",
-    "resume": "Des proches de Faur entrent dans l'équipe de campagne de Glucksman. Le PS reste derrière ce candidat. Faur a dit qu'il voterait la censure si Lecorn engage le 49.3 sur le budget. Le nom est tronqué.",
-    "propositions": ["Renfort d'équipe, pas une nouvelle mesure chiffrée", "Censure : Faur la votera"],
+    "evenement": "Des proches d'Olivier Faure rejoignent l'équipe de Glucksman",
+    "resume": "Des proches d'Olivier Faure entrent dans l'équipe de campagne de Glucksman. Le PS reste derrière ce candidat. Faure a dit qu'il voterait la censure si Lecornu engage le 49.3 sur le budget. Faure n'est pas candidat : son nom reste entier.",
+    "propositions": ["Renfort d'équipe, pas une nouvelle mesure chiffrée", "Censure : Olivier Faure la votera"],
     "source": "Séquence politique du 15 novembre 2026.",
     "biais": { "PS": 0.4 }
+  },
+  {
+    "id": "philippe-reunion-2026-11-16",
+    "date": "2026-11-16",
+    "evenement": "Philipp accepte la réunion de Gérard Larcher, pas la primaire",
+    "resume": "Dans Le Parisien, Philipp se dit enchanté de discuter avec Retaillea, Atta et Lisnar du rassemblement, de la présidentielle et des législatives. Il refuse la primaire : « Cette primaire, je n'y participerai pas. Point. » Il tacle Lisnar : « La liberté dont je me revendique, ce n'est pas l'ultralibéralisme de Milei. » Atta, Retaillea et Lisnar sont pour la primaire. Leurs directeurs de campagne se réunissent le 17 novembre, sans l'équipe de Philipp. Dans le jeu, le candidat unique dépend surtout de ce refus.",
+    "propositions": ["Réunion acceptée : rassemblement, présidentielle, législatives", "Primaire refusée", "Candidat unique bloqué tant que Philipp reste dehors"],
+    "source": "RFI, 16 novembre 2026 ; France 24, 15 novembre 2026, d'après Le Parisien.",
+    "biais": { "Horizons": 0.3, "LR": -0.2, "Renaissance": -0.2 },
+    "important": true
+  },
+  {
+    "id": "attal-retailleau-5-2026-11-16",
+    "date": "2026-11-16",
+    "evenement": "Atta et Retaillea, vers 5 %, négocient un retrait au profit d'une primaire",
+    "resume": "L'Opinion du 15 novembre : Atta et Retaillea sont autour de 5 % chacun. La question du retrait se pose. Ils négocient une sortie par la primaire plutôt qu'un abandon en rase campagne. Rallier Philipp reconstituerait le bloc qu'ils veulent dépasser. Ce n'est pas un retrait annoncé.",
+    "propositions": ["Environ 5 % chacun, pas un sondage unique cité dans l'article", "Retrait négocié au profit d'une primaire, pas encore acté"],
+    "source": "L'Opinion, 15 novembre 2026.",
+    "biais": { "Renaissance": -0.2, "LR": -0.2 }
+  },
+  {
+    "id": "rn-retraites-annonce-2026-11-16",
+    "date": "2026-11-16",
+    "evenement": "Le Pe et Bardell présentent leur réforme des retraites le 17 novembre",
+    "resume": "Ouest-France, avant la présentation : départ à 62 ans après 42 annuités, ou à 60 ans après 40 annuités pour les carrières longues, financé par « plus de travail » et une part de capitalisation. Il faut revenir sur les 64 ans de la réforme de 2023. Le coût est non chiffré. Il sera mis à jour après la présentation. Verdict du module : difficile, parce que c'est coûteux et que cela demande une majorité.",
+    "propositions": ["62 ans et 42 annuités, ou 60 ans et 40 pour les carrières longues", "Financement annoncé : plus de travail et une part de capitalisation", "Coût : non chiffré"],
+    "source": "Ouest-France, 15 novembre 2026.",
+    "biais": { "RN": 0.2 }
+  },
+  {
+    "id": "melenchon-autain-2026-11-16",
+    "date": "2026-11-16",
+    "evenement": "Lefèvre accuse Mélencho, Autain reconnaît sa dynamique",
+    "resume": "Mathieu Lefèvre, porte-parole du gouvernement, accuse Mélencho de « mettre des cibles dans le dos des journalistes », après l'agression de deux journalistes de BFMTV en marge de la manifestation du 14 novembre. Clémentine Autain (l'Après) reconnaît sa dynamique et se dit favorable à L'Avenir en commun. Le vote de l'Après est attendu mi-décembre. Elle refuse sa proposition de consultation dans le Donbass. Cette consultation est infaisable par la France seule : elle relève de l'Ukraine et d'un accord de paix. Lefèvre et Autain ne sont pas candidats : leurs noms restent entiers.",
+    "propositions": ["Accusation sur les journalistes, pas une mesure", "Autain : dynamique reconnue, Donbass refusé", "Consultation du Donbass : infaisable par la France seule"],
+    "source": "Le Figaro, direct du 16 novembre 2026.",
+    "biais": { "LFI": 0.2 }
+  },
+  {
+    "id": "pouvoir-achat-2026-11-16",
+    "date": "2026-11-16",
+    "evenement": "Smic, bas salaires publics et budget : un peu plus d'un milliard",
+    "resume": "David Amiel chiffre à « un peu plus d'un milliard d'euros » la hausse du Smic et le relèvement des plus bas salaires de la fonction publique, surtout à cause de la fonction publique. 1,35 million d'agents, gain moyen de 350 € bruts par an. Le Smic passe à environ 1 502 € net le 1er décembre, environ 24 € de plus par mois, par décret. Le brut de décembre n'est pas donné : non chiffré. Le budget 2027, rejeté par l'Assemblée, est examiné au Sénat à partir du 20 novembre. Le modèle ajoute 1 Md€/an de dépense, sans découper le total.",
+    "propositions": ["Smic : environ 1 502 € net au 1er décembre, par décret", "Fonction publique : 1,35 million d'agents, +350 € bruts par an", "Coût d'ensemble : un peu plus d'un milliard, retenu à 1 Md€ dans le modèle", "Budget 2027 au Sénat le 20 novembre"],
+    "source": "France 24, 15 novembre 2026, citant David Amiel.",
+    "biais": { "popularite": 0.3 },
+    "effet": { "depMission": { "autres": 1 }, "tensionSociale": -1 },
+    "important": true
+  },
+  {
+    "id": "smic-decret-2026-12-01",
+    "date": "2026-12-01",
+    "evenement": "Le Smic passe à environ 1 502 € net",
+    "resume": "Le décret annoncé prend effet. Le net est d'environ 1 502 €, soit environ 24 € de plus par mois. Le brut de décembre n'est pas dans la source du 15 novembre : le jeu ne le change pas. Le brut de départ reste 1 867,02 €, celui du 1er juin.",
+    "propositions": ["Net annoncé : environ 1 502 €", "Brut de décembre : non chiffré"],
+    "source": "France 24, 15 novembre 2026.",
+    "biais": {},
+    "smicNet": 1502
   },
   {
     "id": "convention-finances-2026-11-27",
@@ -346,7 +404,7 @@
     "id": "lfi-budget-2026-10-14",
     "date": "2026-10-14",
     "evenement": "Contre-budget LFI : 106,4 Md€ de recettes, 81,7 Md€ de dépenses",
-    "resume": "Éric Coquere et le candidat présentent un budget rectificatif d'arrivée. Ils affichent 25 Md€ de réduction du déficit la première année. Challenges relève le pari de lever cette recette sans casser l'activité, et un avis réservé du Conseil d'État sur la taxe Zucman.",
+    "resume": "Éric Coquerel et le candidat présentent un budget rectificatif d'arrivée. Ils affichent 25 Md€ de réduction du déficit la première année. Challenges relève le pari de lever cette recette sans casser l'activité, et un avis réservé du Conseil d'État sur la taxe Zucman.",
     "propositions": ["ISF climatique : 10 Md€ selon LFI", "Fin de la flat tax : 9 Md€ selon LFI", "Taxe Zucman au-delà de 100 M€ : 15 Md€ selon LFI", "Retour à 62 ans : 9 Md€ selon LFI"],
     "source": "Public Sénat et BFM, 14 octobre 2026 ; Challenges, novembre 2026.",
     "biais": { "LFI": 0.4, "popularite": -0.3 }
@@ -355,7 +413,7 @@
     "id": "rn-retraites-2026-06-12",
     "date": "2026-06-12",
     "evenement": "Le Pe et Bardell divergent sur l'âge de la retraite",
-    "resume": "Marine Le Pe dit sur RTL que le retour de l'âge légal reste d'actualité. Jordan Bardell répond que l'âge « ne veut rien dire » et met en avant la durée de cotisation. Louis Alio indique que, s'il était candidat, Bardell aurait son propre programme.",
+    "resume": "Marine Le Pe dit sur RTL que le retour de l'âge légal reste d'actualité. Jordan Bardell répond que l'âge « ne veut rien dire » et met en avant la durée de cotisation. Louis Aliot indique que, s'il était candidat, Bardell aurait son propre programme.",
     "propositions": ["Le Pe : âge légal vers 62 ans, 60 ans pour les carrières longues", "Bardell : durée de cotisation plutôt qu'âge couperet"],
     "source": "Public Sénat, 12 juin 2026, repris par les synthèses de programme RN.",
     "biais": { "RN": -0.4 }
