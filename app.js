@@ -106,14 +106,24 @@ function syncCalendrier() {
   S.tri = Math.floor((+S.date.slice(5, 7) - 1) / 3) + 1;
 }
 
+let actuChargee = null;
+function chargerActu() {
+  if (typeof fetch !== "function") return;
+  const url = (typeof location !== "undefined" && location.href) ? new URL("data/actu.json", location.href).href : "data/actu.json";
+  fetch(url).then(r => r.ok ? r.json() : []).then(j => {
+    actuChargee = Array.isArray(j) ? j : [];
+    if (S) integrerActu(actuChargee);
+  }).catch(() => {});
+}
 function nouvelle(perso) {
+  const actuInit = actuChargee || [];
   S = {
     date: DEBUT, annee: D.debut.annee, tri: D.debut.trimestre, tour: 0,
     e: { ...D.eco }, taux: { ...D.taux }, dep: { ...D.depenses }, rec: { ...D.recettes },
     ret: { ...(D.retraites || { ageLegal: 64, ratioCotRet: 1.5, deficitMd: 0, pensionMoy: 0 }) }, smic: (D.smic && D.smic.brutMensuel) || 0, smicNet: (D.smic && D.smic.netMensuel) || 0,
     contraintes: D.contraintes ? JSON.parse(JSON.stringify(D.contraintes)) : null, texteHostile: null, paysId: D.id || "fr",
     effets: [], journal: [], news: [], recap: null,
-    biaisSondages: {}, programmesAppliques: [], actu: (S && S.actu) || [], actuAppliquee: {},
+    biaisSondages: {}, programmesAppliques: [], actu: actuInit, actuAppliquee: {},
     hist: { pib: [], chomage: [], inflation: [], dette: [], oat: [], deficit: [], pop: [] },
     n493: 0, greve: 0, soutien: D.politique.soutienBase, bce: 2.0,
     fini: false, elu: null, draft: null, flexUE: 0, bouclier: false,
@@ -1438,10 +1448,14 @@ function appliquerActuJusqua(sac) {
   }
 }
 function integrerActu(items) {
+  actuChargee = items || [];
   if (!S) return;
-  S.actu = items || [];
+  S.actu = actuChargee;
   appliquerActuJusqua();
-  if (isBrowser && view === "actu") render();
+  if (isBrowser) {
+    majFlash();
+    if (view === "actu" || view === "dash") render();
+  }
 }
 function appliquerProgramme(id) {
   const m = programmesPays().flatMap(p => (p.mesures || []).map(x => ({ ...x, parti: p.parti, candidat: p.candidat }))).find(x => x.id === id);
@@ -1783,7 +1797,7 @@ function lier() {
   }
   binderPartage();
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
-  if (S && typeof fetch === "function") fetch("data/actu.json").then(r => r.ok ? r.json() : []).then(j => integrerActu(j)).catch(() => {});
+  chargerActu();
   render();
 }
 const SIM = { nouvelle, avancer, voter, draftInit, deciderBouclier, resoudreSpecial, appliquerRupture, appliquerProgramme, integrerActu, choisirPrimaire, actionMeeting, actionAlliance, actionInvestiture, photo, fmtDate, addDays, addMonths, etat: () => S, idsPays };
