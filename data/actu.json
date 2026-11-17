@@ -390,6 +390,64 @@
     "smicNet": 1502
   },
   {
+    "id": "rn-retraites-presentees-2026-11-17",
+    "date": "2026-11-17",
+    "evenement": "Le RN présente sa réforme des retraites : une quinzaine de milliards",
+    "resume": "Le Pe, Bardell et Jean-Philippe Tanguy la présentent le 17 novembre. Retour à 62 ans avec 42 annuités. Départ à 60 ans avec 40 annuités pour qui a commencé avant 20 ans. Capitalisation obligatoire : un cadre du RN dit que l'influence d'Éric Ciotti a compté. Un député du RN parle d'une quinzaine de milliards d'euros, compensés par plus de volume de travail. Ce n'est pas un audit. Une loi ou une LFSS suffit, mais il faut 289 voix. La capitalisation obligatoire fait payer deux fois la génération de transition. Tanguy et Ciotti gardent leur nom : ils ne sont pas les candidats.",
+    "propositions": ["62 ans et 42 annuités", "60 ans et 40 annuités si début avant 20 ans", "Capitalisation obligatoire", "Coût annoncé : une quinzaine de milliards, pas un audit"],
+    "source": "franceinfo, 17 novembre 2026.",
+    "biais": { "RN": 0.3 },
+    "important": true
+  },
+  {
+    "id": "debat-restos-2026-11-16",
+    "date": "2026-11-16",
+    "evenement": "Débat TF1/LCI aux Restos du Cœur, sans Philipp",
+    "resume": "Le 16 novembre, à Rungis, Mélencho, Le Pe, Glucksman, Retaillea et Atta débattent. Philipp est absent, retenu au Havre. Mélencho : état d'urgence sociale pour bloquer les marges, cantine bio gratuite, 1 337 € par mois pour les étudiants en licence professionnelle et en apprentissage, taxe de 100 % sur les héritages au-delà de 12 M€, réquisition des logements vides. Le rendement de la taxe n'est pas publié : on ne dit pas qu'il paie l'allocation. Le Pe : TVA à 0 % sur l'alimentation et l'hygiène, TVA à 5,5 % sur les carburants, le fioul, l'électricité et le gaz, priorité nationale pour le logement social. Atta : supprimer la CSG. Retaillea : allègement massif des charges, moins de normes, contre le blocage des prix. Glucksman : taxer plus les très hauts revenus et les grandes entreprises. Les coûts absents des articles restent non chiffrés.",
+    "propositions": ["Mélencho : urgence sociale, 1 337 €, taxe à 100 % au-delà de 12 M€", "Le Pe : TVA 0 % et 5,5 %, priorité nationale", "Atta : fin de la CSG, infaisable sans ressource de remplacement", "Retaillea et Glucksman : pas de nouveau montant"],
+    "source": "France 24 et L'Internaute, 16 novembre 2026.",
+    "biais": { "LFI": 0.2, "RN": 0.2 }
+  },
+  {
+    "id": "bardella-gg-2026-11-16",
+    "date": "2026-11-16",
+    "evenement": "Bardell aux Grandes Gueules : Le Pe présumée innocente",
+    "resume": "Bardell dit que Le Pe est présumée innocente et que le RN est extrêmement confiant sur le dossier devant la Cour de cassation. Il espère qu'elle sera présidente. S'il a la charge de servir comme chef du gouvernement, il dit qu'il le fera. Rien n'est tranché par la Cour.",
+    "propositions": ["Présomption d'innocence", "Confiance affichée sur la Cour de cassation", "Bardell se voit chef du gouvernement si Le Pe est élue"],
+    "source": "RMC, Les Grandes Gueules, 16 novembre 2026.",
+    "biais": { "RN": 0.2 }
+  },
+  {
+    "id": "senat-desindexation-2026-11-16",
+    "date": "2026-11-17",
+    "evenement": "Le Sénat rejette la désindexation des pensions, environ 4 Md€",
+    "resume": "Le 16 novembre, le Sénat supprime à l'unanimité la désindexation des pensions supérieures à 1 260 €. franceinfo parle d'une mesure susceptible de rapporter environ 4 Md€. Marie-Do Aeschlimann dit que cette suppression sera compensée dans l'examen plus large du budget. Le même jour, les sénateurs rétablissent de façon symbolique les 64 ans de la réforme de 2023, contre l'avis du gouvernement. Ils suppriment aussi la réforme de la majoration pour trois enfants. Sur un PLFSS, l'Assemblée a le dernier mot. Le modèle ajoute 4 Md€/an de dépenses de retraites : c'est l'économie retirée du texte du gouvernement, pas une hausse des pensions déjà versées par rapport au droit en vigueur.",
+    "propositions": ["Désindexation rejetée à l'unanimité, environ 4 Md€", "64 ans rétablis symboliquement, gouvernement opposé", "Réforme de la majoration pour 3 enfants supprimée", "L'Assemblée tranche en dernier"],
+    "source": "franceinfo et Public Sénat, 17 novembre 2026.",
+    "biais": {},
+    "effet": { "depMission": { "retraites": 4 }, "confianceMarches": -1 },
+    "cleUnique": "plfss-desindex-2027",
+    "important": true
+  },
+  {
+    "id": "directeurs-larcher-2026-11-17",
+    "date": "2026-11-17",
+    "evenement": "Directeurs de campagne autour de Gérard Larcher, sans Philipp",
+    "resume": "Les directeurs de campagne d'Atta, Retaillea et Lisnar se réunissent le 17 novembre. Gérard Larcher a proposé la table. L'équipe de Philipp n'y va pas : il accepte une réunion sur le rassemblement, pas sur la primaire. Aucun résultat de cette réunion n'est dans les sources lues le matin du 17. Dominique de Villepin est testé dans deux des cinq derniers sondages suivis par Civiqo, sans moyenne publiée. Il n'est pas ajouté comme candidat déclaré.",
+    "propositions": ["Réunion prévue, sans accord publié", "Villepin non déclaré"],
+    "source": "France 24, 15 novembre 2026, sur la réunion du 17 ; Civiqo, moyenne au 13 novembre 2026.",
+    "biais": {}
+  },
+  {
+    "id": "sondages-civiqo-2026-11-13",
+    "date": "2026-11-17",
+    "evenement": "Sondages : moyenne Civiqo des cinq derniers, pas une prévision",
+    "resume": "Civiqo, moyenne des cinq derniers sondages pris en compte jusqu'au 13 novembre : Le Pe 31,4 % (les cinq vont de 27 à 34), Mélencho 17,6 % (de 16 à 19), Philipp 10,5 % (dernier Elabe : 9,5), Glucksman 10,1 % (dernier : 10,5), Lisnar 8,8 % (dernier : 8). Ce n'est pas une prévision. Le bulletin du modèle reste Bardell pour le RN.",
+    "propositions": ["Moyennes publiées, pas les fourchettes arrondies", "Pas de valeur prédictive"],
+    "source": "Civiqo, page sondages présidentielle 2027, consultée le 17 novembre 2026.",
+    "biais": {}
+  },
+  {
     "id": "convention-finances-2026-11-27",
     "date": "2026-11-27",
     "evenement": "Convention citoyenne sur les finances publiques",
